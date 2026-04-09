@@ -11,24 +11,25 @@ export default async function DashboardPage() {
     user = { id: '2388e5b4-adbf-4be8-922d-219254d70b0a' } as any;
   }
 
+  const userId = (user as any).id;
+
   const { data: profile } = await supabase
     .from("profiles")
     .select("protein_target_g, current_weight_kg")
-    .eq("id", user.id)
+    .eq("id", userId)
     .single();
 
-  // Today's food logs
   const today = new Date().toISOString().split("T")[0];
   const { data: foodLogs } = await supabase
     .from("food_logs")
     .select("*")
-    .eq("user_id", user.id)
+    .eq("user_id", userId)
     .eq("log_date", today)
     .order("logged_at", { ascending: true });
 
   return (
     <DashboardClient
-      userId={user.id}
+      userId={userId}
       proteinGoalG={profile?.protein_target_g ?? 120}
       initialLogs={foodLogs ?? []}
     />
