@@ -4,14 +4,13 @@ import { DashboardClient } from "./DashboardClient";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
-  let { data: { user } } = await supabase.auth.getUser();
-  
-  // TEMPORARY BYPASS FOR TESTING
+  const { data: { user } } = await supabase.auth.getUser();
+
   if (!user) {
-    user = { id: '2388e5b4-adbf-4be8-922d-219254d70b0a' } as any;
+    return redirect("/login");
   }
 
-  const userId = (user as any).id;
+  const userId = user.id;
 
   const { data: profile } = await supabase
     .from("profiles")
