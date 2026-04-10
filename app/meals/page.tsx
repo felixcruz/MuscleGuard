@@ -15,7 +15,7 @@ export default async function MealsPage() {
   const [profileResult, logsResult] = await Promise.all([
     supabase
       .from("profiles")
-      .select("protein_target_g, dietary_prefs")
+      .select("protein_goal_g, dietary_prefs")
       .eq("id", user.id)
       .single(),
     supabase
@@ -25,7 +25,7 @@ export default async function MealsPage() {
       .eq("log_date", today),
   ]);
 
-  const proteinGoal = profileResult.data?.protein_target_g ?? 120;
+  const proteinGoal = profileResult.data?.protein_goal_g ?? 120;
   const loggedG = (logsResult.data ?? []).reduce(
     (sum, l) => sum + Number(l.protein_g),
     0

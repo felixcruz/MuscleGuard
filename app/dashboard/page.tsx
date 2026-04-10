@@ -14,7 +14,7 @@ export default async function DashboardPage() {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("protein_target_g, current_weight_kg")
+    .select("protein_goal_g, weight_kg")
     .eq("id", userId)
     .single();
 
@@ -29,7 +29,7 @@ export default async function DashboardPage() {
   return (
     <DashboardClient
       userId={userId}
-      proteinGoalG={profile?.protein_target_g ?? 120}
+      proteinGoalG={profile?.protein_goal_g ?? 120}
       initialLogs={foodLogs ?? []}
     />
   );
