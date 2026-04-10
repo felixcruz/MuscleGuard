@@ -2,30 +2,52 @@ import { createClient } from "@/lib/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
-  const { searchParams, origin } = new URL(request.url);
+  const { searchParams } = new URL(request.url);
   const code = searchParams.get("code");
-  const next = searchParams.get("next") ?? "/dashboard";
+  const error = searchParams.get("error");
+  const error_description = searchParams.get("error_description");
 
-  if (code) {
-    const supabase = await createClient();
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
-    if (!error) {
-      // Check if onboarding is done
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("onboarding_done")
-          .eq("id", user.id)
-          .single();
-
-        if (!profile?.onboarding_done) {
-          return NextResponse.redirect(`${origin}/onboarding`);
-        }
-      }
-      return NextResponse.redirect(`${origin}${next}`);
-    }
+  // Handle error from Supabase
+  if (error) {
+    console.error("Auth error:", error_description);
+    return NextResponse.redirect(
+      new URL(`/login?error=${encodeURIComponent(error_description || error)}`, request.url)
+    );
   }
 
-  return NextResponse.redirect(`${origin}/login?error=auth`);
+  // If no code, redirect to login
+  if (!code) {
+    return NextResponse.redirect(new URL("/login?error=No authorization code", request.url));
+  }
+
+  try {
+    const supabase = createClient();
+
+    // Exchange code for session
+    const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+
+    if (exchangeError) {
+      console.error("Exchange error:", exchangeError.message);
+      return NextResponse.redirect(
+        new URL(`/login?error=${encodeURIComponent(exchangeError.message)}`, request.url)
+      );
+    }
+
+    // Get the user to verify authentication
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+
+    if (userError || !user) {
+      console.error("User fetch error:", userError?.message);
+      return NextResponse.redirect(new URL("/login?error=Failed to verify user", request.url));
+    }
+
+    // Redirect to dashboard on successful auth
+    return NextResponse.redirect(new URL("/dashboard", request.url));
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Authentication failed";
+    console.error("Callback error:", message);
+    return NextResponse.redirect(
+      new URL(`/login?error=${encodeURIComponent(message)}`, request.url)
+    );
+  }
 }

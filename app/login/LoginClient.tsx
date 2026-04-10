@@ -29,9 +29,10 @@ export default function LoginPage() {
     }
 
     try {
+      const appUrl = process.env.NEXT_PUBLIC_APP_URL || window.location.origin;
       const { error: authError } = await supabase.auth.signInWithOtp({
         email,
-        options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
+        options: { emailRedirectTo: `${appUrl}/auth/callback` },
       });
       if (authError) throw authError;
       setSent(true);
@@ -46,9 +47,10 @@ export default function LoginPage() {
   async function handleGoogle() {
     setError(null);
     try {
+      const appUrl = process.env.NEXT_PUBLIC_APP_URL || window.location.origin;
       const { error: authError } = await supabase.auth.signInWithOAuth({
         provider: "google",
-        options: { redirectTo: `${window.location.origin}/auth/callback` },
+        options: { redirectTo: `${appUrl}/auth/callback` },
       });
       if (authError) throw authError;
     } catch (err) {
