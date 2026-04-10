@@ -31,6 +31,11 @@ export async function updateSession(request: NextRequest) {
 
   const { pathname } = request.nextUrl;
 
+  // Skip middleware checks for auth callback
+  if (pathname === "/auth/callback") {
+    return supabaseResponse;
+  }
+
   // Protected routes: redirect to login if not authenticated
   const protectedPaths = [
     "/dashboard",

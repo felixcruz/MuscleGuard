@@ -42,7 +42,10 @@ export async function GET(request: NextRequest) {
     }
 
     // Redirect to dashboard on successful auth
-    return NextResponse.redirect(new URL("/dashboard", request.url));
+    const dashboardUrl = new URL(request.nextUrl);
+    dashboardUrl.pathname = "/dashboard";
+    dashboardUrl.searchParams.delete("code");
+    return NextResponse.redirect(dashboardUrl);
   } catch (err) {
     const message = err instanceof Error ? err.message : "Authentication failed";
     console.error("Callback error:", message);
