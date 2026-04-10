@@ -41,12 +41,17 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const { proteinRemainingG, dietaryPrefs } = validation.data!;
+  const { proteinRemainingG, dietaryPrefs, ingredients } = validation.data!;
 
   const prefsText =
     dietaryPrefs?.length > 0
       ? `Dietary requirements: ${dietaryPrefs.join(", ")}.`
       : "No dietary restrictions.";
+
+  const ingredientsText =
+    ingredients && ingredients.length > 0
+      ? `Use these available ingredients (prioritize them, but you can add simple pantry staples): ${ingredients.join(", ")}.`
+      : "";
 
   const message = await getAnthropic().messages.create({
     model: MEAL_MODEL,
@@ -58,7 +63,7 @@ Always return valid JSON only — no markdown, no extra text.`,
     messages: [
       {
         role: "user",
-        content: `Generate 4 high-protein meal ideas for someone who needs ${proteinRemainingG}g more protein today. ${prefsText}
+        content: `Generate 4 high-protein meal ideas for someone who needs ${proteinRemainingG}g more protein today. ${prefsText} ${ingredientsText}
 Return a JSON array with this exact structure:
 [
   {

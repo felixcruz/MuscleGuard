@@ -10,7 +10,7 @@ export interface ValidationError {
 
 export function validateMealGenerationRequest(data: unknown): {
   valid: boolean;
-  data?: { proteinRemainingG: number; dietaryPrefs: string[] };
+  data?: { proteinRemainingG: number; dietaryPrefs: string[]; ingredients?: string[] };
   errors?: ValidationError[];
 } {
   const errors: ValidationError[] = [];
@@ -55,6 +55,20 @@ export function validateMealGenerationRequest(data: unknown): {
     });
   }
 
+  // Validate optional ingredients
+  let ingredients: string[] | undefined;
+  if (obj.ingredients !== undefined) {
+    if (!Array.isArray(obj.ingredients)) {
+      errors.push({ field: "ingredients", message: "Must be an array" });
+    } else if (obj.ingredients.length > 20) {
+      errors.push({ field: "ingredients", message: "Maximum 20 ingredients allowed" });
+    } else if (!obj.ingredients.every((i) => typeof i === "string")) {
+      errors.push({ field: "ingredients", message: "All items must be strings" });
+    } else {
+      ingredients = obj.ingredients as string[];
+    }
+  }
+
   if (errors.length > 0) {
     return { valid: false, errors };
   }
@@ -64,6 +78,7 @@ export function validateMealGenerationRequest(data: unknown): {
     data: {
       proteinRemainingG: obj.proteinRemainingG as number,
       dietaryPrefs: obj.dietaryPrefs as string[],
+      ingredients,
     },
   };
 }

@@ -3,7 +3,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Clock, Dumbbell, Flame, Plus } from "lucide-react";
+import { Check, Clock, Dumbbell, Flame, Plus } from "lucide-react";
 
 export interface Meal {
   name: string;
@@ -19,9 +19,10 @@ interface Props {
   meal: Meal;
   onLog: (meal: Meal) => void;
   logging?: boolean;
+  logged?: boolean;
 }
 
-export function MealCard({ meal, onLog, logging }: Props) {
+export function MealCard({ meal, onLog, logging, logged }: Props) {
   return (
     <Card>
       <CardContent className="pt-5 pb-4 space-y-3">
@@ -55,15 +56,22 @@ export function MealCard({ meal, onLog, logging }: Props) {
 
         <p className="text-sm text-gray-600 italic">{meal.instructions}</p>
 
-        <Button
-          size="sm"
-          onClick={() => onLog(meal)}
-          disabled={logging}
-          className="w-full"
-        >
-          <Plus className="h-4 w-4 mr-1" />
-          {logging ? "Logging…" : "Log this meal"}
-        </Button>
+        {logged ? (
+          <div className="flex items-center justify-center gap-2 w-full py-2 px-4 rounded-md bg-green-50 border border-green-200 text-green-700 text-sm font-medium">
+            <Check className="h-4 w-4" />
+            Logged!
+          </div>
+        ) : (
+          <Button
+            size="sm"
+            onClick={() => onLog(meal)}
+            disabled={logging}
+            className="w-full"
+          >
+            <Plus className="h-4 w-4 mr-1" />
+            {logging ? "Logging…" : "Log this meal"}
+          </Button>
+        )}
       </CardContent>
     </Card>
   );

@@ -34,7 +34,8 @@ export default async function MealsPage() {
   return (
     <MealsClient
       userId={user.id}
-      proteinRemainingG={Math.max(0, proteinGoal - loggedG)}
+      proteinGoalG={proteinGoal}
+      proteinLoggedG={loggedG}
       dietaryPrefs={profileResult.data?.dietary_prefs ?? []}
     />
   );
