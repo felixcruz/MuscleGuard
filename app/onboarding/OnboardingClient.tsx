@@ -59,7 +59,15 @@ export default function OnboardingPage() {
       updated_at: new Date().toISOString(),
     });
 
-    router.push("/dashboard");
+    // Redirect to Stripe Checkout to collect card for the 7-day trial
+    const res = await fetch("/api/stripe/checkout", { method: "POST" });
+    const data = await res.json();
+    if (data.url) {
+      window.location.href = data.url;
+    } else {
+      // Stripe unavailable — go to dashboard, user can upgrade from settings
+      router.push("/dashboard");
+    }
   }
 
   const weightKgNum = parseFloat(form.weightKg) || 0;

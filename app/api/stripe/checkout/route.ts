@@ -56,10 +56,11 @@ export async function POST() {
           quantity: 1,
         },
       ],
-      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?success=1`,
-      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/settings`,
+      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?trial_started=1`,
+      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/onboarding`,
       metadata: { supabase_uid: user.id },
       subscription_data: {
+        trial_period_days: 7,
         metadata: { supabase_uid: user.id },
       },
     });

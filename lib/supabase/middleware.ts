@@ -53,6 +53,22 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
+  // Subscription gating: block expired/cancelled accounts (except on /settings and /onboarding)
+  if (user && isProtected && pathname !== "/settings" && pathname !== "/onboarding") {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("subscription_status")
+      .eq("id", user.id)
+      .single();
+
+    const blockedStatuses = ["past_due", "cancelled"];
+    if (profile && blockedStatuses.includes(profile.subscription_status)) {
+      const settingsUrl = request.nextUrl.clone();
+      settingsUrl.pathname = "/settings";
+      return NextResponse.redirect(settingsUrl);
+    }
+  }
+
   // Redirect authenticated users away from login
   if (pathname === "/login" && user) {
     const dashboardUrl = request.nextUrl.clone();

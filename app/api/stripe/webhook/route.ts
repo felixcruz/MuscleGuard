@@ -26,13 +26,37 @@ export async function POST(request: NextRequest) {
 
   switch (event.type) {
     case "checkout.session.completed": {
+      // Card is on file. If trial, status = "trialing"; if no trial, status = "active".
       const session = event.data.object as Stripe.Checkout.Session;
       const uid = session.metadata?.supabase_uid;
       if (uid && session.subscription) {
+        const sub = await getStripe().subscriptions.retrieve(session.subscription as string);
+        const status = sub.status === "trialing" ? "trialing" : "active";
         await supabase.from("profiles").update({
-          subscription_status: "active",
+          subscription_status: status,
           stripe_subscription_id: session.subscription as string,
         }).eq("id", uid);
+      }
+      break;
+    }
+    case "customer.subscription.updated": {
+      // Fires when trial ends (trialing → active or past_due) and on other state changes.
+      const sub = event.data.object as Stripe.Subscription;
+      const uid = sub.metadata?.supabase_uid;
+      if (uid) {
+        const statusMap: Record<string, string> = {
+          active: "active",
+          trialing: "trialing",
+          past_due: "past_due",
+          canceled: "cancelled",
+          unpaid: "past_due",
+        };
+        const status = statusMap[sub.status];
+        if (status) {
+          await supabase.from("profiles")
+            .update({ subscription_status: status })
+            .eq("id", uid);
+        }
       }
       break;
     }
