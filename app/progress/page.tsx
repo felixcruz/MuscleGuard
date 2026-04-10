@@ -4,11 +4,12 @@ import { ProgressClient } from "./ProgressClient";
 
 export default async function ProgressPage() {
   const supabase = await createClient();
-  let { data: { user } } = await supabase.auth.getUser();
-  // TEMPORARY BYPASS FOR TESTING
-if (!user) {
-  user = { id: '2388e5b4-adbf-4be8-922d-219254d70b0a' } as any;
-}
+  const { data: { user } } = await supabase.auth.getUser();
+
+  // Protected by middleware - user should always exist
+  if (!user) {
+    return redirect("/login");
+  }
 
   const { data: measurements } = await supabase
     .from("body_measurements")

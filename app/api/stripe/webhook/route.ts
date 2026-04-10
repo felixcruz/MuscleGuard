@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
     case "checkout.session.completed": {
       const session = event.data.object as Stripe.Checkout.Session;
       const uid = session.metadata?.supabase_uid;
-      if (uid) {
+      if (uid && session.subscription) {
         await supabase.from("profiles").update({
           subscription_status: "active",
           stripe_subscription_id: session.subscription as string,

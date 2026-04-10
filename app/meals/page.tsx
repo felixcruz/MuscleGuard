@@ -4,11 +4,11 @@ import { MealsClient } from "./MealsClient";
 
 export default async function MealsPage() {
   const supabase = await createClient();
-  let { data: { user } } = await supabase.auth.getUser();
-  
-  // TEMPORARY BYPASS FOR TESTING
+  const { data: { user } } = await supabase.auth.getUser();
+
+  // Protected by middleware - user should always exist
   if (!user) {
-    user = { id: '2388e5b4-adbf-4be8-922d-219254d70b0a' } as any;
+    return redirect("/login");
   }
 
   const today = new Date().toISOString().split("T")[0];

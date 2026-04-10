@@ -16,19 +16,32 @@ export function MealsClient({ userId, proteinRemainingG, dietaryPrefs }: Props) 
   const [meals, setMeals] = useState<Meal[]>([]);
   const [generating, setGenerating] = useState(false);
   const [loggingId, setLoggingId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  // NOTE: createClient() is memoized in Supabase SSR, so this is already optimized
   const supabase = createClient();
 
   async function handleGenerate() {
     setGenerating(true);
     setMeals([]);
+    setError(null);
     try {
       const res = await fetch("/api/generate-meals", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ proteinRemainingG, dietaryPrefs }),
       });
+
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.error || `API error: ${res.status}`);
+      }
+
       const data = await res.json();
       setMeals(data.meals ?? []);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to generate meals";
+      setError(message);
+      setMeals([]);
     } finally {
       setGenerating(false);
     }
@@ -36,14 +49,22 @@ export function MealsClient({ userId, proteinRemainingG, dietaryPrefs }: Props) 
 
   async function handleLogMeal(meal: Meal) {
     setLoggingId(meal.name);
-    await supabase.from("food_logs").insert({
-      user_id: userId,
-      food_name: meal.name,
-      protein_g: meal.protein_g,
-      calories: meal.calories,
-      portion_g: meal.portion_g,
-    });
-    setLoggingId(null);
+    try {
+      const { error: dbError } = await supabase.from("food_logs").insert({
+        user_id: userId,
+        food_name: meal.name,
+        protein_g: meal.protein_g,
+        calories: meal.calories,
+        portion_g: meal.portion_g,
+      });
+
+      if (dbError) throw dbError;
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to log meal";
+      setError(message);
+    } finally {
+      setLoggingId(null);
+    }
   }
 
   return (
@@ -67,6 +88,12 @@ export function MealsClient({ userId, proteinRemainingG, dietaryPrefs }: Props) 
         {generating ? "Generating your meals…" : "Generate today's meal ideas"}
       </Button>
 
+      {error && (
+        <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+          {error}
+        </div>
+      )}
+
       {generating && (
         <div className="space-y-3">
           {[1, 2, 3, 4].map((i) => (
@@ -77,9 +104,9 @@ export function MealsClient({ userId, proteinRemainingG, dietaryPrefs }: Props) 
 
       {meals.length > 0 && (
         <div className="space-y-4">
-          {meals.map((meal) => (
+          {meals.map((meal, index) => (
             <MealCard
-              key={meal.name}
+              key={`${index}-${meal.name}`}
               meal={meal}
               onLog={handleLogMeal}
               logging={loggingId === meal.name}

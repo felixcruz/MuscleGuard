@@ -23,6 +23,7 @@ interface Props {
 
 export function DashboardClient({ userId, proteinGoalG, initialLogs }: Props) {
   const [logs, setLogs] = useState<FoodLogEntry[]>(initialLogs);
+  // NOTE: createClient() is memoized in Supabase SSR, so this is already optimized
   const supabase = createClient();
 
   const totalProtein = logs.reduce((sum, l) => sum + Number(l.protein_g), 0);

@@ -1,13 +1,47 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getAnthropic, MEAL_MODEL } from "@/lib/anthropic";
+import { validateMealGenerationRequest } from "@/lib/api-validation";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 export async function POST(request: NextRequest) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { proteinRemainingG, dietaryPrefs } = await request.json();
+  // Rate limiting
+  const rateLimit = checkRateLimit(user.id);
+  if (!rateLimit.allowed) {
+    const resetAt = new Date(rateLimit.resetAt).toISOString();
+    return NextResponse.json(
+      {
+        error: "Rate limit exceeded",
+        message: "Too many requests. Please wait before generating more meals.",
+        resetAt,
+      },
+      { status: 429 }
+    );
+  }
+
+  let bodyData: unknown;
+  try {
+    bodyData = await request.json();
+  } catch {
+    return NextResponse.json(
+      { error: "Invalid JSON in request body" },
+      { status: 400 }
+    );
+  }
+
+  const validation = validateMealGenerationRequest(bodyData);
+  if (!validation.valid) {
+    return NextResponse.json(
+      { error: "Validation failed", details: validation.errors },
+      { status: 400 }
+    );
+  }
+
+  const { proteinRemainingG, dietaryPrefs } = validation.data!;
 
   const prefsText =
     dietaryPrefs?.length > 0

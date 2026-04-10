@@ -12,24 +12,49 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const supabase = createClient();
 
   async function handleMagicLink(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
-    await supabase.auth.signInWithOtp({
-      email,
-      options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
-    });
-    setSent(true);
-    setLoading(false);
+    setError(null);
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError("Please enter a valid email address");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const { error: authError } = await supabase.auth.signInWithOtp({
+        email,
+        options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
+      });
+      if (authError) throw authError;
+      setSent(true);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to send magic link";
+      setError(message);
+    } finally {
+      setLoading(false);
+    }
   }
 
   async function handleGoogle() {
-    await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo: `${window.location.origin}/auth/callback` },
-    });
+    setError(null);
+    try {
+      const { error: authError } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: { redirectTo: `${window.location.origin}/auth/callback` },
+      });
+      if (authError) throw authError;
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Google sign-in failed";
+      setError(message);
+    }
   }
 
   return (
@@ -43,6 +68,11 @@ export default function LoginPage() {
           <CardDescription>Your GLP-1 muscle protection coach</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          {error && (
+            <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+              {error}
+            </div>
+          )}
           {sent ? (
             <div className="text-center py-6">
               <p className="text-brand-700 font-medium">Check your email!</p>
