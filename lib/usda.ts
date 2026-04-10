@@ -1,4 +1,5 @@
 const USDA_BASE = "https://api.nal.usda.gov/fdc/v1";
+const API_KEY = process.env.USDA_API_KEY ?? "DEMO_KEY";
 
 export interface USDAFood {
   fdcId: number;
@@ -8,7 +9,7 @@ export interface USDAFood {
 }
 
 export async function searchFoods(query: string): Promise<USDAFood[]> {
-  const url = `${USDA_BASE}/foods/search?query=${encodeURIComponent(query)}&dataType=SR%20Legacy,Foundation&pageSize=10`;
+  const url = `${USDA_BASE}/foods/search?query=${encodeURIComponent(query)}&dataType=SR%20Legacy,Foundation&pageSize=15&api_key=${API_KEY}`;
 
   const res = await fetch(url, { next: { revalidate: 86400 } });
   if (!res.ok) return [];
