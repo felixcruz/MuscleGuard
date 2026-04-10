@@ -29,7 +29,20 @@ export default function LoginPage() {
     }
 
     try {
-      const appUrl = process.env.NEXT_PUBLIC_APP_URL || window.location.origin;
+      // Use configured APP_URL (set in environment variables).
+      // If running on Vercel, this will always be https://muscle-guard.vercel.app
+      // If not set, fall back to current browser origin for local development.
+      let appUrl = process.env.NEXT_PUBLIC_APP_URL;
+
+      if (!appUrl && typeof window !== 'undefined') {
+        // Only use window.location.origin if NEXT_PUBLIC_APP_URL is not set
+        appUrl = window.location.origin;
+      }
+
+      if (!appUrl) {
+        throw new Error('Application URL is not configured');
+      }
+
       const { error: authError } = await supabase.auth.signInWithOtp({
         email,
         options: { emailRedirectTo: `${appUrl}/auth/callback` },
@@ -47,7 +60,18 @@ export default function LoginPage() {
   async function handleGoogle() {
     setError(null);
     try {
-      const appUrl = process.env.NEXT_PUBLIC_APP_URL || window.location.origin;
+      // Use configured APP_URL (set in environment variables).
+      let appUrl = process.env.NEXT_PUBLIC_APP_URL;
+
+      if (!appUrl && typeof window !== 'undefined') {
+        // Only use window.location.origin if NEXT_PUBLIC_APP_URL is not set
+        appUrl = window.location.origin;
+      }
+
+      if (!appUrl) {
+        throw new Error('Application URL is not configured');
+      }
+
       const { error: authError } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: { redirectTo: `${appUrl}/auth/callback` },
