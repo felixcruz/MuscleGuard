@@ -11,36 +11,36 @@ const MEDICATIONS = [
   { value: "semaglutide", label: "Semaglutide (Ozempic / Wegovy)" },
   { value: "tirzepatide", label: "Tirzepatide (Mounjaro / Zepbound)" },
   { value: "liraglutide", label: "Liraglutide (Saxenda / Victoza)" },
-  { value: "other", label: "Otro GLP-1" },
+  { value: "other", label: "Other GLP-1" },
 ];
 
 const DIET_PREFS = [
-  { value: "omnivore", label: "Omnívoro" },
-  { value: "vegetarian", label: "Vegetariano" },
-  { value: "vegan", label: "Vegano" },
-  { value: "gluten_free", label: "Sin gluten" },
-  { value: "lactose_free", label: "Sin lácteos" },
-  { value: "low_sodium", label: "Bajo en sodio" },
+  { value: "omnivore", label: "Omnivore" },
+  { value: "vegetarian", label: "Vegetarian" },
+  { value: "vegan", label: "Vegan" },
+  { value: "gluten_free", label: "Gluten-free" },
+  { value: "lactose_free", label: "Dairy-free" },
+  { value: "low_sodium", label: "Low sodium" },
 ];
 
 const ACTIVITY_LEVELS = [
-  { value: "sedentary", label: "Sedentario", desc: "Trabajo de escritorio, <3,000 pasos/día" },
-  { value: "light", label: "Ligera", desc: "Caminatas regulares, 5,000–8,000 pasos/día" },
-  { value: "moderate", label: "Moderada", desc: "Entrenamiento 2–3 veces/semana" },
-  { value: "intense", label: "Intensa", desc: "Fuerza 4+ veces/semana o deportes" },
+  { value: "sedentary", label: "Sedentary", desc: "Desk job, <3,000 steps/day" },
+  { value: "light", label: "Light", desc: "Regular walks, 5,000–8,000 steps/day" },
+  { value: "moderate", label: "Moderate", desc: "Training 2–3 times/week" },
+  { value: "intense", label: "Intense", desc: "Strength 4+ times/week or sports" },
 ];
 
 const BOWEL_PATTERNS = [
-  { value: "daily", label: "Diario" },
-  { value: "every2to3days", label: "Cada 2–3 días" },
-  { value: "lessThan2xWeek", label: "Menos de 2x/semana" },
+  { value: "daily", label: "Daily" },
+  { value: "every2to3days", label: "Every 2–3 days" },
+  { value: "lessThan2xWeek", label: "Less than 2x/week" },
 ];
 
 const ALCOHOL_OPTIONS = [
-  { value: "none", label: "No consumo" },
-  { value: "occasional", label: "Ocasional" },
+  { value: "none", label: "None" },
+  { value: "occasional", label: "Occasional" },
   { value: "regular", label: "Regular" },
-  { value: "frequent", label: "Frecuente" },
+  { value: "frequent", label: "Frequent" },
 ];
 
 type Form = {
@@ -102,7 +102,7 @@ export default function OnboardingPage() {
 
   function handleNext() {
     if (!canAdvance()) {
-      setFieldError("Por favor, completa todas las preguntas antes de continuar.");
+      setFieldError("Please complete all questions before continuing.");
       return;
     }
     setFieldError(null);
@@ -118,7 +118,7 @@ export default function OnboardingPage() {
 
   async function handleFinish() {
     if (!canAdvance()) {
-      setFieldError("Por favor, completa todas las preguntas antes de continuar.");
+      setFieldError("Please complete all questions before continuing.");
       return;
     }
     setSaving(true);
@@ -182,7 +182,7 @@ export default function OnboardingPage() {
         {!done && (
           <div style={{ marginBottom: 20 }}>
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
-              <span style={{ fontSize: 13, color: "#666" }}>Paso {step} de {TOTAL_STEPS}</span>
+              <span style={{ fontSize: 13, color: "#666" }}>Step {step} of {TOTAL_STEPS}</span>
               <span style={{ fontSize: 13, color: "#666" }}>{progress}%</span>
             </div>
             <div style={{ height: 6, background: "#ddd", borderRadius: 99 }}>
@@ -210,17 +210,17 @@ export default function OnboardingPage() {
             <div style={{ textAlign: "center" }}>
               <div style={{ fontSize: 40, marginBottom: 12 }}>✓</div>
               <h2 style={{ fontSize: 20, fontWeight: 700, color: "#1a1a1a", marginBottom: 8 }}>
-                Evaluación completada
+                Assessment complete
               </h2>
               <p style={{ color: "#666", fontSize: 14, marginBottom: 24 }}>
-                Tu protocolo personalizado de preservación muscular está siendo generado:
+                Your personalized muscle preservation protocol is being generated:
               </p>
               <div style={{ textAlign: "left", display: "flex", flexDirection: "column", gap: 10 }}>
                 {[
-                  "Cálculo de proteína ajustado a tu dosis (1.2–1.6 g/kg)",
-                  "Plan de resistencia para proteger masa magra",
-                  "Estrategia de hidratación y fibra para GLP-1",
-                  "Monitoreo de composición corporal (no solo peso)",
+                  "Protein target adjusted to your dose (1.2–1.6 g/kg)",
+                  "Resistance plan to protect lean mass",
+                  "Hydration and fiber strategy for GLP-1",
+                  "Body composition monitoring (not just weight)",
                 ].map((item) => (
                   <div key={item} style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
                     <span style={{ color: "#2e7d32", fontWeight: 700, marginTop: 1 }}>✓</span>
@@ -228,7 +228,7 @@ export default function OnboardingPage() {
                   </div>
                 ))}
               </div>
-              <p style={{ fontSize: 12, color: "#999", marginTop: 20 }}>Redirigiendo en un momento…</p>
+              <p style={{ fontSize: 12, color: "#999", marginTop: 20 }}>Redirecting in a moment…</p>
             </div>
           )}
 
@@ -236,20 +236,20 @@ export default function OnboardingPage() {
           {!done && step === 1 && (
             <div>
               <h2 style={{ fontSize: 20, fontWeight: 700, color: "#1a1a1a", marginBottom: 4 }}>
-                Tu medicación GLP-1
+                Your GLP-1 medication
               </h2>
               <p style={{ fontSize: 14, color: "#666", marginBottom: 20 }}>
-                Esta información nos permite ajustar tu protocolo de preservación muscular.
+                This helps us tailor your muscle preservation protocol.
               </p>
 
               <div style={{ background: "#e3f2fd", border: "1px solid #2196f3", borderRadius: 8, padding: "12px 14px", marginBottom: 20 }}>
                 <p style={{ fontSize: 13, color: "#1565c0", margin: 0 }}>
-                  <strong>MuscleGuard</strong> no es un servicio médico. Esta app complementa — no reemplaza — la supervisión de tu médico.
+                  <strong>MuscleGuard</strong> is not a medical service. This app complements — does not replace — your doctor&apos;s supervision.
                 </p>
               </div>
 
               <label style={{ fontSize: 13, fontWeight: 600, color: "#1a1a1a", display: "block", marginBottom: 8 }}>
-                ¿Qué medicamento usas?
+                Which medication are you taking?
               </label>
               <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 20 }}>
                 {MEDICATIONS.map((med) => (
@@ -270,10 +270,10 @@ export default function OnboardingPage() {
               </div>
 
               <label style={{ fontSize: 13, fontWeight: 600, color: "#1a1a1a", display: "block", marginBottom: 8 }}>
-                ¿Tienes historial personal o familiar de cáncer de tiroides o síndrome MEN-2?
+                Do you have a personal or family history of thyroid cancer or MEN-2 syndrome?
               </label>
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                {[{ value: "no", label: "No" }, { value: "yes", label: "Sí" }].map((opt) => (
+                {[{ value: "no", label: "No" }, { value: "yes", label: "Yes" }].map((opt) => (
                   <button
                     key={opt.value}
                     type="button"
@@ -293,10 +293,10 @@ export default function OnboardingPage() {
               {form.thyroid === "yes" && (
                 <div style={{ background: "#ffebee", border: "1px solid #f44336", borderRadius: 8, padding: "12px 14px", marginTop: 16 }}>
                   <p style={{ fontSize: 13, color: "#c62828", margin: 0, fontWeight: 600 }}>
-                    ⚠ MuscleGuard no puede ser utilizado con historial de cáncer de tiroides o MEN-2.
+                    ⚠ MuscleGuard cannot be used with a history of thyroid cancer or MEN-2.
                   </p>
                   <p style={{ fontSize: 13, color: "#c62828", margin: "6px 0 0" }}>
-                    Los GLP-1 están contraindicados en estas condiciones. Consulta a tu médico antes de continuar.
+                    GLP-1 medications are contraindicated in these conditions. Please consult your doctor before continuing.
                   </p>
                 </div>
               )}
@@ -307,10 +307,10 @@ export default function OnboardingPage() {
           {!done && step === 2 && (
             <div>
               <h2 style={{ fontSize: 20, fontWeight: 700, color: "#1a1a1a", marginBottom: 4 }}>
-                Preferencias alimentarias
+                Dietary preferences
               </h2>
               <p style={{ fontSize: 14, color: "#666", marginBottom: 20 }}>
-                Selecciona todas las que apliquen. Las usaremos para personalizar tus recomendaciones de comidas.
+                Select all that apply. We&apos;ll use these to personalize your meal recommendations.
               </p>
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {DIET_PREFS.map((pref) => {
@@ -347,17 +347,17 @@ export default function OnboardingPage() {
           {!done && step === 3 && (
             <div>
               <h2 style={{ fontSize: 20, fontWeight: 700, color: "#1a1a1a", marginBottom: 4 }}>
-                Biometría base
+                Body metrics
               </h2>
               <p style={{ fontSize: 14, color: "#666", marginBottom: 20 }}>
-                Necesitamos estos datos para calcular tu meta de proteína personalizada.
+                We need this data to calculate your personalized protein target.
               </p>
 
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12, marginBottom: 16 }}>
                 {[
-                  { field: "age" as keyof Form, label: "Edad", placeholder: "ej. 38", unit: "años", type: "number" },
-                  { field: "weightKg" as keyof Form, label: "Peso", placeholder: "ej. 82", unit: "kg", type: "number" },
-                  { field: "heightCm" as keyof Form, label: "Estatura", placeholder: "ej. 170", unit: "cm", type: "number" },
+                  { field: "age" as keyof Form, label: "Age", placeholder: "e.g. 38", unit: "yrs", type: "number" },
+                  { field: "weightKg" as keyof Form, label: "Weight", placeholder: "e.g. 82", unit: "kg", type: "number" },
+                  { field: "heightCm" as keyof Form, label: "Height", placeholder: "e.g. 170", unit: "cm", type: "number" },
                 ].map(({ field, label, placeholder, unit, type }) => (
                   <div key={field}>
                     <label style={{ fontSize: 12, fontWeight: 600, color: "#666", display: "block", marginBottom: 4 }}>
@@ -383,13 +383,13 @@ export default function OnboardingPage() {
               </div>
 
               <label style={{ fontSize: 13, fontWeight: 600, color: "#1a1a1a", display: "block", marginBottom: 8 }}>
-                Sexo biológico
+                Biological sex
               </label>
               <div style={{ display: "flex", gap: 8, marginBottom: 20 }}>
                 {[
-                  { value: "male", label: "Masculino" },
-                  { value: "female", label: "Femenino" },
-                  { value: "other", label: "Otro" },
+                  { value: "male", label: "Male" },
+                  { value: "female", label: "Female" },
+                  { value: "other", label: "Other" },
                 ].map((opt) => (
                   <button
                     key={opt.value}
@@ -408,7 +408,7 @@ export default function OnboardingPage() {
               </div>
 
               <label style={{ fontSize: 13, fontWeight: 600, color: "#1a1a1a", display: "block", marginBottom: 8 }}>
-                Nivel de actividad física
+                Physical activity level
               </label>
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {ACTIVITY_LEVELS.map((lvl) => (
@@ -435,14 +435,14 @@ export default function OnboardingPage() {
           {!done && step === 4 && (
             <div>
               <h2 style={{ fontSize: 20, fontWeight: 700, color: "#1a1a1a", marginBottom: 4 }}>
-                Salud gastrointestinal
+                Gastrointestinal health
               </h2>
               <p style={{ fontSize: 14, color: "#666", marginBottom: 20 }}>
-                Los GLP-1 afectan directamente el tránsito intestinal. Esta información nos ayuda a personalizar tu plan.
+                GLP-1 medications directly affect gut motility. This helps us personalize your plan.
               </p>
 
               <label style={{ fontSize: 13, fontWeight: 600, color: "#1a1a1a", display: "block", marginBottom: 8 }}>
-                ¿Con qué frecuencia vas al baño?
+                How often do you have a bowel movement?
               </label>
               <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 20 }}>
                 {BOWEL_PATTERNS.map((opt) => (
@@ -463,7 +463,7 @@ export default function OnboardingPage() {
               </div>
 
               <label style={{ fontSize: 13, fontWeight: 600, color: "#1a1a1a", display: "block", marginBottom: 8 }}>
-                Consumo de alcohol
+                Alcohol consumption
               </label>
               <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 16 }}>
                 {ALCOHOL_OPTIONS.map((opt) => (
@@ -486,10 +486,10 @@ export default function OnboardingPage() {
               {form.alcoholConsumption && form.alcoholConsumption !== "none" && (
                 <div style={{ background: "#fff3cd", border: "1px solid #ffc107", borderRadius: 8, padding: "12px 14px" }}>
                   <p style={{ fontSize: 13, color: "#856404", margin: 0, fontWeight: 600 }}>
-                    ⚠ Alcohol + GLP-1 = riesgo de pancreatitis y deshidratación
+                    ⚠ Alcohol + GLP-1 = increased risk of pancreatitis and dehydration
                   </p>
                   <p style={{ fontSize: 13, color: "#856404", margin: "6px 0 0" }}>
-                    La combinación puede intensificar los efectos secundarios. Tu plan incluirá estrategias de hidratación reforzadas.
+                    The combination can intensify side effects. Your plan will include enhanced hydration strategies.
                   </p>
                 </div>
               )}
@@ -515,7 +515,7 @@ export default function OnboardingPage() {
                     border: "1px solid #ddd", background: "#fff", color: "#1a1a1a", cursor: "pointer",
                   }}
                 >
-                  ← Atrás
+                  ← Back
                 </button>
               )}
               {step < TOTAL_STEPS ? (
@@ -530,7 +530,7 @@ export default function OnboardingPage() {
                     color: "#fff", cursor: step === 1 && form.thyroid === "yes" ? "not-allowed" : "pointer",
                   }}
                 >
-                  Siguiente →
+                  Next →
                 </button>
               ) : (
                 <button
@@ -543,7 +543,7 @@ export default function OnboardingPage() {
                     color: "#fff", cursor: saving ? "not-allowed" : "pointer",
                   }}
                 >
-                  {saving ? "Guardando…" : "Completar →"}
+                  {saving ? "Saving…" : "Complete →"}
                 </button>
               )}
             </div>
