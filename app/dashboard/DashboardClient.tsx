@@ -1,12 +1,119 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { ProteinRing } from "@/components/dashboard/ProteinRing";
 import { QuickLogForm } from "@/components/dashboard/QuickLogForm";
 import { TodayFoodLog } from "@/components/dashboard/TodayFoodLog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Flame, Trophy, Zap, X } from "lucide-react";
 
+// ── Meal presets ──
+const MEAL_PRESETS = {
+  breakfast: {
+    emoji: "🌅", label: "Breakfast",
+    items: [
+      { name: "Greek yogurt (150g)", protein_g: 18, calories: 120, portion_g: 150 },
+      { name: "Scrambled eggs (2)", protein_g: 13, calories: 180, portion_g: 120 },
+      { name: "Cottage cheese (200g)", protein_g: 22, calories: 180, portion_g: 200 },
+      { name: "Protein shake", protein_g: 30, calories: 180, portion_g: 350 },
+    ],
+  },
+  lunch: {
+    emoji: "☀️", label: "Lunch",
+    items: [
+      { name: "Chicken breast (150g)", protein_g: 45, calories: 248, portion_g: 150 },
+      { name: "Canned tuna (140g)", protein_g: 30, calories: 110, portion_g: 140 },
+      { name: "Ground turkey (150g)", protein_g: 35, calories: 200, portion_g: 150 },
+      { name: "Salmon fillet (150g)", protein_g: 39, calories: 312, portion_g: 150 },
+    ],
+  },
+  dinner: {
+    emoji: "🌙", label: "Dinner",
+    items: [
+      { name: "Chicken breast (200g)", protein_g: 60, calories: 330, portion_g: 200 },
+      { name: "Lean beef (150g)", protein_g: 38, calories: 270, portion_g: 150 },
+      { name: "Salmon (180g)", protein_g: 47, calories: 374, portion_g: 180 },
+      { name: "Shrimp (200g)", protein_g: 38, calories: 200, portion_g: 200 },
+    ],
+  },
+  snack: {
+    emoji: "⚡", label: "Snack",
+    items: [
+      { name: "Protein bar", protein_g: 20, calories: 200, portion_g: 60 },
+      { name: "Greek yogurt (100g)", protein_g: 10, calories: 80, portion_g: 100 },
+      { name: "Hard-boiled eggs (2)", protein_g: 13, calories: 140, portion_g: 100 },
+      { name: "Edamame (150g)", protein_g: 18, calories: 190, portion_g: 150 },
+    ],
+  },
+} as const;
+
+type MealType = keyof typeof MEAL_PRESETS;
+
+// ── Confetti ──
+const CONFETTI_COLORS = ["#ff6b6b","#ffd93d","#6bcb77","#4d96ff","#ff922b","#cc5de8","#20c997"];
+const CONFETTI_PIECES = Array.from({ length: 32 }, (_, i) => ({
+  id: i,
+  color: CONFETTI_COLORS[i % CONFETTI_COLORS.length],
+  left: (i / 32) * 100,
+  delay: (i % 8) * 0.1,
+  dur: 1.5 + (i % 4) * 0.2,
+  size: 7 + (i % 3) * 3,
+  round: i % 3 === 0,
+}));
+
+function Confetti() {
+  return (
+    <>
+      <style>{`
+        @keyframes mg-confetti {
+          0%   { transform: translateY(-10px) rotate(0deg);   opacity: 1; }
+          100% { transform: translateY(100vh)  rotate(720deg); opacity: 0; }
+        }
+      `}</style>
+      <div style={{ position:"fixed", inset:0, pointerEvents:"none", zIndex:9999, overflow:"hidden" }}>
+        {CONFETTI_PIECES.map(p => (
+          <div key={p.id} style={{
+            position: "absolute",
+            left: `${p.left}%`,
+            top: 0,
+            width: p.size,
+            height: p.size,
+            background: p.color,
+            borderRadius: p.round ? "50%" : "2px",
+            animation: `mg-confetti ${p.dur}s ${p.delay}s ease-in forwards`,
+          }} />
+        ))}
+      </div>
+    </>
+  );
+}
+
+// ── Dynamic message ──
+function getDynamicMessage(hour: number, pct: number, remaining: number) {
+  if (pct >= 0.9) return {
+    title: "🏆 You protected your muscles today!",
+    sub: "Consistent days like this prevent muscle loss on GLP-1.",
+  };
+  if (hour < 11) return {
+    title: "Good morning! Ready to protect your muscles?",
+    sub: `${remaining}g of protein to hit today's goal.`,
+  };
+  if (hour < 14) return {
+    title: "Halfway through the day!",
+    sub: `Still ${remaining}g to go — keep it up.`,
+  };
+  if (hour < 18) return {
+    title: "Final stretch!",
+    sub: `${remaining}g more protein before tonight.`,
+  };
+  return {
+    title: "Evening push!",
+    sub: `${remaining}g to go before midnight.`,
+  };
+}
+
+// ── Types ──
 interface FoodLogEntry {
   id: string;
   food_name: string;
@@ -19,14 +126,60 @@ interface Props {
   userId: string;
   proteinGoalG: number;
   initialLogs: FoodLogEntry[];
+  proteinStreakDays: number;
+  workoutStreakDays: number;
+  totalPoints: number;
+  goalAlreadyHitToday: boolean;
 }
 
-export function DashboardClient({ userId, proteinGoalG, initialLogs }: Props) {
-  const [logs, setLogs] = useState<FoodLogEntry[]>(initialLogs);
-  // NOTE: createClient() is memoized in Supabase SSR, so this is already optimized
+export function DashboardClient({
+  userId, proteinGoalG, initialLogs,
+  proteinStreakDays, workoutStreakDays, totalPoints,
+  goalAlreadyHitToday,
+}: Props) {
   const supabase = createClient();
 
+  const [logs, setLogs] = useState<FoodLogEntry[]>(initialLogs);
+  const [streak, setStreak] = useState(proteinStreakDays);
+  const [points, setPoints] = useState(totalPoints);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const goalHitRef = useRef(goalAlreadyHitToday);
+  const confettiTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const [activePreset, setActivePreset] = useState<MealType | null>(null);
+  const [loggingPreset, setLoggingPreset] = useState<string | null>(null);
+  const [quickAdding, setQuickAdding] = useState(false);
+
+  // Avoid SSR/client mismatch for time-based message
+  const [hour, setHour] = useState(12);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setHour(new Date().getHours());
+    setMounted(true);
+  }, []);
+
   const totalProtein = logs.reduce((sum, l) => sum + Number(l.protein_g), 0);
+  const pct = proteinGoalG > 0 ? totalProtein / proteinGoalG : 0;
+  const remaining = Math.max(0, proteinGoalG - totalProtein);
+
+  // Confetti + streak when goal first reached this session
+  useEffect(() => {
+    if (pct >= 0.9 && !goalHitRef.current) {
+      goalHitRef.current = true;
+      setShowConfetti(true);
+      confettiTimer.current = setTimeout(() => setShowConfetti(false), 3000);
+      fetch("/api/streak/protein", { method: "POST" })
+        .then(r => r.json())
+        .then(d => {
+          if (typeof d.streak === "number") setStreak(d.streak);
+          if (typeof d.points === "number") setPoints(d.points);
+        });
+    }
+  }, [pct]);
+
+  useEffect(() => {
+    return () => { if (confettiTimer.current) clearTimeout(confettiTimer.current); };
+  }, []);
 
   const refreshLogs = useCallback(async () => {
     const today = new Date().toISOString().split("T")[0];
@@ -39,26 +192,180 @@ export function DashboardClient({ userId, proteinGoalG, initialLogs }: Props) {
     setLogs(data ?? []);
   }, [supabase, userId]);
 
+  async function logPreset(item: { name: string; protein_g: number; calories: number; portion_g: number }) {
+    setLoggingPreset(item.name);
+    await supabase.from("food_logs").insert({
+      user_id: userId,
+      food_name: item.name,
+      protein_g: item.protein_g,
+      calories: item.calories,
+      portion_g: item.portion_g,
+    });
+    await refreshLogs();
+    setLoggingPreset(null);
+    setActivePreset(null);
+  }
+
+  async function quickAdd30g() {
+    setQuickAdding(true);
+    await supabase.from("food_logs").insert({
+      user_id: userId,
+      food_name: "Protein supplement (30g)",
+      protein_g: 30,
+      calories: 120,
+      portion_g: 40,
+    });
+    await refreshLogs();
+    setQuickAdding(false);
+  }
+
+  const msg = mounted ? getDynamicMessage(hour, pct, remaining) : { title: "Today", sub: "" };
+  const milestoneLabel =
+    streak >= 30 ? "🏆 30-day badge!" :
+    streak >= 14 ? "⭐ 14-day badge!" :
+    streak >= 7  ? "🎖 7-day badge!"  : null;
+
   return (
-    <div className="max-w-lg mx-auto px-4 py-8 space-y-6">
-      {/* Protein Ring */}
+    <div className="max-w-lg mx-auto px-4 py-8 space-y-5">
+      {showConfetti && <Confetti />}
+
+      {/* ── Header: streak badges ── */}
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Today</h1>
+          {mounted && <p className="text-sm text-gray-500 mt-0.5 max-w-xs">{msg.title}</p>}
+        </div>
+        <div className="flex items-center gap-2 flex-shrink-0">
+          {workoutStreakDays >= 1 && (
+            <div className="flex items-center gap-1 bg-blue-50 border border-blue-100 px-2.5 py-1.5 rounded-full">
+              <Flame className="h-3.5 w-3.5 text-blue-500" />
+              <span className="text-xs font-semibold text-blue-700">{workoutStreakDays}d gym</span>
+            </div>
+          )}
+          <div className={`flex items-center gap-1 px-2.5 py-1.5 rounded-full border ${
+            streak >= 1 ? "bg-orange-50 border-orange-100" : "bg-gray-50 border-gray-200"
+          }`}>
+            <span className="text-sm">{streak >= 7 ? "🔥🔥" : streak >= 1 ? "🔥" : "💤"}</span>
+            <span className={`text-xs font-semibold ${streak >= 1 ? "text-orange-700" : "text-gray-400"}`}>
+              {streak}d streak
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Milestone badge */}
+      {milestoneLabel && (
+        <div className="flex items-center gap-2 px-3 py-2 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <Trophy className="h-4 w-4 text-yellow-600 flex-shrink-0" />
+          <span className="text-sm font-medium text-yellow-800">
+            {milestoneLabel} {streak}-day protein streak!
+          </span>
+        </div>
+      )}
+
+      {/* ── Protein ring ── */}
       <Card>
         <CardContent className="pt-8 pb-6 flex justify-center">
           <ProteinRing goalG={proteinGoalG} loggedG={totalProtein} />
         </CardContent>
       </Card>
 
-      {/* Log food */}
+      {/* Sub-message */}
+      {mounted && msg.sub && (
+        <p className="text-sm text-gray-500 text-center -mt-2">{msg.sub}</p>
+      )}
+
+      {/* Points */}
+      <div className="flex items-center justify-center gap-1.5">
+        <Trophy className="h-3.5 w-3.5 text-yellow-500" />
+        <span className="text-xs text-gray-400 font-medium">{points} points</span>
+        <span className="text-gray-200">·</span>
+        <span className="text-xs text-gray-400">Protein goal = +10pts · Workout = +5pts</span>
+      </div>
+
+      {/* ── Quick-add meal buttons ── */}
+      <div className="space-y-3">
+        <div className="grid grid-cols-4 gap-2">
+          {(Object.keys(MEAL_PRESETS) as MealType[]).map((key) => {
+            const preset = MEAL_PRESETS[key];
+            const isActive = activePreset === key;
+            return (
+              <button
+                key={key}
+                type="button"
+                onClick={() => setActivePreset(isActive ? null : key)}
+                className="flex flex-col items-center gap-0.5 py-2.5 px-1 rounded-lg border text-xs font-medium transition-colors"
+                style={isActive
+                  ? { borderColor: "#2e7d32", background: "#f1f8f1", color: "#1b5e20" }
+                  : { borderColor: "#e5e7eb", background: "#fff", color: "#4b5563" }
+                }
+              >
+                <span className="text-lg">{preset.emoji}</span>
+                {preset.label}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Preset panel */}
+        {activePreset && (
+          <div className="border border-gray-200 rounded-xl bg-white overflow-hidden shadow-sm">
+            <div className="flex items-center justify-between px-4 py-2.5 border-b border-gray-100 bg-gray-50">
+              <span className="text-sm font-semibold text-gray-800">
+                {MEAL_PRESETS[activePreset].emoji} {MEAL_PRESETS[activePreset].label}
+              </span>
+              <button onClick={() => setActivePreset(null)} className="text-gray-400 hover:text-gray-600">
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <div className="divide-y divide-gray-100">
+              {MEAL_PRESETS[activePreset].items.map((item) => (
+                <button
+                  key={item.name}
+                  type="button"
+                  onClick={() => logPreset(item)}
+                  disabled={loggingPreset === item.name}
+                  className="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition-colors text-left"
+                >
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">{item.name}</p>
+                    <p className="text-xs text-gray-400">{item.calories} kcal</p>
+                  </div>
+                  <span className="text-sm font-semibold ml-3 flex-shrink-0" style={{
+                    color: loggingPreset === item.name ? "#9ca3af" : "#15803d"
+                  }}>
+                    {loggingPreset === item.name ? "Adding…" : `+${item.protein_g}g`}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Quick add 30g */}
+        <button
+          type="button"
+          onClick={quickAdd30g}
+          disabled={quickAdding}
+          className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg border border-dashed text-sm font-medium transition-colors disabled:opacity-60"
+          style={{ borderColor: "#86efac", background: "#f0fdf4", color: "#15803d" }}
+        >
+          <Zap className="h-4 w-4" />
+          {quickAdding ? "Adding…" : "Quick add 30g protein"}
+        </button>
+      </div>
+
+      {/* ── Log food (USDA search) ── */}
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-base">Log protein</CardTitle>
+          <CardTitle className="text-base">Log food</CardTitle>
         </CardHeader>
         <CardContent>
           <QuickLogForm userId={userId} onLogged={refreshLogs} />
         </CardContent>
       </Card>
 
-      {/* Today's log */}
+      {/* ── Today's log ── */}
       <Card>
         <CardHeader className="pb-3">
           <CardTitle className="text-base">Today&apos;s food</CardTitle>
