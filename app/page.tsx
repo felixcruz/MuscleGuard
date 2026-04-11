@@ -227,8 +227,8 @@ export default function LandingPage() {
           </p>
           <div className="grid md:grid-cols-3 gap-6">
             <div className="p-8 rounded-[10px] border border-black/5 bg-white space-y-4">
-              <div className="h-12 w-12 bg-[#CDFF00]/10 rounded-[10px] flex items-center justify-center">
-                <AlertTriangle className="h-6 w-6 text-[#131413]" />
+              <div className="h-12 w-12 bg-[#131413] rounded-[10px] flex items-center justify-center">
+                <AlertTriangle className="h-6 w-6 text-[#CDFF00]" />
               </div>
               <h3 className="font-medium text-[#131413] text-lg">Your doctor may not mention it</h3>
               <p className="text-[#585A59] leading-relaxed">
@@ -238,8 +238,8 @@ export default function LandingPage() {
               </p>
             </div>
             <div className="p-8 rounded-[10px] border border-black/5 bg-white space-y-4">
-              <div className="h-12 w-12 bg-[#CDFF00]/10 rounded-[10px] flex items-center justify-center">
-                <Zap className="h-6 w-6 text-[#131413]" />
+              <div className="h-12 w-12 bg-[#131413] rounded-[10px] flex items-center justify-center">
+                <Zap className="h-6 w-6 text-[#CDFF00]" />
               </div>
               <h3 className="font-medium text-[#131413] text-lg">Other apps are not built for this</h3>
               <p className="text-[#585A59] leading-relaxed">
@@ -249,8 +249,8 @@ export default function LandingPage() {
               </p>
             </div>
             <div className="p-8 rounded-[10px] border border-black/5 bg-white space-y-4">
-              <div className="h-12 w-12 bg-[#f7f7f7] rounded-[10px] flex items-center justify-center">
-                <Dumbbell className="h-6 w-6 text-[#131413]" />
+              <div className="h-12 w-12 bg-[#131413] rounded-[10px] flex items-center justify-center">
+                <Dumbbell className="h-6 w-6 text-[#CDFF00]" />
               </div>
               <h3 className="font-medium text-[#131413] text-lg">Your muscles need a signal to stay</h3>
               <p className="text-[#585A59] leading-relaxed">
@@ -396,7 +396,7 @@ export default function LandingPage() {
               },
             ].map((s) => (
               <div key={s.step} className="text-center">
-                <div className="h-14 w-14 bg-[#CDFF00] text-[#131413] rounded-[10px] flex items-center justify-center mx-auto text-xl font-medium mb-5">
+                <div className="h-14 w-14 bg-[#131413] text-white rounded-[10px] flex items-center justify-center mx-auto text-xl font-medium mb-5">
                   {s.step}
                 </div>
                 <h3 className="font-medium text-[#131413] text-lg mb-2">{s.title}</h3>
@@ -461,7 +461,7 @@ export default function LandingPage() {
               </ul>
               <Link
                 href="/login"
-                className="flex items-center justify-center gap-2 mt-8 w-full py-3.5 bg-[#CDFF00] text-[#131413] font-medium rounded-lg hover:bg-[#b8e600] transition-colors"
+                className="flex items-center justify-center gap-2 mt-8 w-full py-3.5 bg-[#131413] text-white font-medium rounded-lg hover:bg-[#202222] transition-colors"
               >
                 Start free trial <ArrowRight className="h-4 w-4" />
               </Link>
