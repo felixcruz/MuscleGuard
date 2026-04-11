@@ -124,7 +124,7 @@ const faqs = [
   },
   {
     q: "Is MuscleGuard a medical app?",
-    a: "No. MuscleGuard is an educational wellness tool designed to support your nutrition and fitness goals. It is not a medical device and does not diagnose, treat, cure, or prevent any disease. Always consult your healthcare provider about your GLP-1 medication and exercise plan.",
+    a: "No. MuscleGuard is a wellness tool designed to support your nutrition and fitness goals. It is not a medical device and does not diagnose, treat, cure, or prevent any disease. Always consult your healthcare provider about your GLP-1 medication and exercise plan.",
   },
   {
     q: "Which GLP-1 medications does MuscleGuard support?",
@@ -501,7 +501,7 @@ export default function LandingPage() {
                 <span className="font-bold text-gray-900">MuscleGuard</span>
               </div>
               <p className="text-sm text-gray-400 max-w-xs">
-                An educational wellness tool designed to support GLP-1 medication users in
+                A wellness tool designed to support GLP-1 medication users in
                 preserving lean muscle during weight loss.
               </p>
             </div>
