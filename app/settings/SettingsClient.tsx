@@ -129,19 +129,25 @@ export function SettingsClient({ userId, email, profile }: Props) {
           <div className="space-y-1.5">
             <label className="text-sm text-gray-500">Language</label>
             <div className="flex gap-2">
-              {LANGUAGES.map((l) => (
-                <button
-                  key={l.value}
-                  onClick={() => setLanguage(l.value)}
-                  className={`flex-1 py-2 rounded-lg border text-sm font-medium transition-colors ${
-                    language === l.value
-                      ? "bg-brand-600 text-white border-brand-600"
-                      : "bg-white text-gray-600 border-gray-200 hover:border-gray-300"
-                  }`}
-                >
-                  {l.label}
-                </button>
-              ))}
+              {LANGUAGES.map((l) => {
+                const isDisabled = l.value === "es";
+                return (
+                  <button
+                    key={l.value}
+                    onClick={() => !isDisabled && setLanguage(l.value)}
+                    disabled={isDisabled}
+                    className={`flex-1 py-2 rounded-lg border text-sm font-medium transition-colors ${
+                      isDisabled
+                        ? "bg-gray-50 text-gray-300 border-gray-200 cursor-not-allowed"
+                        : language === l.value
+                        ? "bg-brand-600 text-white border-brand-600"
+                        : "bg-white text-gray-600 border-gray-200 hover:border-gray-300"
+                    }`}
+                  >
+                    {l.label}{isDisabled ? " (soon)" : ""}
+                  </button>
+                );
+              })}
             </div>
           </div>
 

@@ -29,7 +29,7 @@ export default async function TrainingPage() {
     supabase
       .from("profiles")
       .select(
-        "workout_streak_days, protein_streak_days, total_points, glp1_dose_mg, appetite_level, experience_level, activity_types, primary_activity, equipment"
+        "workout_streak_days, protein_streak_days, total_points, glp1_dose_mg, appetite_level, experience_level, activity_types, primary_activity, equipment, comm_style"
       )
       .eq("id", user.id)
       .single(),
@@ -57,6 +57,7 @@ export default async function TrainingPage() {
       primaryActivity={profile?.primary_activity ?? "strength"}
       experienceLevel={profile?.experience_level ?? "beginner"}
       equipment={profile?.equipment ?? "bodyweight"}
+      commStyle={profile?.comm_style ?? "balanced"}
     />
   );
 }

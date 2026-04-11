@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { getAnthropic } from "./anthropic";
+import { getAIToneInstruction, type CommStyle } from "./comm-style";
 
 export interface WeeklyReportData {
   id: string;
@@ -73,7 +74,7 @@ export async function generateWeeklyReportForUser(
   // Fetch profile
   const { data: profile } = await supabase
     .from("profiles")
-    .select("protein_goal_g, glp1_medication, protein_streak_days, workout_streak_days")
+    .select("protein_goal_g, glp1_medication, protein_streak_days, workout_streak_days, comm_style")
     .eq("id", userId)
     .single();
 
@@ -115,7 +116,10 @@ export async function generateWeeklyReportForUser(
 
   // Generate AI summary
   const medication = profile?.glp1_medication ?? "GLP-1 medication";
+  const commStyle = (profile?.comm_style ?? "balanced") as CommStyle;
+  const toneInstruction = getAIToneInstruction(commStyle);
   const summaryPrompt = `You are a GLP-1 health coach writing a weekly progress report for a user on ${medication} who is trying to preserve muscle mass.
+${toneInstruction}
 
 Week of ${weekStart} to ${weekEnd}:
 - Protein goal: ${proteinGoalG}g/day

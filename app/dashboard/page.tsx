@@ -33,7 +33,7 @@ export default async function DashboardPage() {
     supabase
       .from("profiles")
       .select(
-        "protein_goal_g, weight_kg, protein_streak_days, protein_streak_last_date, workout_streak_days, total_points, primary_goal, glp1_dose_mg, glp1_medication, appetite_level, best_appetite_time, activity_types, primary_activity"
+        "protein_goal_g, weight_kg, protein_streak_days, protein_streak_last_date, workout_streak_days, total_points, primary_goal, glp1_dose_mg, glp1_medication, appetite_level, best_appetite_time, activity_types, primary_activity, comm_style"
       )
       .eq("id", user.id)
       .single(),
@@ -82,6 +82,7 @@ export default async function DashboardPage() {
       proteinBreakdown={breakdown}
       trainingIntensityPct={trainingIntensityPct}
       appetiteLevel={appetiteLevel}
+      commStyle={profile?.comm_style ?? "balanced"}
     />
   );
 }

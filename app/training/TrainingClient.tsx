@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle2, Circle, Flame, Trophy, AlertTriangle } from "lucide-react";
 import { intensityInfo } from "@/lib/personalization";
+import { getIntensityAdvice, type CommStyle } from "@/lib/comm-style";
 import { getProtocol, COMPLEMENTARY_STRENGTH_SESSIONS, type WorkoutSession } from "@/lib/workout-protocols";
 
 interface Props {
@@ -19,6 +20,7 @@ interface Props {
   primaryActivity: string;
   experienceLevel: string;
   equipment: string;
+  commStyle: string;
 }
 
 export function TrainingClient({
@@ -32,6 +34,7 @@ export function TrainingClient({
   primaryActivity,
   experienceLevel: _experienceLevel,
   equipment: _equipment,
+  commStyle,
 }: Props) {
   const [done, setDone] = useState<string[]>(initialDone);
   const [streak, setStreak] = useState(workoutStreakDays);
@@ -108,7 +111,7 @@ export function TrainingClient({
             Training at {intensityPct}% intensity today — {info.label}
           </p>
           <p style={{ fontSize: 12, color: intensityText, margin: "3px 0 0", opacity: 0.85 }}>
-            {info.advice}
+            {getIntensityAdvice(intensityPct, commStyle as CommStyle)}
           </p>
         </div>
       </div>

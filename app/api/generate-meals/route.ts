@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getAnthropic, MEAL_MODEL } from "@/lib/anthropic";
 import { validateMealGenerationRequest } from "@/lib/api-validation";
 import { checkRateLimit } from "@/lib/rate-limit";
+import { getAIToneInstruction, type CommStyle } from "@/lib/comm-style";
 
 export async function POST(request: NextRequest) {
   const supabase = await createClient();
@@ -43,6 +44,14 @@ export async function POST(request: NextRequest) {
 
   const { proteinRemainingG, dietaryPrefs, ingredients, mealTime, hungerLevel } = validation.data!;
 
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("comm_style")
+    .eq("id", user.id)
+    .single();
+  const commStyle = (profile?.comm_style ?? "balanced") as CommStyle;
+  const toneInstruction = getAIToneInstruction(commStyle);
+
   const prefsText =
     dietaryPrefs?.length > 0
       ? `Dietary requirements: ${dietaryPrefs.join(", ")}.`
@@ -76,6 +85,7 @@ export async function POST(request: NextRequest) {
     system: `You are a GLP-1 nutritional coach specializing in muscle preservation.
 Users are on Ozempic, Wegovy, or Mounjaro and have severely reduced appetite.
 Your meals must be: nutrient-dense, easy to prepare (under 15 minutes), and appetizing despite low hunger.
+${toneInstruction}
 Always return valid JSON only — no markdown, no extra text.`,
     messages: [
       {

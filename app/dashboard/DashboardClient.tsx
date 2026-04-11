@@ -7,6 +7,7 @@ import { QuickLogForm } from "@/components/dashboard/QuickLogForm";
 import { TodayFoodLog } from "@/components/dashboard/TodayFoodLog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Flame, Trophy, Zap, X, ChevronDown, ChevronRight, AlertTriangle } from "lucide-react";
+import { getDynamicMsg, getSevereAppetiteAlert, type CommStyle } from "@/lib/comm-style";
 
 // ── Meal presets ──
 const MEAL_PRESETS = {
@@ -89,29 +90,6 @@ function Confetti() {
   );
 }
 
-// ── Dynamic message ──
-function getDynamicMessage(hour: number, pct: number, remaining: number) {
-  if (pct >= 0.9) return {
-    title: "🏆 You protected your muscles today!",
-    sub: "Consistent days like this prevent muscle loss on GLP-1.",
-  };
-  if (hour < 11) return {
-    title: "Good morning! Ready to protect your muscles?",
-    sub: `${remaining}g of protein to hit today's goal.`,
-  };
-  if (hour < 14) return {
-    title: "Halfway through the day!",
-    sub: `Still ${remaining}g to go — keep it up.`,
-  };
-  if (hour < 18) return {
-    title: "Final stretch!",
-    sub: `${remaining}g more protein before tonight.`,
-  };
-  return {
-    title: "Evening push!",
-    sub: `${remaining}g to go before midnight.`,
-  };
-}
 
 // ── Types ──
 interface FoodLogEntry {
@@ -145,6 +123,7 @@ interface Props {
   proteinBreakdown: { breakfast: number; lunch: number; dinner: number; snack: number };
   trainingIntensityPct: number;
   appetiteLevel: string;
+  commStyle: string;
 }
 
 function formatTime(ts: string) {
@@ -167,7 +146,7 @@ export function DashboardClient({
   userId, proteinGoalG, initialLogs, weekLogs, weekStart,
   proteinStreakDays, workoutStreakDays, totalPoints,
   goalAlreadyHitToday, proteinGoalExplanation, proteinBreakdown,
-  trainingIntensityPct, appetiteLevel,
+  trainingIntensityPct, appetiteLevel, commStyle,
 }: Props) {
   const supabase = createClient();
 
@@ -253,7 +232,7 @@ export function DashboardClient({
     setQuickAdding(false);
   }
 
-  const msg = mounted ? getDynamicMessage(hour, pct, remaining) : { title: "Today", sub: "" };
+  const msg = mounted ? getDynamicMsg(hour, pct, remaining, commStyle as CommStyle) : { title: "Today", sub: "" };
   const milestoneLabel =
     streak >= 30 ? "🏆 30-day protein streak!" :
     streak >= 14 ? "⭐ 14-day protein streak!" :
@@ -266,20 +245,18 @@ export function DashboardClient({
       {showConfetti && <Confetti />}
 
       {/* ── Severe appetite alert banner ── */}
-      {isSevereAppetite && (
-        <div className="flex items-start gap-3 p-4 bg-amber-50 border border-amber-200 rounded-lg">
-          <AlertTriangle className="h-5 w-5 text-amber-600 mt-0.5 flex-shrink-0" />
-          <div>
-            <p className="font-semibold text-amber-800 text-sm">
-              Severe appetite suppression detected
-            </p>
-            <p className="text-xs text-amber-700 mt-1">
-              Focus on high-density foods: protein shakes, Greek yogurt, cottage cheese.
-              Training at reduced intensity today.
-            </p>
+      {isSevereAppetite && (() => {
+        const alert = getSevereAppetiteAlert(commStyle as CommStyle);
+        return (
+          <div className="flex items-start gap-3 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+            <AlertTriangle className="h-5 w-5 text-amber-600 mt-0.5 flex-shrink-0" />
+            <div>
+              <p className="font-semibold text-amber-800 text-sm">{alert.title}</p>
+              <p className="text-xs text-amber-700 mt-1">{alert.body}</p>
+            </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {/* ── Header: streak badges ── */}
       <div className="flex items-start justify-between">
