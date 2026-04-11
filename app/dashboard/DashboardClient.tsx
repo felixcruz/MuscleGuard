@@ -6,7 +6,7 @@ import { ProteinRing } from "@/components/dashboard/ProteinRing";
 import { QuickLogForm } from "@/components/dashboard/QuickLogForm";
 import { TodayFoodLog } from "@/components/dashboard/TodayFoodLog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Flame, Trophy, Zap, X } from "lucide-react";
+import { Flame, Trophy, Zap, X, ChevronDown, ChevronRight } from "lucide-react";
 
 // ── Meal presets ──
 const MEAL_PRESETS = {
@@ -120,20 +120,47 @@ interface FoodLogEntry {
   protein_g: number;
   calories: number | null;
   portion_g: number | null;
+  logged_at?: string | null;
+}
+
+interface WeekLogEntry {
+  id: string;
+  food_name: string;
+  protein_g: number;
+  log_date: string;
+  logged_at: string;
 }
 
 interface Props {
   userId: string;
   proteinGoalG: number;
   initialLogs: FoodLogEntry[];
+  weekLogs: WeekLogEntry[];
+  weekStart: string;
   proteinStreakDays: number;
   workoutStreakDays: number;
   totalPoints: number;
   goalAlreadyHitToday: boolean;
 }
 
+function formatTime(ts: string) {
+  return new Date(ts).toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  });
+}
+
+function formatDayLabel(dateStr: string) {
+  return new Date(dateStr + "T12:00:00Z").toLocaleDateString("en-US", {
+    weekday: "long",
+    month: "short",
+    day: "numeric",
+  });
+}
+
 export function DashboardClient({
-  userId, proteinGoalG, initialLogs,
+  userId, proteinGoalG, initialLogs, weekLogs, weekStart,
   proteinStreakDays, workoutStreakDays, totalPoints,
   goalAlreadyHitToday,
 }: Props) {
@@ -149,6 +176,8 @@ export function DashboardClient({
   const [activePreset, setActivePreset] = useState<MealType | null>(null);
   const [loggingPreset, setLoggingPreset] = useState<string | null>(null);
   const [quickAdding, setQuickAdding] = useState(false);
+  const [weekExpanded, setWeekExpanded] = useState(false);
+  const [expandedDays, setExpandedDays] = useState<Set<string>>(new Set());
 
   // Avoid SSR/client mismatch for time-based message
   const [hour, setHour] = useState(12);
@@ -185,7 +214,7 @@ export function DashboardClient({
     const today = new Date().toISOString().split("T")[0];
     const { data } = await supabase
       .from("food_logs")
-      .select("id, food_name, protein_g, calories, portion_g")
+      .select("id, food_name, protein_g, calories, portion_g, logged_at")
       .eq("user_id", userId)
       .eq("log_date", today)
       .order("logged_at", { ascending: true });
@@ -374,6 +403,131 @@ export function DashboardClient({
           <TodayFoodLog entries={logs} onDeleted={refreshLogs} />
         </CardContent>
       </Card>
+
+      {/* ── This Week (collapsible) ── */}
+      <ThisWeek
+        weekLogs={weekLogs}
+        weekStart={weekStart}
+        expanded={weekExpanded}
+        onToggle={() => setWeekExpanded(e => !e)}
+        expandedDays={expandedDays}
+        onToggleDay={(d) =>
+          setExpandedDays(prev => {
+            const next = new Set(prev);
+            next.has(d) ? next.delete(d) : next.add(d);
+            return next;
+          })
+        }
+      />
+    </div>
+  );
+}
+
+// ── This Week sub-component ──────────────────────────────────────────────────
+
+interface ThisWeekProps {
+  weekLogs: WeekLogEntry[];
+  weekStart: string;
+  expanded: boolean;
+  onToggle: () => void;
+  expandedDays: Set<string>;
+  onToggleDay: (date: string) => void;
+}
+
+function ThisWeek({ weekLogs, weekStart, expanded, onToggle, expandedDays, onToggleDay }: ThisWeekProps) {
+  // Build ordered list of days Mon→today
+  const today = new Date().toISOString().split("T")[0];
+  const days: string[] = [];
+  const cursor = new Date(weekStart + "T12:00:00Z");
+  const end = new Date(today + "T12:00:00Z");
+  while (cursor <= end) {
+    days.push(cursor.toISOString().split("T")[0]);
+    cursor.setDate(cursor.getDate() + 1);
+  }
+
+  // Group logs by day
+  const byDay: Record<string, WeekLogEntry[]> = {};
+  for (const log of weekLogs) {
+    if (!byDay[log.log_date]) byDay[log.log_date] = [];
+    byDay[log.log_date].push(log);
+  }
+
+  const weekTotalProtein = weekLogs.reduce((s, l) => s + Number(l.protein_g), 0);
+
+  return (
+    <div className="border border-gray-200 rounded-xl overflow-hidden bg-white">
+      {/* Header row — always visible */}
+      <button
+        type="button"
+        onClick={onToggle}
+        className="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition-colors"
+      >
+        <div className="flex items-center gap-2">
+          {expanded
+            ? <ChevronDown className="h-4 w-4 text-gray-400" />
+            : <ChevronRight className="h-4 w-4 text-gray-400" />
+          }
+          <span className="text-sm font-semibold text-gray-700">This Week</span>
+        </div>
+        <span className="text-xs text-gray-400">{weekTotalProtein}g protein total</span>
+      </button>
+
+      {/* Expanded content */}
+      {expanded && (
+        <div className="border-t border-gray-100 divide-y divide-gray-100">
+          {[...days].reverse().map((date) => {
+            const entries = byDay[date] ?? [];
+            const dayProtein = entries.reduce((s, l) => s + Number(l.protein_g), 0);
+            const isToday = date === today;
+            const isDayExpanded = expandedDays.has(date);
+
+            return (
+              <div key={date}>
+                <button
+                  type="button"
+                  onClick={() => entries.length > 0 && onToggleDay(date)}
+                  className={`w-full flex items-center justify-between px-4 py-2.5 text-left transition-colors ${
+                    entries.length > 0 ? "hover:bg-gray-50 cursor-pointer" : "cursor-default"
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    {entries.length > 0
+                      ? isDayExpanded
+                        ? <ChevronDown className="h-3.5 w-3.5 text-gray-300" />
+                        : <ChevronRight className="h-3.5 w-3.5 text-gray-300" />
+                      : <span className="w-3.5" />
+                    }
+                    <span className={`text-sm ${isToday ? "font-semibold text-gray-900" : "text-gray-600"}`}>
+                      {isToday ? "Today" : formatDayLabel(date)}
+                    </span>
+                  </div>
+                  <span className={`text-xs font-medium ${
+                    dayProtein > 0 ? "text-green-600" : "text-gray-300"
+                  }`}>
+                    {dayProtein > 0 ? `${dayProtein}g` : "—"}
+                  </span>
+                </button>
+
+                {isDayExpanded && entries.length > 0 && (
+                  <div className="px-4 pb-2 space-y-1.5 bg-gray-50">
+                    {entries.map((entry) => (
+                      <div key={entry.id} className="flex items-center justify-between pl-5">
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs text-gray-700 line-clamp-1">{entry.food_name}</p>
+                          <p className="text-xs text-gray-400">{formatTime(entry.logged_at)}</p>
+                        </div>
+                        <span className="text-xs font-semibold text-green-600 ml-2 flex-shrink-0">
+                          +{entry.protein_g}g
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
