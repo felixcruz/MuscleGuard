@@ -26,6 +26,7 @@ interface Props {
 
 const STATUS_LABELS: Record<string, string> = {
   trial: "Free trial",
+  trialing: "Trial (card on file)",
   active: "Active",
   past_due: "Payment past due",
   cancelled: "Cancelled",
@@ -33,6 +34,7 @@ const STATUS_LABELS: Record<string, string> = {
 
 const STATUS_VARIANTS: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
   trial: "secondary",
+  trialing: "default",
   active: "default",
   past_due: "destructive",
   cancelled: "outline",
@@ -66,7 +68,7 @@ export function SettingsClient({ userId, email, profile }: Props) {
   const trialEnd = profile.trial_ends_at
     ? new Date(profile.trial_ends_at).toLocaleDateString()
     : null;
-  const isActive = status === "active";
+  const isActive = status === "active" || status === "trialing";
   const isTrial = status === "trial";
 
   async function handleSave() {
