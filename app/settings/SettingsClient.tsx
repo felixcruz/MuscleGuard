@@ -6,9 +6,11 @@ import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import { CreditCard, LogOut, Shield } from "lucide-react";
 
 interface Props {
+  userId: string;
   email: string;
   profile: {
     weight_kg?: number;
@@ -17,6 +19,9 @@ interface Props {
     subscription_status?: string;
     trial_ends_at?: string;
     stripe_customer_id?: string;
+    full_name?: string;
+    language?: string;
+    comm_style?: string;
   };
 }
 
@@ -34,11 +39,42 @@ const STATUS_VARIANTS: Record<string, "default" | "secondary" | "destructive" | 
   cancelled: "outline",
 };
 
-export function SettingsClient({ email, profile }: Props) {
+const LANGUAGES = [
+  { value: "en", label: "English" },
+  { value: "es", label: "Español" },
+];
+
+const COMM_STYLES = [
+  { value: "balanced", label: "Balanced", desc: "Mix of motivation and facts" },
+  { value: "direct", label: "Direct", desc: "Short, no-fluff responses" },
+  { value: "clinical", label: "Clinical", desc: "Data-driven, evidence-based" },
+  { value: "supportive", label: "Supportive", desc: "Warm and encouraging" },
+  { value: "motivational", label: "Motivational", desc: "High-energy, push harder" },
+];
+
+export function SettingsClient({ userId, email, profile }: Props) {
   const [upgrading, setUpgrading] = useState(false);
   const [portal, setPortal] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  const [fullName, setFullName] = useState(profile.full_name ?? "");
+  const [language, setLanguage] = useState(profile.language ?? "en");
+  const [commStyle, setCommStyle] = useState(profile.comm_style ?? "balanced");
+
   const router = useRouter();
   const supabase = createClient();
+
+  async function handleSavePreferences() {
+    setSaving(true);
+    await supabase
+      .from("profiles")
+      .update({ full_name: fullName || null, language, comm_style: commStyle })
+      .eq("id", userId);
+    setSaving(false);
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
+  }
 
   async function handleUpgrade() {
     setUpgrading(true);
@@ -72,6 +108,69 @@ export function SettingsClient({ email, profile }: Props) {
   return (
     <div className="max-w-lg mx-auto px-4 py-8 space-y-6">
       <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
+
+      {/* Preferences */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base">Preferences</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-5">
+          {/* Name */}
+          <div className="space-y-1.5">
+            <label className="text-sm text-gray-500">Name</label>
+            <Input
+              placeholder="Your name"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+            />
+          </div>
+
+          {/* Language */}
+          <div className="space-y-1.5">
+            <label className="text-sm text-gray-500">Language</label>
+            <div className="flex gap-2">
+              {LANGUAGES.map((l) => (
+                <button
+                  key={l.value}
+                  onClick={() => setLanguage(l.value)}
+                  className={`flex-1 py-2 rounded-lg border text-sm font-medium transition-colors ${
+                    language === l.value
+                      ? "bg-brand-600 text-white border-brand-600"
+                      : "bg-white text-gray-600 border-gray-200 hover:border-gray-300"
+                  }`}
+                >
+                  {l.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Communication style */}
+          <div className="space-y-1.5">
+            <label className="text-sm text-gray-500">Communication style</label>
+            <div className="space-y-2">
+              {COMM_STYLES.map((s) => (
+                <button
+                  key={s.value}
+                  onClick={() => setCommStyle(s.value)}
+                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg border text-sm transition-colors ${
+                    commStyle === s.value
+                      ? "bg-brand-50 border-brand-400 text-brand-800"
+                      : "bg-white border-gray-200 text-gray-700 hover:border-gray-300"
+                  }`}
+                >
+                  <span className="font-medium">{s.label}</span>
+                  <span className="text-xs text-gray-400">{s.desc}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <Button onClick={handleSavePreferences} disabled={saving} className="w-full">
+            {saving ? "Saving…" : saved ? "Saved!" : "Save preferences"}
+          </Button>
+        </CardContent>
+      </Card>
 
       {/* Account */}
       <Card>
