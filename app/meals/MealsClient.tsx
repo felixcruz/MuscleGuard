@@ -18,15 +18,25 @@ interface Props {
   proteinGoalG: number;
   proteinLoggedG: number;
   dietaryPrefs: string[];
+  proteinBreakdown?: { breakfast: number; lunch: number; dinner: number; snack: number };
 }
 
-export function MealsClient({ userId, proteinGoalG, proteinLoggedG: initialLogged, dietaryPrefs }: Props) {
+export function MealsClient({
+  userId,
+  proteinGoalG,
+  proteinLoggedG: initialLogged,
+  dietaryPrefs,
+  proteinBreakdown,
+}: Props) {
   const supabase = createClient();
 
   // ── Protein tracker (live) ──
   const [proteinLogged, setProteinLogged] = useState(initialLogged);
   const proteinRemaining = Math.max(0, proteinGoalG - proteinLogged);
-  const pct = proteinGoalG > 0 ? Math.min(100, Math.round((proteinLogged / proteinGoalG) * 100)) : 0;
+  const pct =
+    proteinGoalG > 0
+      ? Math.min(100, Math.round((proteinLogged / proteinGoalG) * 100))
+      : 0;
 
   // ── Food search ──
   const [query, setQuery] = useState("");
@@ -39,16 +49,20 @@ export function MealsClient({ userId, proteinGoalG, proteinLoggedG: initialLogge
   const [searchError, setSearchError] = useState<string | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-
   // Debounced USDA search
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
-    if (query.length < 2) { setResults([]); return; }
+    if (query.length < 2) {
+      setResults([]);
+      return;
+    }
     debounceRef.current = setTimeout(async () => {
       setSearching(true);
       setSearchError(null);
       try {
-        const res = await fetch(`/api/food/search?q=${encodeURIComponent(query)}`);
+        const res = await fetch(
+          `/api/food/search?q=${encodeURIComponent(query)}`
+        );
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || "Search failed");
         setResults(data.foods ?? []);
@@ -59,7 +73,9 @@ export function MealsClient({ userId, proteinGoalG, proteinLoggedG: initialLogge
         setSearching(false);
       }
     }, 350);
-    return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
   }, [query]);
 
   function handleSelect(food: USDAFood) {
@@ -101,7 +117,9 @@ export function MealsClient({ userId, proteinGoalG, proteinLoggedG: initialLogge
       setSelected(null);
       setResults([]);
     } catch (err) {
-      setSearchError(err instanceof Error ? err.message : "Failed to log food");
+      setSearchError(
+        err instanceof Error ? err.message : "Failed to log food"
+      );
     } finally {
       setLogging(false);
     }
@@ -111,16 +129,23 @@ export function MealsClient({ userId, proteinGoalG, proteinLoggedG: initialLogge
 
   return (
     <div className="max-w-lg mx-auto px-4 py-8 space-y-8">
-
       {/* ── Header + protein bar ── */}
       <div className="space-y-3">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Meals</h1>
           <p className="text-gray-500 mt-1 text-sm">
-            {proteinRemaining > 0
-              ? <><span className="text-brand-700 font-semibold">{proteinRemaining}g protein</span> remaining today</>
-              : <span className="text-green-600 font-semibold">Daily protein goal reached!</span>
-            }
+            {proteinRemaining > 0 ? (
+              <>
+                <span className="text-brand-700 font-semibold">
+                  {proteinRemaining}g protein
+                </span>{" "}
+                remaining today
+              </>
+            ) : (
+              <span className="text-green-600 font-semibold">
+                Daily protein goal reached!
+              </span>
+            )}
           </p>
         </div>
         <div>
@@ -137,8 +162,18 @@ export function MealsClient({ userId, proteinGoalG, proteinLoggedG: initialLogge
               }}
             />
           </div>
-          <p className="text-xs text-gray-400 mt-1 text-right">{pct}% complete</p>
+          <p className="text-xs text-gray-400 mt-1 text-right">
+            {pct}% complete
+          </p>
         </div>
+
+        {/* Meal distribution breakdown */}
+        {proteinBreakdown && (
+          <p className="text-xs text-gray-400">
+            <span className="font-medium text-gray-500">Targets:</span>{" "}
+            Breakfast: {proteinBreakdown.breakfast}g · Lunch: {proteinBreakdown.lunch}g · Dinner: {proteinBreakdown.dinner}g · Snack: {proteinBreakdown.snack}g
+          </p>
+        )}
       </div>
 
       {/* ── Food Search ── */}
@@ -158,7 +193,9 @@ export function MealsClient({ userId, proteinGoalG, proteinLoggedG: initialLogge
             className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white"
           />
           {searching && (
-            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400">Searching…</span>
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400">
+              Searching…
+            </span>
           )}
         </div>
 
@@ -171,9 +208,12 @@ export function MealsClient({ userId, proteinGoalG, proteinLoggedG: initialLogge
                 onClick={() => handleSelect(food)}
                 className="w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors"
               >
-                <p className="text-sm font-medium text-gray-900 leading-snug">{food.description}</p>
+                <p className="text-sm font-medium text-gray-900 leading-snug">
+                  {food.description}
+                </p>
                 <p className="text-xs text-gray-500 mt-0.5">
-                  {food.proteinPer100g}g protein · {food.caloriesPer100g} kcal per 100g
+                  {food.proteinPer100g}g protein · {food.caloriesPer100g} kcal
+                  per 100g
                 </p>
               </button>
             ))}
@@ -182,13 +222,18 @@ export function MealsClient({ userId, proteinGoalG, proteinLoggedG: initialLogge
 
         {selected && (
           <div className="border border-gray-200 rounded-lg p-4 bg-gray-50 space-y-3">
-            <p className="text-sm font-semibold text-gray-900 leading-snug">{selected.description}</p>
+            <p className="text-sm font-semibold text-gray-900 leading-snug">
+              {selected.description}
+            </p>
             <p className="text-xs text-gray-500">
-              {selected.proteinPer100g}g protein · {selected.caloriesPer100g} kcal per 100g
+              {selected.proteinPer100g}g protein · {selected.caloriesPer100g}{" "}
+              kcal per 100g
             </p>
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-2 flex-1">
-                <label className="text-sm text-gray-600 whitespace-nowrap">Portion</label>
+                <label className="text-sm text-gray-600 whitespace-nowrap">
+                  Portion
+                </label>
                 <input
                   type="number"
                   min="1"
@@ -200,8 +245,12 @@ export function MealsClient({ userId, proteinGoalG, proteinLoggedG: initialLogge
                 <span className="text-sm text-gray-500">g</span>
               </div>
               <div className="text-right text-sm text-gray-700">
-                <span className="font-semibold text-brand-700">{nutrients.protein}g</span> protein
-                {" · "}{nutrients.calories} kcal
+                <span className="font-semibold text-brand-700">
+                  {nutrients.protein}g
+                </span>{" "}
+                protein
+                {" · "}
+                {nutrients.calories} kcal
               </div>
             </div>
             <Button
@@ -233,7 +282,9 @@ export function MealsClient({ userId, proteinGoalG, proteinLoggedG: initialLogge
       {/* ── Divider ── */}
       <div className="flex items-center gap-3">
         <div className="h-px flex-1 bg-gray-200" />
-        <span className="text-xs text-gray-400 uppercase tracking-wide">or get AI meal ideas</span>
+        <span className="text-xs text-gray-400 uppercase tracking-wide">
+          or get AI meal ideas
+        </span>
         <div className="h-px flex-1 bg-gray-200" />
       </div>
 
@@ -244,7 +295,6 @@ export function MealsClient({ userId, proteinGoalG, proteinLoggedG: initialLogge
         dietaryPrefs={dietaryPrefs}
         onMealLogged={(proteinG) => setProteinLogged((p) => p + proteinG)}
       />
-
     </div>
   );
 }

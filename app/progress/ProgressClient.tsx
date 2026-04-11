@@ -13,6 +13,7 @@ import {
   Tooltip,
   ResponsiveContainer,
   CartesianGrid,
+  ReferenceLine,
 } from "recharts";
 
 interface Measurement {
@@ -22,9 +23,18 @@ interface Measurement {
   body_fat_pct: number | null;
 }
 
+interface MedicationLog {
+  id: string;
+  dose_mg: number;
+  change_date: string;
+  change_type: string;
+  created_at: string;
+}
+
 interface Props {
   userId: string;
   initialMeasurements: Measurement[];
+  medicationLogs?: MedicationLog[];
 }
 
 function checkMuscleLoss(measurements: Measurement[]): boolean {
@@ -32,14 +42,20 @@ function checkMuscleLoss(measurements: Measurement[]): boolean {
   const recent = measurements[measurements.length - 1];
   const weekAgo = measurements.find(
     (m) =>
-      new Date(recent.measured_at).getTime() - new Date(m.measured_at).getTime() >=
+      new Date(recent.measured_at).getTime() -
+        new Date(m.measured_at).getTime() >=
       6 * 24 * 60 * 60 * 1000
   );
-  if (!weekAgo || !recent.muscle_mass_kg || !weekAgo.muscle_mass_kg) return false;
+  if (!weekAgo || !recent.muscle_mass_kg || !weekAgo.muscle_mass_kg)
+    return false;
   return weekAgo.muscle_mass_kg - recent.muscle_mass_kg > 1;
 }
 
-export function ProgressClient({ userId, initialMeasurements }: Props) {
+export function ProgressClient({
+  userId,
+  initialMeasurements,
+  medicationLogs = [],
+}: Props) {
   const [measurements, setMeasurements] = useState(initialMeasurements);
   const supabase = createClient();
 
@@ -56,16 +72,32 @@ export function ProgressClient({ userId, initialMeasurements }: Props) {
   const muscleLossAlert = checkMuscleLoss(measurements);
 
   const chartData = measurements.map((m) => ({
-    date: new Date(m.measured_at).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+    date: new Date(m.measured_at).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+    }),
+    dateIso: m.measured_at.split("T")[0],
     weight: m.weight_kg,
     muscle: m.muscle_mass_kg,
+  }));
+
+  // Build a lookup: date string → dose for reference lines
+  const doseDates = medicationLogs.map((log) => ({
+    date: new Date(log.change_date).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+    }),
+    dose: log.dose_mg,
+    type: log.change_type,
   }));
 
   return (
     <div className="max-w-lg mx-auto px-4 py-8 space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Progress</h1>
-        <p className="text-gray-500 mt-1">Track your weight and muscle mass weekly.</p>
+        <p className="text-gray-500 mt-1">
+          Track your weight and muscle mass weekly.
+        </p>
       </div>
 
       {muscleLossAlert && (
@@ -75,8 +107,14 @@ export function ProgressClient({ userId, initialMeasurements }: Props) {
             <p className="font-semibold text-red-800">Muscle loss detected</p>
             <p className="text-sm text-red-700 mt-0.5">
               You lost more than 1kg of muscle this week. Check your{" "}
-              <a href="/meals" className="underline font-medium">meal plan</a> and{" "}
-              <a href="/training" className="underline font-medium">strength training</a>.
+              <a href="/meals" className="underline font-medium">
+                meal plan
+              </a>{" "}
+              and{" "}
+              <a href="/training" className="underline font-medium">
+                strength training
+              </a>
+              .
             </p>
           </div>
         </div>
@@ -84,7 +122,9 @@ export function ProgressClient({ userId, initialMeasurements }: Props) {
 
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-base">Log today&apos;s measurement</CardTitle>
+          <CardTitle className="text-base">
+            Log today&apos;s measurement
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <MeasurementForm userId={userId} onSaved={refresh} />
@@ -95,6 +135,11 @@ export function ProgressClient({ userId, initialMeasurements }: Props) {
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-base">Weight trend</CardTitle>
+            {doseDates.length > 0 && (
+              <p className="text-xs text-gray-400">
+                Dashed lines indicate dose changes
+              </p>
+            )}
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={200}>
@@ -103,6 +148,21 @@ export function ProgressClient({ userId, initialMeasurements }: Props) {
                 <XAxis dataKey="date" tick={{ fontSize: 11 }} />
                 <YAxis tick={{ fontSize: 11 }} domain={["auto", "auto"]} />
                 <Tooltip />
+                {/* Medication dose change reference lines */}
+                {doseDates.map((dd, i) => (
+                  <ReferenceLine
+                    key={i}
+                    x={dd.date}
+                    stroke="#2e7d32"
+                    strokeDasharray="3 3"
+                    label={{
+                      value: `${dd.dose}mg`,
+                      position: "top",
+                      fontSize: 10,
+                      fill: "#2e7d32",
+                    }}
+                  />
+                ))}
                 <Line
                   type="monotone"
                   dataKey="weight"
@@ -129,6 +189,20 @@ export function ProgressClient({ userId, initialMeasurements }: Props) {
                 <XAxis dataKey="date" tick={{ fontSize: 11 }} />
                 <YAxis tick={{ fontSize: 11 }} domain={["auto", "auto"]} />
                 <Tooltip />
+                {doseDates.map((dd, i) => (
+                  <ReferenceLine
+                    key={i}
+                    x={dd.date}
+                    stroke="#2e7d32"
+                    strokeDasharray="3 3"
+                    label={{
+                      value: `${dd.dose}mg`,
+                      position: "top",
+                      fontSize: 10,
+                      fill: "#2e7d32",
+                    }}
+                  />
+                ))}
                 <Line
                   type="monotone"
                   dataKey="muscle"

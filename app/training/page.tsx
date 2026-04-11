@@ -3,6 +3,7 @@ export const dynamic = "force-dynamic";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { TrainingClient } from "./TrainingClient";
+import { calculateTrainingIntensityPct, type AppetiteLevel } from "@/lib/personalization";
 
 // Monday-anchored week key: "mg-w-2026-04-07"
 function getWeekKey(): string {
@@ -17,7 +18,9 @@ function getWeekKey(): string {
 
 export default async function TrainingPage() {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) return redirect("/login");
 
   const weekKey = getWeekKey();
@@ -25,7 +28,9 @@ export default async function TrainingPage() {
   const [profileResult, logsResult] = await Promise.all([
     supabase
       .from("profiles")
-      .select("workout_streak_days, protein_streak_days, total_points")
+      .select(
+        "workout_streak_days, protein_streak_days, total_points, glp1_dose_mg, appetite_level, experience_level, activity_types, primary_activity, equipment"
+      )
       .eq("id", user.id)
       .single(),
     supabase
@@ -35,13 +40,23 @@ export default async function TrainingPage() {
       .eq("week_key", weekKey),
   ]);
 
+  const profile = profileResult.data;
+  const doseMg = profile?.glp1_dose_mg ?? 1.0;
+  const appetiteLevel = (profile?.appetite_level ?? "moderate") as AppetiteLevel;
+  const intensityPct = calculateTrainingIntensityPct(doseMg, appetiteLevel);
+
   return (
     <TrainingClient
       weekKey={weekKey}
-      initialDone={logsResult.data?.map(l => l.workout_day) ?? []}
-      workoutStreakDays={profileResult.data?.workout_streak_days ?? 0}
-      proteinStreakDays={profileResult.data?.protein_streak_days ?? 0}
-      totalPoints={profileResult.data?.total_points ?? 0}
+      initialDone={logsResult.data?.map((l) => l.workout_day) ?? []}
+      workoutStreakDays={profile?.workout_streak_days ?? 0}
+      proteinStreakDays={profile?.protein_streak_days ?? 0}
+      totalPoints={profile?.total_points ?? 0}
+      intensityPct={intensityPct}
+      activityTypes={profile?.activity_types ?? ["strength"]}
+      primaryActivity={profile?.primary_activity ?? "strength"}
+      experienceLevel={profile?.experience_level ?? "beginner"}
+      equipment={profile?.equipment ?? "bodyweight"}
     />
   );
 }

@@ -3,10 +3,20 @@ export const dynamic = "force-dynamic";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { DashboardClient } from "./DashboardClient";
+import {
+  calculateProteinGoal,
+  proteinGoalExplanation,
+  proteinMealBreakdown,
+  calculateTrainingIntensityPct,
+  type Goal,
+  type AppetiteLevel,
+} from "@/lib/personalization";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) return redirect("/login");
 
   const today = new Date().toISOString().split("T")[0];
@@ -22,7 +32,9 @@ export default async function DashboardPage() {
   const [profileResult, logsResult, weekLogsResult] = await Promise.all([
     supabase
       .from("profiles")
-      .select("protein_goal_g, weight_kg, protein_streak_days, protein_streak_last_date, workout_streak_days, total_points")
+      .select(
+        "protein_goal_g, weight_kg, protein_streak_days, protein_streak_last_date, workout_streak_days, total_points, primary_goal, glp1_dose_mg, glp1_medication, appetite_level, best_appetite_time, activity_types, primary_activity"
+      )
       .eq("id", user.id)
       .single(),
     supabase
@@ -42,10 +54,23 @@ export default async function DashboardPage() {
 
   const profile = profileResult.data;
 
+  // Compute personalization data server-side
+  const weightKg = profile?.weight_kg ?? 80;
+  const goal = (profile?.primary_goal ?? "preserve_muscle") as Goal;
+  const doseMg = profile?.glp1_dose_mg ?? 1.0;
+  const medication = profile?.glp1_medication ?? "semaglutide";
+  const appetiteLevel = (profile?.appetite_level ?? "moderate") as AppetiteLevel;
+  const bestAppetiteTime = profile?.best_appetite_time ?? "midday";
+
+  const proteinGoalG = profile?.protein_goal_g ?? calculateProteinGoal(weightKg, goal, doseMg);
+  const explanation = proteinGoalExplanation(weightKg, goal, doseMg, medication);
+  const breakdown = proteinMealBreakdown(proteinGoalG, bestAppetiteTime);
+  const trainingIntensityPct = calculateTrainingIntensityPct(doseMg, appetiteLevel);
+
   return (
     <DashboardClient
       userId={user.id}
-      proteinGoalG={profile?.protein_goal_g ?? 120}
+      proteinGoalG={proteinGoalG}
       initialLogs={logsResult.data ?? []}
       weekLogs={weekLogsResult.data ?? []}
       weekStart={weekStart}
@@ -53,6 +78,10 @@ export default async function DashboardPage() {
       workoutStreakDays={profile?.workout_streak_days ?? 0}
       totalPoints={profile?.total_points ?? 0}
       goalAlreadyHitToday={profile?.protein_streak_last_date === today}
+      proteinGoalExplanation={explanation}
+      proteinBreakdown={breakdown}
+      trainingIntensityPct={trainingIntensityPct}
+      appetiteLevel={appetiteLevel}
     />
   );
 }

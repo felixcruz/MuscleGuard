@@ -3,57 +3,51 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { calcProteinGoal } from "@/lib/protein";
+import { calculateProteinGoal, type Goal } from "@/lib/personalization";
 
-const TOTAL_STEPS = 4;
+const TOTAL_STEPS = 3;
 
-const MEDICATIONS = [
-  { value: "semaglutide", label: "Semaglutide (Ozempic / Wegovy)" },
-  { value: "tirzepatide", label: "Tirzepatide (Mounjaro / Zepbound)" },
-  { value: "liraglutide", label: "Liraglutide (Saxenda / Victoza)" },
-  { value: "other", label: "Other GLP-1" },
+const SEMAGLUTIDE_DOSES = [0.25, 0.5, 1.0, 1.7, 2.4];
+const TIRZEPATIDE_DOSES = [2.5, 5, 7.5, 10, 12.5, 15];
+
+const ACTIVITY_OPTIONS = [
+  { value: "strength", label: "Strength training", emoji: "🏋️" },
+  { value: "running", label: "Running", emoji: "🏃" },
+  { value: "cycling", label: "Cycling", emoji: "🚴" },
+  { value: "swimming", label: "Swimming", emoji: "🏊" },
+  { value: "yoga", label: "Yoga / Pilates", emoji: "🧘" },
+  { value: "padel", label: "Padel / Tennis", emoji: "🎾" },
+  { value: "hiit", label: "HIIT / Hyrox", emoji: "🔥" },
+  { value: "walking", label: "Walking", emoji: "🚶" },
 ];
 
-const DIET_PREFS = [
-  { value: "omnivore", label: "Omnivore" },
-  { value: "vegetarian", label: "Vegetarian" },
-  { value: "vegan", label: "Vegan" },
-  { value: "gluten_free", label: "Gluten-free" },
-  { value: "lactose_free", label: "Dairy-free" },
-  { value: "low_sodium", label: "Low sodium" },
+const APPETITE_OPTIONS = [
+  { value: "none", label: "No suppression", emoji: "😊" },
+  { value: "mild", label: "Mild", emoji: "🙂" },
+  { value: "moderate", label: "Moderate", emoji: "😐" },
+  { value: "severe", label: "Severe", emoji: "😕" },
+  { value: "very_severe", label: "Very severe", emoji: "😔" },
 ];
 
-const ACTIVITY_LEVELS = [
-  { value: "sedentary", label: "Sedentary", desc: "Desk job, <3,000 steps/day" },
-  { value: "light", label: "Light", desc: "Regular walks, 5,000–8,000 steps/day" },
-  { value: "moderate", label: "Moderate", desc: "Training 2–3 times/week" },
-  { value: "intense", label: "Intense", desc: "Strength 4+ times/week or sports" },
-];
-
-const BOWEL_PATTERNS = [
-  { value: "daily", label: "Daily" },
-  { value: "every2to3days", label: "Every 2–3 days" },
-  { value: "lessThan2xWeek", label: "Less than 2x/week" },
-];
-
-const ALCOHOL_OPTIONS = [
-  { value: "none", label: "None" },
-  { value: "occasional", label: "Occasional" },
-  { value: "regular", label: "Regular" },
-  { value: "frequent", label: "Frequent" },
-];
+const DAYS_OF_WEEK = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 type Form = {
+  // Screen 1
+  weight_kg: string;
+  primary_goal: string;
+  // Screen 2
   medication: string;
-  thyroid: string;
-  dietaryPrefs: string[];
-  age: string;
-  weightKg: string;
-  heightCm: string;
-  sex: string;
-  activityLevel: string;
-  bowelPattern: string;
-  alcoholConsumption: string;
+  dose_mg: string;
+  dose_other: string;
+  frequency: string;
+  injection_day: string;
+  appetite_level: string;
+  // Screen 3
+  activity_types: string[];
+  primary_activity: string;
+  activity_frequency: string;
+  experience_level: string;
+  equipment: string;
 };
 
 export default function OnboardingPage() {
@@ -65,16 +59,19 @@ export default function OnboardingPage() {
   const [fieldError, setFieldError] = useState<string | null>(null);
 
   const [form, setForm] = useState<Form>({
+    weight_kg: "",
+    primary_goal: "",
     medication: "",
-    thyroid: "",
-    dietaryPrefs: [],
-    age: "",
-    weightKg: "",
-    heightCm: "",
-    sex: "",
-    activityLevel: "",
-    bowelPattern: "",
-    alcoholConsumption: "",
+    dose_mg: "",
+    dose_other: "",
+    frequency: "",
+    injection_day: "",
+    appetite_level: "",
+    activity_types: [],
+    primary_activity: "",
+    activity_frequency: "",
+    experience_level: "",
+    equipment: "",
   });
 
   function set(field: keyof Form, value: string) {
@@ -82,21 +79,52 @@ export default function OnboardingPage() {
     setFieldError(null);
   }
 
-  function toggleDiet(val: string) {
-    setForm((f) => ({
-      ...f,
-      dietaryPrefs: f.dietaryPrefs.includes(val)
-        ? f.dietaryPrefs.filter((v) => v !== val)
-        : [...f.dietaryPrefs, val],
-    }));
+  function toggleActivity(val: string) {
+    setForm((f) => {
+      const next = f.activity_types.includes(val)
+        ? f.activity_types.filter((v) => v !== val)
+        : [...f.activity_types, val];
+      // Reset primary_activity if removed
+      const primary =
+        f.primary_activity && next.includes(f.primary_activity)
+          ? f.primary_activity
+          : "";
+      return { ...f, activity_types: next, primary_activity: primary };
+    });
     setFieldError(null);
   }
 
+  function getDoses(): number[] {
+    if (form.medication === "semaglutide") return SEMAGLUTIDE_DOSES;
+    if (form.medication === "tirzepatide") return TIRZEPATIDE_DOSES;
+    return [];
+  }
+
   function canAdvance(): boolean {
-    if (step === 1) return !!form.medication && !!form.thyroid;
-    if (step === 2) return form.dietaryPrefs.length > 0;
-    if (step === 3) return !!form.age && !!form.weightKg && !!form.heightCm && !!form.sex && !!form.activityLevel;
-    if (step === 4) return !!form.bowelPattern && !!form.alcoholConsumption;
+    if (step === 1) {
+      return parseFloat(form.weight_kg) > 0 && !!form.primary_goal;
+    }
+    if (step === 2) {
+      const hasBasics = !!form.medication && !!form.frequency && !!form.appetite_level;
+      const hasFreqDay = form.frequency !== "weekly" || !!form.injection_day;
+      let hasDose = false;
+      if (form.medication === "other") {
+        hasDose = parseFloat(form.dose_other) > 0;
+      } else {
+        hasDose = !!form.dose_mg;
+      }
+      return hasBasics && hasDose && hasFreqDay;
+    }
+    if (step === 3) {
+      const hasActivities = form.activity_types.length > 0;
+      const hasPrimary =
+        form.activity_types.length === 1 || !!form.primary_activity;
+      const hasFreq = !!form.activity_frequency;
+      const hasExp = !!form.experience_level;
+      const needsEquipment = form.activity_types.includes("strength");
+      const hasEquipment = !needsEquipment || !!form.equipment;
+      return hasActivities && hasPrimary && hasFreq && hasExp && hasEquipment;
+    }
     return true;
   }
 
@@ -122,220 +150,351 @@ export default function OnboardingPage() {
       return;
     }
     setSaving(true);
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) { router.push("/login"); return; }
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
+      router.push("/login");
+      return;
+    }
 
-    const weightKg = parseFloat(form.weightKg);
+    const weightKg = parseFloat(form.weight_kg);
+    const goal = form.primary_goal as Goal;
+    const doseMg =
+      form.medication === "other"
+        ? parseFloat(form.dose_other)
+        : parseFloat(form.dose_mg);
+    const proteinGoalG = calculateProteinGoal(weightKg, goal, doseMg);
+
+    // Compute primary_activity
+    const primaryActivity =
+      form.activity_types.length === 1
+        ? form.activity_types[0]
+        : form.primary_activity;
+
+    const today = new Date().toISOString().split("T")[0];
+
+    // Upsert profile
     await supabase.from("profiles").upsert({
       id: user.id,
-      glp1_medication: form.medication,
-      dietary_prefs: form.dietaryPrefs,
-      age: parseInt(form.age),
       weight_kg: weightKg,
-      height_cm: parseInt(form.heightCm),
-      sex: form.sex,
-      activity_level: form.activityLevel,
-      protein_goal_g: calcProteinGoal(weightKg, form.activityLevel),
-      bowel_pattern: form.bowelPattern,
-      alcohol_consumption: form.alcoholConsumption,
+      primary_goal: goal,
+      glp1_medication: form.medication,
+      glp1_dose_mg: doseMg,
+      glp1_frequency: form.frequency,
+      glp1_injection_day:
+        form.frequency === "weekly" ? form.injection_day : null,
+      appetite_level: form.appetite_level,
+      activity_types: form.activity_types,
+      primary_activity: primaryActivity,
+      activity_frequency: form.activity_frequency,
+      experience_level: form.experience_level,
+      equipment: form.activity_types.includes("strength")
+        ? form.equipment
+        : "bodyweight",
+      protein_goal_g: proteinGoalG,
+      dietary_prefs: [],
       onboarding_done: true,
       updated_at: new Date().toISOString(),
+    });
+
+    // Insert medication log
+    await supabase.from("medication_logs").insert({
+      user_id: user.id,
+      medication: form.medication,
+      dose_mg: doseMg,
+      change_date: today,
+      change_type: "start",
     });
 
     setDone(true);
     setSaving(false);
 
-    // Redirect to Stripe checkout after brief pause to show completion screen
-    setTimeout(async () => {
-      const res = await fetch("/api/stripe/checkout", { method: "POST" });
-      const data = await res.json();
-      if (data.url) {
-        window.location.href = data.url;
-      } else {
-        router.push("/dashboard");
-      }
+    // Redirect to dashboard after brief pause
+    setTimeout(() => {
+      router.push("/dashboard");
     }, 3000);
   }
 
   const progress = Math.round((step / TOTAL_STEPS) * 100);
+  const doses = getDoses();
 
   return (
-    <div style={{
-      minHeight: "100vh",
-      background: "linear-gradient(180deg, #f5f5f5 0%, #e8e8e8 100%)",
-      fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-      padding: "32px 16px 48px",
-    }}>
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "linear-gradient(180deg, #f5f5f5 0%, #e8e8e8 100%)",
+        fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        padding: "32px 16px 48px",
+      }}
+    >
       {/* Logo */}
-      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 24 }}>
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2e7d32" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <div
+        style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 24 }}
+      >
+        <svg
+          width="22"
+          height="22"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="#2e7d32"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
           <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
         </svg>
-        <span style={{ fontWeight: 700, fontSize: 17, color: "#1a1a1a" }}>MuscleGuard</span>
+        <span style={{ fontWeight: 700, fontSize: 17, color: "#1a1a1a" }}>
+          MuscleGuard
+        </span>
       </div>
 
       <div style={{ width: "100%", maxWidth: 540 }}>
         {/* Progress bar */}
         {!done && (
           <div style={{ marginBottom: 20 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
-              <span style={{ fontSize: 13, color: "#666" }}>Step {step} of {TOTAL_STEPS}</span>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                marginBottom: 6,
+              }}
+            >
+              <span style={{ fontSize: 13, color: "#666" }}>
+                Step {step} of {TOTAL_STEPS}
+              </span>
               <span style={{ fontSize: 13, color: "#666" }}>{progress}%</span>
             </div>
             <div style={{ height: 6, background: "#ddd", borderRadius: 99 }}>
-              <div style={{
-                height: 6,
-                background: "#2e7d32",
-                borderRadius: 99,
-                width: `${progress}%`,
-                transition: "width 0.4s ease",
-              }} />
+              <div
+                style={{
+                  height: 6,
+                  background: "#2e7d32",
+                  borderRadius: 99,
+                  width: `${progress}%`,
+                  transition: "width 0.4s ease",
+                }}
+              />
             </div>
           </div>
         )}
 
         {/* Card */}
-        <div style={{
-          background: "#fff",
-          border: "1px solid #ddd",
-          borderRadius: 12,
-          padding: "28px 24px",
-        }}>
-
+        <div
+          style={{
+            background: "#fff",
+            border: "1px solid #ddd",
+            borderRadius: 12,
+            padding: "28px 24px",
+          }}
+        >
           {/* ── DONE SCREEN ── */}
           {done && (
             <div style={{ textAlign: "center" }}>
               <div style={{ fontSize: 40, marginBottom: 12 }}>✓</div>
-              <h2 style={{ fontSize: 20, fontWeight: 700, color: "#1a1a1a", marginBottom: 8 }}>
+              <h2
+                style={{
+                  fontSize: 20,
+                  fontWeight: 700,
+                  color: "#1a1a1a",
+                  marginBottom: 8,
+                }}
+              >
                 Assessment complete
               </h2>
-              <p style={{ color: "#666", fontSize: 14, marginBottom: 24 }}>
-                Your personalized muscle preservation protocol is being generated:
+              <p
+                style={{
+                  color: "#666",
+                  fontSize: 14,
+                  marginBottom: 24,
+                }}
+              >
+                Your personalized muscle preservation protocol is being
+                generated:
               </p>
-              <div style={{ textAlign: "left", display: "flex", flexDirection: "column", gap: 10 }}>
+              <div
+                style={{
+                  textAlign: "left",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 10,
+                }}
+              >
                 {[
-                  "Protein target adjusted to your dose (1.2–1.6 g/kg)",
+                  "Protein target adjusted to your dose",
                   "Resistance plan to protect lean mass",
-                  "Hydration and fiber strategy for GLP-1",
+                  "Activity-specific training protocol",
                   "Body composition monitoring (not just weight)",
                 ].map((item) => (
-                  <div key={item} style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
-                    <span style={{ color: "#2e7d32", fontWeight: 700, marginTop: 1 }}>✓</span>
-                    <span style={{ fontSize: 14, color: "#1a1a1a" }}>{item}</span>
+                  <div
+                    key={item}
+                    style={{
+                      display: "flex",
+                      alignItems: "flex-start",
+                      gap: 10,
+                    }}
+                  >
+                    <span
+                      style={{ color: "#2e7d32", fontWeight: 700, marginTop: 1 }}
+                    >
+                      ✓
+                    </span>
+                    <span style={{ fontSize: 14, color: "#1a1a1a" }}>
+                      {item}
+                    </span>
                   </div>
                 ))}
               </div>
-              <p style={{ fontSize: 12, color: "#999", marginTop: 20 }}>Redirecting in a moment…</p>
+              <p
+                style={{ fontSize: 12, color: "#999", marginTop: 20 }}
+              >
+                Redirecting in a moment…
+              </p>
             </div>
           )}
 
-          {/* ── STEP 1: Medicación + Tiroides ── */}
+          {/* ── STEP 1: Body & Goal ── */}
           {!done && step === 1 && (
             <div>
-              <h2 style={{ fontSize: 20, fontWeight: 700, color: "#1a1a1a", marginBottom: 4 }}>
-                Your GLP-1 medication
+              <h2
+                style={{
+                  fontSize: 20,
+                  fontWeight: 700,
+                  color: "#1a1a1a",
+                  marginBottom: 4,
+                }}
+              >
+                Your body &amp; goal
               </h2>
               <p style={{ fontSize: 14, color: "#666", marginBottom: 20 }}>
-                This helps us tailor your muscle preservation protocol.
+                This helps us calculate your personalized protein target.
               </p>
 
-              <div style={{ background: "#e3f2fd", border: "1px solid #2196f3", borderRadius: 8, padding: "12px 14px", marginBottom: 20 }}>
-                <p style={{ fontSize: 13, color: "#1565c0", margin: 0 }}>
-                  <strong>MuscleGuard</strong> is not a medical service. This app complements — does not replace — your doctor&apos;s supervision.
-                </p>
-              </div>
-
-              <label style={{ fontSize: 13, fontWeight: 600, color: "#1a1a1a", display: "block", marginBottom: 8 }}>
-                Which medication are you taking?
+              {/* Weight input */}
+              <label
+                style={{
+                  fontSize: 13,
+                  fontWeight: 600,
+                  color: "#1a1a1a",
+                  display: "block",
+                  marginBottom: 8,
+                }}
+              >
+                Current weight
               </label>
-              <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 20 }}>
-                {MEDICATIONS.map((med) => (
-                  <button
-                    key={med.value}
-                    type="button"
-                    onClick={() => set("medication", med.value)}
-                    style={{
-                      textAlign: "left", padding: "11px 14px", borderRadius: 8, fontSize: 14,
-                      border: form.medication === med.value ? "2px solid #2e7d32" : "1px solid #ddd",
-                      background: form.medication === med.value ? "#f1f8f1" : "#fff",
-                      color: "#1a1a1a", cursor: "pointer", fontWeight: form.medication === med.value ? 600 : 400,
-                    }}
-                  >
-                    {med.label}
-                  </button>
-                ))}
+              <div
+                style={{
+                  position: "relative",
+                  marginBottom: 24,
+                  maxWidth: 160,
+                }}
+              >
+                <input
+                  type="number"
+                  placeholder="e.g. 82"
+                  value={form.weight_kg}
+                  onChange={(e) => set("weight_kg", e.target.value)}
+                  style={{
+                    width: "100%",
+                    padding: "10px 40px 10px 12px",
+                    borderRadius: 8,
+                    border: "1px solid #ddd",
+                    fontSize: 15,
+                    color: "#1a1a1a",
+                    background: "#fff",
+                    boxSizing: "border-box",
+                  }}
+                />
+                <span
+                  style={{
+                    position: "absolute",
+                    right: 12,
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    fontSize: 13,
+                    color: "#999",
+                    fontWeight: 600,
+                  }}
+                >
+                  kg
+                </span>
               </div>
 
-              <label style={{ fontSize: 13, fontWeight: 600, color: "#1a1a1a", display: "block", marginBottom: 8 }}>
-                Do you have a personal or family history of thyroid cancer or MEN-2 syndrome?
+              {/* Primary goal */}
+              <label
+                style={{
+                  fontSize: 13,
+                  fontWeight: 600,
+                  color: "#1a1a1a",
+                  display: "block",
+                  marginBottom: 8,
+                }}
+              >
+                What is your primary goal?
               </label>
-              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                {[{ value: "no", label: "No" }, { value: "yes", label: "Yes" }].map((opt) => (
-                  <button
-                    key={opt.value}
-                    type="button"
-                    onClick={() => set("thyroid", opt.value)}
-                    style={{
-                      textAlign: "left", padding: "11px 14px", borderRadius: 8, fontSize: 14,
-                      border: form.thyroid === opt.value ? "2px solid #2e7d32" : "1px solid #ddd",
-                      background: form.thyroid === opt.value ? "#f1f8f1" : "#fff",
-                      color: "#1a1a1a", cursor: "pointer", fontWeight: form.thyroid === opt.value ? 600 : 400,
-                    }}
-                  >
-                    {opt.label}
-                  </button>
-                ))}
-              </div>
-
-              {form.thyroid === "yes" && (
-                <div style={{ background: "#ffebee", border: "1px solid #f44336", borderRadius: 8, padding: "12px 14px", marginTop: 16 }}>
-                  <p style={{ fontSize: 13, color: "#c62828", margin: 0, fontWeight: 600 }}>
-                    ⚠ MuscleGuard cannot be used with a history of thyroid cancer or MEN-2.
-                  </p>
-                  <p style={{ fontSize: 13, color: "#c62828", margin: "6px 0 0" }}>
-                    GLP-1 medications are contraindicated in these conditions. Please consult your doctor before continuing.
-                  </p>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* ── STEP 2: Preferencias dietéticas ── */}
-          {!done && step === 2 && (
-            <div>
-              <h2 style={{ fontSize: 20, fontWeight: 700, color: "#1a1a1a", marginBottom: 4 }}>
-                Dietary preferences
-              </h2>
-              <p style={{ fontSize: 14, color: "#666", marginBottom: 20 }}>
-                Select all that apply. We&apos;ll use these to personalize your meal recommendations.
-              </p>
-              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                {DIET_PREFS.map((pref) => {
-                  const selected = form.dietaryPrefs.includes(pref.value);
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 10,
+                }}
+              >
+                {[
+                  {
+                    value: "preserve_muscle",
+                    label: "Preserve muscle",
+                    desc: "Maintain lean mass while losing weight on GLP-1",
+                  },
+                  {
+                    value: "build_strength",
+                    label: "Build strength",
+                    desc: "Add muscle while managing weight",
+                  },
+                  {
+                    value: "general_health",
+                    label: "General health",
+                    desc: "Stay active and feel better",
+                  },
+                ].map((opt) => {
+                  const selected = form.primary_goal === opt.value;
                   return (
                     <button
-                      key={pref.value}
+                      key={opt.value}
                       type="button"
-                      onClick={() => toggleDiet(pref.value)}
+                      onClick={() => set("primary_goal", opt.value)}
                       style={{
-                        textAlign: "left", padding: "11px 14px", borderRadius: 8, fontSize: 14,
-                        border: selected ? "2px solid #2e7d32" : "1px solid #ddd",
+                        textAlign: "left",
+                        padding: "14px 16px",
+                        borderRadius: 10,
+                        border: selected
+                          ? "2px solid #2e7d32"
+                          : "1px solid #ddd",
                         background: selected ? "#f1f8f1" : "#fff",
-                        color: "#1a1a1a", cursor: "pointer", fontWeight: selected ? 600 : 400,
-                        display: "flex", alignItems: "center", gap: 10,
+                        color: "#1a1a1a",
+                        cursor: "pointer",
                       }}
                     >
-                      <span style={{
-                        width: 18, height: 18, borderRadius: 4, border: selected ? "none" : "1.5px solid #ccc",
-                        background: selected ? "#2e7d32" : "transparent",
-                        display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
-                      }}>
-                        {selected && <span style={{ color: "#fff", fontSize: 11, fontWeight: 700 }}>✓</span>}
-                      </span>
-                      {pref.label}
+                      <div
+                        style={{
+                          fontSize: 15,
+                          fontWeight: selected ? 700 : 600,
+                          color: selected ? "#1b5e20" : "#1a1a1a",
+                        }}
+                      >
+                        {opt.label}
+                      </div>
+                      <div
+                        style={{
+                          fontSize: 13,
+                          color: "#666",
+                          marginTop: 3,
+                        }}
+                      >
+                        {opt.desc}
+                      </div>
                     </button>
                   );
                 })}
@@ -343,63 +502,207 @@ export default function OnboardingPage() {
             </div>
           )}
 
-          {/* ── STEP 3: Biometría ── */}
-          {!done && step === 3 && (
+          {/* ── STEP 2: GLP-1 Medication ── */}
+          {!done && step === 2 && (
             <div>
-              <h2 style={{ fontSize: 20, fontWeight: 700, color: "#1a1a1a", marginBottom: 4 }}>
-                Body metrics
+              <h2
+                style={{
+                  fontSize: 20,
+                  fontWeight: 700,
+                  color: "#1a1a1a",
+                  marginBottom: 4,
+                }}
+              >
+                Your GLP-1 medication
               </h2>
               <p style={{ fontSize: 14, color: "#666", marginBottom: 20 }}>
-                We need this data to calculate your personalized protein target.
+                We use this to adjust your protein and training intensity.
               </p>
 
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12, marginBottom: 16 }}>
+              {/* Medication type */}
+              <label
+                style={{
+                  fontSize: 13,
+                  fontWeight: 600,
+                  color: "#1a1a1a",
+                  display: "block",
+                  marginBottom: 8,
+                }}
+              >
+                Medication type
+              </label>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 8,
+                  marginBottom: 20,
+                }}
+              >
                 {[
-                  { field: "age" as keyof Form, label: "Age", placeholder: "e.g. 38", unit: "yrs", type: "number" },
-                  { field: "weightKg" as keyof Form, label: "Weight", placeholder: "e.g. 82", unit: "kg", type: "number" },
-                  { field: "heightCm" as keyof Form, label: "Height", placeholder: "e.g. 170", unit: "cm", type: "number" },
-                ].map(({ field, label, placeholder, unit, type }) => (
-                  <div key={field}>
-                    <label style={{ fontSize: 12, fontWeight: 600, color: "#666", display: "block", marginBottom: 4 }}>
-                      {label}
-                    </label>
-                    <div style={{ position: "relative" }}>
-                      <input
-                        type={type}
-                        placeholder={placeholder}
-                        value={form[field] as string}
-                        onChange={(e) => set(field, e.target.value)}
-                        style={{
-                          width: "100%", padding: "9px 10px", borderRadius: 8, border: "1px solid #ddd",
-                          fontSize: 14, color: "#1a1a1a", background: "#fff", boxSizing: "border-box",
-                        }}
-                      />
-                      <span style={{ position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)", fontSize: 11, color: "#999" }}>
-                        {unit}
-                      </span>
-                    </div>
-                  </div>
+                  {
+                    value: "semaglutide",
+                    label: "Semaglutide (Ozempic / Wegovy)",
+                  },
+                  {
+                    value: "tirzepatide",
+                    label: "Tirzepatide (Mounjaro / Zepbound)",
+                  },
+                  { value: "other", label: "Other GLP-1" },
+                ].map((med) => (
+                  <button
+                    key={med.value}
+                    type="button"
+                    onClick={() => {
+                      set("medication", med.value);
+                      set("dose_mg", "");
+                    }}
+                    style={{
+                      textAlign: "left",
+                      padding: "11px 14px",
+                      borderRadius: 8,
+                      fontSize: 14,
+                      border:
+                        form.medication === med.value
+                          ? "2px solid #2e7d32"
+                          : "1px solid #ddd",
+                      background:
+                        form.medication === med.value ? "#f1f8f1" : "#fff",
+                      color: "#1a1a1a",
+                      cursor: "pointer",
+                      fontWeight: form.medication === med.value ? 600 : 400,
+                    }}
+                  >
+                    {med.label}
+                  </button>
                 ))}
               </div>
 
-              <label style={{ fontSize: 13, fontWeight: 600, color: "#1a1a1a", display: "block", marginBottom: 8 }}>
-                Biological sex
+              {/* Dose */}
+              {form.medication && (
+                <>
+                  <label
+                    style={{
+                      fontSize: 13,
+                      fontWeight: 600,
+                      color: "#1a1a1a",
+                      display: "block",
+                      marginBottom: 8,
+                    }}
+                  >
+                    Current dose
+                  </label>
+                  {form.medication === "other" ? (
+                    <div
+                      style={{
+                        position: "relative",
+                        marginBottom: 20,
+                        maxWidth: 160,
+                      }}
+                    >
+                      <input
+                        type="number"
+                        placeholder="e.g. 1.0"
+                        value={form.dose_other}
+                        onChange={(e) => set("dose_other", e.target.value)}
+                        style={{
+                          width: "100%",
+                          padding: "10px 40px 10px 12px",
+                          borderRadius: 8,
+                          border: "1px solid #ddd",
+                          fontSize: 15,
+                          color: "#1a1a1a",
+                          background: "#fff",
+                          boxSizing: "border-box",
+                        }}
+                      />
+                      <span
+                        style={{
+                          position: "absolute",
+                          right: 12,
+                          top: "50%",
+                          transform: "translateY(-50%)",
+                          fontSize: 13,
+                          color: "#999",
+                          fontWeight: 600,
+                        }}
+                      >
+                        mg
+                      </span>
+                    </div>
+                  ) : (
+                    <div style={{ marginBottom: 20 }}>
+                      <select
+                        value={form.dose_mg}
+                        onChange={(e) => set("dose_mg", e.target.value)}
+                        style={{
+                          padding: "10px 12px",
+                          borderRadius: 8,
+                          border: "1px solid #ddd",
+                          fontSize: 14,
+                          color: form.dose_mg ? "#1a1a1a" : "#999",
+                          background: "#fff",
+                          cursor: "pointer",
+                          minWidth: 160,
+                        }}
+                      >
+                        <option value="">Select dose…</option>
+                        {doses.map((d) => (
+                          <option key={d} value={String(d)}>
+                            {d} mg
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+                </>
+              )}
+
+              {/* Frequency */}
+              <label
+                style={{
+                  fontSize: 13,
+                  fontWeight: 600,
+                  color: "#1a1a1a",
+                  display: "block",
+                  marginBottom: 8,
+                }}
+              >
+                Injection frequency
               </label>
-              <div style={{ display: "flex", gap: 8, marginBottom: 20 }}>
+              <div
+                style={{
+                  display: "flex",
+                  gap: 8,
+                  marginBottom: 20,
+                  flexWrap: "wrap",
+                }}
+              >
                 {[
-                  { value: "male", label: "Male" },
-                  { value: "female", label: "Female" },
-                  { value: "other", label: "Other" },
+                  { value: "weekly", label: "Weekly" },
+                  { value: "biweekly", label: "Every 2 weeks" },
+                  { value: "monthly", label: "Monthly" },
                 ].map((opt) => (
                   <button
                     key={opt.value}
                     type="button"
-                    onClick={() => set("sex", opt.value)}
+                    onClick={() => {
+                      set("frequency", opt.value);
+                      if (opt.value !== "weekly") set("injection_day", "");
+                    }}
                     style={{
-                      flex: 1, padding: "10px 6px", borderRadius: 8, fontSize: 13,
-                      border: form.sex === opt.value ? "2px solid #2e7d32" : "1px solid #ddd",
-                      background: form.sex === opt.value ? "#f1f8f1" : "#fff",
-                      color: "#1a1a1a", cursor: "pointer", fontWeight: form.sex === opt.value ? 600 : 400,
+                      padding: "10px 16px",
+                      borderRadius: 8,
+                      fontSize: 13,
+                      border:
+                        form.frequency === opt.value
+                          ? "2px solid #2e7d32"
+                          : "1px solid #ddd",
+                      background:
+                        form.frequency === opt.value ? "#f1f8f1" : "#fff",
+                      color: "#1a1a1a",
+                      cursor: "pointer",
+                      fontWeight: form.frequency === opt.value ? 600 : 400,
                     }}
                   >
                     {opt.label}
@@ -407,54 +710,269 @@ export default function OnboardingPage() {
                 ))}
               </div>
 
-              <label style={{ fontSize: 13, fontWeight: 600, color: "#1a1a1a", display: "block", marginBottom: 8 }}>
-                Physical activity level
-              </label>
-              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                {ACTIVITY_LEVELS.map((lvl) => (
-                  <button
-                    key={lvl.value}
-                    type="button"
-                    onClick={() => set("activityLevel", lvl.value)}
+              {/* Injection day (weekly only) */}
+              {form.frequency === "weekly" && (
+                <>
+                  <label
                     style={{
-                      textAlign: "left", padding: "11px 14px", borderRadius: 8,
-                      border: form.activityLevel === lvl.value ? "2px solid #2e7d32" : "1px solid #ddd",
-                      background: form.activityLevel === lvl.value ? "#f1f8f1" : "#fff",
-                      color: "#1a1a1a", cursor: "pointer",
+                      fontSize: 13,
+                      fontWeight: 600,
+                      color: "#1a1a1a",
+                      display: "block",
+                      marginBottom: 8,
                     }}
                   >
-                    <div style={{ fontSize: 14, fontWeight: 600, color: "#1a1a1a" }}>{lvl.label}</div>
-                    <div style={{ fontSize: 12, color: "#666", marginTop: 2 }}>{lvl.desc}</div>
+                    Injection day
+                  </label>
+                  <div
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "repeat(7, 1fr)",
+                      gap: 6,
+                      marginBottom: 20,
+                    }}
+                  >
+                    {DAYS_OF_WEEK.map((day) => (
+                      <button
+                        key={day}
+                        type="button"
+                        onClick={() => set("injection_day", day)}
+                        style={{
+                          padding: "8px 4px",
+                          borderRadius: 8,
+                          fontSize: 12,
+                          border:
+                            form.injection_day === day
+                              ? "2px solid #2e7d32"
+                              : "1px solid #ddd",
+                          background:
+                            form.injection_day === day ? "#f1f8f1" : "#fff",
+                          color:
+                            form.injection_day === day ? "#1b5e20" : "#1a1a1a",
+                          cursor: "pointer",
+                          fontWeight: form.injection_day === day ? 700 : 400,
+                          textAlign: "center",
+                        }}
+                      >
+                        {day}
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
+
+              {/* Appetite */}
+              <label
+                style={{
+                  fontSize: 13,
+                  fontWeight: 600,
+                  color: "#1a1a1a",
+                  display: "block",
+                  marginBottom: 8,
+                }}
+              >
+                Appetite suppression right now
+              </label>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 8,
+                }}
+              >
+                {APPETITE_OPTIONS.map((opt) => (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => set("appetite_level", opt.value)}
+                    style={{
+                      textAlign: "left",
+                      padding: "10px 14px",
+                      borderRadius: 8,
+                      fontSize: 14,
+                      border:
+                        form.appetite_level === opt.value
+                          ? "2px solid #2e7d32"
+                          : "1px solid #ddd",
+                      background:
+                        form.appetite_level === opt.value ? "#f1f8f1" : "#fff",
+                      color: "#1a1a1a",
+                      cursor: "pointer",
+                      fontWeight: form.appetite_level === opt.value ? 600 : 400,
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 10,
+                    }}
+                  >
+                    <span style={{ fontSize: 16 }}>{opt.emoji}</span>
+                    {opt.label}
                   </button>
                 ))}
               </div>
             </div>
           )}
 
-          {/* ── STEP 4: Salud GI ── */}
-          {!done && step === 4 && (
+          {/* ── STEP 3: Activity ── */}
+          {!done && step === 3 && (
             <div>
-              <h2 style={{ fontSize: 20, fontWeight: 700, color: "#1a1a1a", marginBottom: 4 }}>
-                Gastrointestinal health
+              <h2
+                style={{
+                  fontSize: 20,
+                  fontWeight: 700,
+                  color: "#1a1a1a",
+                  marginBottom: 4,
+                }}
+              >
+                Your activity
               </h2>
               <p style={{ fontSize: 14, color: "#666", marginBottom: 20 }}>
-                GLP-1 medications directly affect gut motility. This helps us personalize your plan.
+                Tell us about your exercise habits so we can build your training
+                protocol.
               </p>
 
-              <label style={{ fontSize: 13, fontWeight: 600, color: "#1a1a1a", display: "block", marginBottom: 8 }}>
-                How often do you have a bowel movement?
+              {/* Activity types */}
+              <label
+                style={{
+                  fontSize: 13,
+                  fontWeight: 600,
+                  color: "#1a1a1a",
+                  display: "block",
+                  marginBottom: 8,
+                }}
+              >
+                What types of exercise do you do?{" "}
+                <span style={{ color: "#666", fontWeight: 400 }}>
+                  (select all that apply)
+                </span>
               </label>
-              <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 20 }}>
-                {BOWEL_PATTERNS.map((opt) => (
+              <div
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  gap: 8,
+                  marginBottom: 20,
+                }}
+              >
+                {ACTIVITY_OPTIONS.map((opt) => {
+                  const selected = form.activity_types.includes(opt.value);
+                  return (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      onClick={() => toggleActivity(opt.value)}
+                      style={{
+                        padding: "8px 14px",
+                        borderRadius: 20,
+                        fontSize: 13,
+                        border: selected
+                          ? "2px solid #2e7d32"
+                          : "1px solid #ddd",
+                        background: selected ? "#f1f8f1" : "#fff",
+                        color: selected ? "#1b5e20" : "#1a1a1a",
+                        cursor: "pointer",
+                        fontWeight: selected ? 600 : 400,
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 6,
+                      }}
+                    >
+                      <span>{opt.emoji}</span>
+                      {opt.label}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Primary activity (only if 2+ selected) */}
+              {form.activity_types.length >= 2 && (
+                <>
+                  <label
+                    style={{
+                      fontSize: 13,
+                      fontWeight: 600,
+                      color: "#1a1a1a",
+                      display: "block",
+                      marginBottom: 8,
+                    }}
+                  >
+                    Which is your primary activity?
+                  </label>
+                  <div style={{ marginBottom: 20 }}>
+                    <select
+                      value={form.primary_activity}
+                      onChange={(e) => set("primary_activity", e.target.value)}
+                      style={{
+                        padding: "10px 12px",
+                        borderRadius: 8,
+                        border: "1px solid #ddd",
+                        fontSize: 14,
+                        color: form.primary_activity ? "#1a1a1a" : "#999",
+                        background: "#fff",
+                        cursor: "pointer",
+                        minWidth: 200,
+                      }}
+                    >
+                      <option value="">Select primary activity…</option>
+                      {form.activity_types.map((act) => {
+                        const opt = ACTIVITY_OPTIONS.find(
+                          (o) => o.value === act
+                        );
+                        return opt ? (
+                          <option key={act} value={act}>
+                            {opt.emoji} {opt.label}
+                          </option>
+                        ) : null;
+                      })}
+                    </select>
+                  </div>
+                </>
+              )}
+
+              {/* Frequency */}
+              <label
+                style={{
+                  fontSize: 13,
+                  fontWeight: 600,
+                  color: "#1a1a1a",
+                  display: "block",
+                  marginBottom: 8,
+                }}
+              >
+                How often do you exercise?
+              </label>
+              <div
+                style={{
+                  display: "flex",
+                  gap: 8,
+                  marginBottom: 20,
+                  flexWrap: "wrap",
+                }}
+              >
+                {[
+                  { value: "1_2x", label: "1-2x/week" },
+                  { value: "3_4x", label: "3-4x/week" },
+                  { value: "5x_plus", label: "5+x/week" },
+                ].map((opt) => (
                   <button
                     key={opt.value}
                     type="button"
-                    onClick={() => set("bowelPattern", opt.value)}
+                    onClick={() => set("activity_frequency", opt.value)}
                     style={{
-                      textAlign: "left", padding: "11px 14px", borderRadius: 8, fontSize: 14,
-                      border: form.bowelPattern === opt.value ? "2px solid #2e7d32" : "1px solid #ddd",
-                      background: form.bowelPattern === opt.value ? "#f1f8f1" : "#fff",
-                      color: "#1a1a1a", cursor: "pointer", fontWeight: form.bowelPattern === opt.value ? 600 : 400,
+                      padding: "10px 16px",
+                      borderRadius: 8,
+                      fontSize: 13,
+                      border:
+                        form.activity_frequency === opt.value
+                          ? "2px solid #2e7d32"
+                          : "1px solid #ddd",
+                      background:
+                        form.activity_frequency === opt.value
+                          ? "#f1f8f1"
+                          : "#fff",
+                      color: "#1a1a1a",
+                      cursor: "pointer",
+                      fontWeight:
+                        form.activity_frequency === opt.value ? 600 : 400,
                     }}
                   >
                     {opt.label}
@@ -462,20 +980,51 @@ export default function OnboardingPage() {
                 ))}
               </div>
 
-              <label style={{ fontSize: 13, fontWeight: 600, color: "#1a1a1a", display: "block", marginBottom: 8 }}>
-                Alcohol consumption
+              {/* Experience */}
+              <label
+                style={{
+                  fontSize: 13,
+                  fontWeight: 600,
+                  color: "#1a1a1a",
+                  display: "block",
+                  marginBottom: 8,
+                }}
+              >
+                Experience level
               </label>
-              <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 16 }}>
-                {ALCOHOL_OPTIONS.map((opt) => (
+              <div
+                style={{
+                  display: "flex",
+                  gap: 8,
+                  marginBottom: 20,
+                  flexWrap: "wrap",
+                }}
+              >
+                {[
+                  { value: "beginner", label: "Beginner" },
+                  { value: "intermediate", label: "Intermediate" },
+                  { value: "advanced", label: "Advanced" },
+                ].map((opt) => (
                   <button
                     key={opt.value}
                     type="button"
-                    onClick={() => set("alcoholConsumption", opt.value)}
+                    onClick={() => set("experience_level", opt.value)}
                     style={{
-                      textAlign: "left", padding: "11px 14px", borderRadius: 8, fontSize: 14,
-                      border: form.alcoholConsumption === opt.value ? "2px solid #2e7d32" : "1px solid #ddd",
-                      background: form.alcoholConsumption === opt.value ? "#f1f8f1" : "#fff",
-                      color: "#1a1a1a", cursor: "pointer", fontWeight: form.alcoholConsumption === opt.value ? 600 : 400,
+                      padding: "10px 16px",
+                      borderRadius: 8,
+                      fontSize: 13,
+                      border:
+                        form.experience_level === opt.value
+                          ? "2px solid #2e7d32"
+                          : "1px solid #ddd",
+                      background:
+                        form.experience_level === opt.value
+                          ? "#f1f8f1"
+                          : "#fff",
+                      color: "#1a1a1a",
+                      cursor: "pointer",
+                      fontWeight:
+                        form.experience_level === opt.value ? 600 : 400,
                     }}
                   >
                     {opt.label}
@@ -483,23 +1032,87 @@ export default function OnboardingPage() {
                 ))}
               </div>
 
-              {form.alcoholConsumption && form.alcoholConsumption !== "none" && (
-                <div style={{ background: "#fff3cd", border: "1px solid #ffc107", borderRadius: 8, padding: "12px 14px" }}>
-                  <p style={{ fontSize: 13, color: "#856404", margin: 0, fontWeight: 600 }}>
-                    ⚠ Alcohol + GLP-1 = increased risk of pancreatitis and dehydration
-                  </p>
-                  <p style={{ fontSize: 13, color: "#856404", margin: "6px 0 0" }}>
-                    The combination can intensify side effects. Your plan will include enhanced hydration strategies.
-                  </p>
-                </div>
+              {/* Equipment (only if strength selected) */}
+              {form.activity_types.includes("strength") && (
+                <>
+                  <label
+                    style={{
+                      fontSize: 13,
+                      fontWeight: 600,
+                      color: "#1a1a1a",
+                      display: "block",
+                      marginBottom: 8,
+                    }}
+                  >
+                    Equipment available
+                  </label>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: 8,
+                    }}
+                  >
+                    {[
+                      { value: "gym", label: "Full gym", emoji: "🏋️" },
+                      {
+                        value: "dumbbells",
+                        label: "Dumbbells at home",
+                        emoji: "💪",
+                      },
+                      {
+                        value: "bodyweight",
+                        label: "Bodyweight only",
+                        emoji: "🤸",
+                      },
+                    ].map((opt) => (
+                      <button
+                        key={opt.value}
+                        type="button"
+                        onClick={() => set("equipment", opt.value)}
+                        style={{
+                          textAlign: "left",
+                          padding: "10px 14px",
+                          borderRadius: 8,
+                          fontSize: 14,
+                          border:
+                            form.equipment === opt.value
+                              ? "2px solid #2e7d32"
+                              : "1px solid #ddd",
+                          background:
+                            form.equipment === opt.value ? "#f1f8f1" : "#fff",
+                          color: "#1a1a1a",
+                          cursor: "pointer",
+                          fontWeight: form.equipment === opt.value ? 600 : 400,
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 10,
+                        }}
+                      >
+                        <span style={{ fontSize: 16 }}>{opt.emoji}</span>
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                </>
               )}
             </div>
           )}
 
           {/* Field error */}
           {fieldError && !done && (
-            <div style={{ background: "#ffebee", border: "1px solid #f44336", borderRadius: 8, padding: "10px 14px", marginTop: 16 }}>
-              <p style={{ fontSize: 13, color: "#c62828", margin: 0 }}>{fieldError}</p>
+            <div
+              style={{
+                background: "#ffebee",
+                border: "1px solid #f44336",
+                borderRadius: 8,
+                padding: "10px 14px",
+                marginTop: 16,
+              }}
+            >
+              <p style={{ fontSize: 13, color: "#c62828", margin: 0 }}>
+                {fieldError}
+              </p>
             </div>
           )}
 
@@ -511,8 +1124,15 @@ export default function OnboardingPage() {
                   type="button"
                   onClick={handleBack}
                   style={{
-                    flex: 1, padding: "12px", borderRadius: 8, fontSize: 14, fontWeight: 600,
-                    border: "1px solid #ddd", background: "#fff", color: "#1a1a1a", cursor: "pointer",
+                    flex: 1,
+                    padding: "12px",
+                    borderRadius: 8,
+                    fontSize: 14,
+                    fontWeight: 600,
+                    border: "1px solid #ddd",
+                    background: "#fff",
+                    color: "#1a1a1a",
+                    cursor: "pointer",
                   }}
                 >
                   ← Back
@@ -522,12 +1142,16 @@ export default function OnboardingPage() {
                 <button
                   type="button"
                   onClick={handleNext}
-                  disabled={step === 1 && form.thyroid === "yes"}
                   style={{
-                    flex: 1, padding: "12px", borderRadius: 8, fontSize: 14, fontWeight: 600,
+                    flex: 1,
+                    padding: "12px",
+                    borderRadius: 8,
+                    fontSize: 14,
+                    fontWeight: 600,
                     border: "none",
-                    background: step === 1 && form.thyroid === "yes" ? "#ccc" : "#2e7d32",
-                    color: "#fff", cursor: step === 1 && form.thyroid === "yes" ? "not-allowed" : "pointer",
+                    background: "#2e7d32",
+                    color: "#fff",
+                    cursor: "pointer",
                   }}
                 >
                   Next →
@@ -538,9 +1162,15 @@ export default function OnboardingPage() {
                   onClick={handleFinish}
                   disabled={saving}
                   style={{
-                    flex: 1, padding: "12px", borderRadius: 8, fontSize: 14, fontWeight: 600,
-                    border: "none", background: saving ? "#ccc" : "#2e7d32",
-                    color: "#fff", cursor: saving ? "not-allowed" : "pointer",
+                    flex: 1,
+                    padding: "12px",
+                    borderRadius: 8,
+                    fontSize: 14,
+                    fontWeight: 600,
+                    border: "none",
+                    background: saving ? "#ccc" : "#2e7d32",
+                    color: "#fff",
+                    cursor: saving ? "not-allowed" : "pointer",
                   }}
                 >
                   {saving ? "Saving…" : "Complete →"}

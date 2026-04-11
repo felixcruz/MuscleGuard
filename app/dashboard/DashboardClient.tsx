@@ -6,7 +6,7 @@ import { ProteinRing } from "@/components/dashboard/ProteinRing";
 import { QuickLogForm } from "@/components/dashboard/QuickLogForm";
 import { TodayFoodLog } from "@/components/dashboard/TodayFoodLog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Flame, Trophy, Zap, X, ChevronDown, ChevronRight } from "lucide-react";
+import { Flame, Trophy, Zap, X, ChevronDown, ChevronRight, AlertTriangle } from "lucide-react";
 
 // ── Meal presets ──
 const MEAL_PRESETS = {
@@ -141,6 +141,10 @@ interface Props {
   workoutStreakDays: number;
   totalPoints: number;
   goalAlreadyHitToday: boolean;
+  proteinGoalExplanation: string;
+  proteinBreakdown: { breakfast: number; lunch: number; dinner: number; snack: number };
+  trainingIntensityPct: number;
+  appetiteLevel: string;
 }
 
 function formatTime(ts: string) {
@@ -162,7 +166,8 @@ function formatDayLabel(dateStr: string) {
 export function DashboardClient({
   userId, proteinGoalG, initialLogs, weekLogs, weekStart,
   proteinStreakDays, workoutStreakDays, totalPoints,
-  goalAlreadyHitToday,
+  goalAlreadyHitToday, proteinGoalExplanation, proteinBreakdown,
+  trainingIntensityPct, appetiteLevel,
 }: Props) {
   const supabase = createClient();
 
@@ -254,9 +259,27 @@ export function DashboardClient({
     streak >= 14 ? "⭐ 14-day protein streak!" :
     streak >= 7  ? "🎖 7-day protein streak!"  : null;
 
+  const isSevereAppetite = appetiteLevel === "severe" || appetiteLevel === "very_severe";
+
   return (
     <div className="max-w-lg mx-auto px-4 py-8 space-y-5">
       {showConfetti && <Confetti />}
+
+      {/* ── Severe appetite alert banner ── */}
+      {isSevereAppetite && (
+        <div className="flex items-start gap-3 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+          <AlertTriangle className="h-5 w-5 text-amber-600 mt-0.5 flex-shrink-0" />
+          <div>
+            <p className="font-semibold text-amber-800 text-sm">
+              Severe appetite suppression detected
+            </p>
+            <p className="text-xs text-amber-700 mt-1">
+              Focus on high-density foods: protein shakes, Greek yogurt, cottage cheese.
+              Training at reduced intensity today.
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* ── Header: streak badges ── */}
       <div className="flex items-start justify-between">
@@ -294,9 +317,23 @@ export function DashboardClient({
 
       {/* ── Protein ring ── */}
       <Card>
-        <CardContent className="pt-8 pb-6 flex justify-center">
+        <CardContent className="pt-8 pb-4 flex justify-center">
           <ProteinRing goalG={proteinGoalG} loggedG={totalProtein} />
         </CardContent>
+        {/* Protein personalization info */}
+        <div className="px-5 pb-5 space-y-2 border-t border-gray-100 pt-3">
+          <p className="text-xs text-gray-500 leading-relaxed">{proteinGoalExplanation}</p>
+          <p className="text-xs text-gray-400">
+            <span className="font-medium text-gray-600">Meal targets:</span>{" "}
+            Breakfast: {proteinBreakdown.breakfast}g · Lunch: {proteinBreakdown.lunch}g · Dinner: {proteinBreakdown.dinner}g · Snack: {proteinBreakdown.snack}g
+          </p>
+          {trainingIntensityPct < 95 && (
+            <p className="text-xs text-gray-400">
+              <span className="font-medium text-gray-600">Training today:</span>{" "}
+              {trainingIntensityPct}% intensity
+            </p>
+          )}
+        </div>
       </Card>
 
       {/* Sub-message */}
@@ -435,7 +472,6 @@ interface ThisWeekProps {
 }
 
 function ThisWeek({ weekLogs, weekStart, expanded, onToggle, expandedDays, onToggleDay }: ThisWeekProps) {
-  // Build ordered list of days Mon→today
   const today = new Date().toISOString().split("T")[0];
   const days: string[] = [];
   const cursor = new Date(weekStart + "T12:00:00Z");
@@ -445,7 +481,6 @@ function ThisWeek({ weekLogs, weekStart, expanded, onToggle, expandedDays, onTog
     cursor.setDate(cursor.getDate() + 1);
   }
 
-  // Group logs by day
   const byDay: Record<string, WeekLogEntry[]> = {};
   for (const log of weekLogs) {
     if (!byDay[log.log_date]) byDay[log.log_date] = [];
@@ -456,7 +491,6 @@ function ThisWeek({ weekLogs, weekStart, expanded, onToggle, expandedDays, onTog
 
   return (
     <div className="border border-gray-200 rounded-xl overflow-hidden bg-white">
-      {/* Header row — always visible */}
       <button
         type="button"
         onClick={onToggle}
@@ -472,7 +506,6 @@ function ThisWeek({ weekLogs, weekStart, expanded, onToggle, expandedDays, onTog
         <span className="text-xs text-gray-400">{weekTotalProtein}g protein total</span>
       </button>
 
-      {/* Expanded content */}
       {expanded && (
         <div className="border-t border-gray-100 divide-y divide-gray-100">
           {[...days].reverse().map((date) => {

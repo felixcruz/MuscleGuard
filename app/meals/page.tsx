@@ -3,12 +3,18 @@ export const dynamic = "force-dynamic";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { MealsClient } from "./MealsClient";
+import {
+  calculateProteinGoal,
+  proteinMealBreakdown,
+  type Goal,
+} from "@/lib/personalization";
 
 export default async function MealsPage() {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  // Protected by middleware - user should always exist
   if (!user) {
     return redirect("/login");
   }
@@ -17,7 +23,9 @@ export default async function MealsPage() {
   const [profileResult, logsResult] = await Promise.all([
     supabase
       .from("profiles")
-      .select("protein_goal_g, dietary_prefs")
+      .select(
+        "protein_goal_g, dietary_prefs, best_appetite_time, primary_goal, glp1_dose_mg, glp1_medication, weight_kg"
+      )
       .eq("id", user.id)
       .single(),
     supabase
@@ -27,7 +35,17 @@ export default async function MealsPage() {
       .eq("log_date", today),
   ]);
 
-  const proteinGoal = profileResult.data?.protein_goal_g ?? 120;
+  const profile = profileResult.data;
+  const weightKg = profile?.weight_kg ?? 80;
+  const goal = (profile?.primary_goal ?? "preserve_muscle") as Goal;
+  const doseMg = profile?.glp1_dose_mg ?? 1.0;
+  const bestAppetiteTime = profile?.best_appetite_time ?? "midday";
+
+  const proteinGoal =
+    profile?.protein_goal_g ??
+    calculateProteinGoal(weightKg, goal, doseMg);
+  const proteinBreakdown = proteinMealBreakdown(proteinGoal, bestAppetiteTime);
+
   const loggedG = (logsResult.data ?? []).reduce(
     (sum, l) => sum + Number(l.protein_g),
     0
@@ -38,7 +56,8 @@ export default async function MealsPage() {
       userId={user.id}
       proteinGoalG={proteinGoal}
       proteinLoggedG={loggedG}
-      dietaryPrefs={profileResult.data?.dietary_prefs ?? []}
+      dietaryPrefs={profile?.dietary_prefs ?? []}
+      proteinBreakdown={proteinBreakdown}
     />
   );
 }

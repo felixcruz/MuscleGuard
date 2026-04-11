@@ -2,14 +2,19 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Shield, LayoutDashboard, Sparkles, Dumbbell, TrendingUp, BarChart2, Settings } from "lucide-react";
+import { Shield, LayoutDashboard, Sparkles, Dumbbell, TrendingUp, BarChart2, Settings, Pill } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const NAV_ITEMS = [
+const MOBILE_NAV = [
   { href: "/dashboard", label: "Today", icon: LayoutDashboard },
   { href: "/meals", label: "Meals", icon: Sparkles },
   { href: "/training", label: "Training", icon: Dumbbell },
+  { href: "/medication", label: "Medication", icon: Pill },
   { href: "/progress", label: "Progress", icon: TrendingUp },
+];
+
+const DESKTOP_NAV = [
+  ...MOBILE_NAV,
   { href: "/reports", label: "Reports", icon: BarChart2 },
   { href: "/settings", label: "Settings", icon: Settings },
 ];
@@ -26,7 +31,7 @@ export function AppNav() {
           <span className="font-semibold text-gray-800">MuscleGuard</span>
         </Link>
         <nav className="flex gap-1">
-          {NAV_ITEMS.map((item) => {
+          {DESKTOP_NAV.map((item) => {
             const active = pathname.startsWith(item.href);
             return (
               <Link
@@ -47,10 +52,10 @@ export function AppNav() {
         </nav>
       </header>
 
-      {/* Bottom tab bar (mobile) */}
+      {/* Bottom tab bar (mobile) — 5 tabs */}
       <nav className="sm:hidden fixed bottom-0 inset-x-0 bg-white border-t z-10">
         <div className="flex">
-          {NAV_ITEMS.map((item) => {
+          {MOBILE_NAV.map((item) => {
             const active = pathname.startsWith(item.href);
             return (
               <Link
