@@ -82,7 +82,7 @@ const comparisonRows = [
     mealPlanner: false,
     training: false,
     medReminders: false,
-    price: "$19.99/mo",
+    price: "$9.99/mo",
     highlight: false,
   },
   {
@@ -102,7 +102,7 @@ const comparisonRows = [
     mealPlanner: false,
     training: true,
     medReminders: false,
-    price: "$135+/mo",
+    price: "$199/mo",
     highlight: false,
   },
   {
