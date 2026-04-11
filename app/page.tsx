@@ -167,7 +167,7 @@ export default function LandingPage() {
           </p>
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-medium text-[#131413] leading-[1.1] tracking-tight">
             Up to 40% of your weight loss<br />
-            could be <span className="text-red-500">muscle, not fat.</span>
+            could be <span className="bg-[#CDFF00] text-[#131413] px-2 py-0.5">muscle, not fat.</span>
           </h1>
           <p className="text-lg text-[#585A59] mt-8 max-w-2xl mx-auto leading-relaxed">
             GLP-1 medications like Ozempic, Wegovy, and Mounjaro suppress your appetite, but eating
@@ -189,20 +189,20 @@ export default function LandingPage() {
       </section>
 
       {/* Pain Point */}
-      <section className="bg-red-50 border-y border-red-100">
+      <section className="bg-[#131413]">
         <div className="max-w-4xl mx-auto px-6 py-14">
           <div className="flex items-start gap-5">
-            <AlertTriangle className="h-7 w-7 text-red-500 mt-1 shrink-0" />
-            <p className="font-medium text-red-900 text-lg leading-relaxed">
+            <AlertTriangle className="h-7 w-7 text-[#CDFF00] mt-1 shrink-0" />
+            <p className="font-medium text-white text-lg leading-relaxed">
               Thousands of posts across Reddit, TikTok, and GLP-1 communities share the same
               story: dramatic weight loss followed by unexpected muscle loss, weakness, and
               metabolic slowdown. The pattern is consistent, and most users say the same
               thing: nobody warned them about protein.
             </p>
           </div>
-          <div className="mt-8 p-5 bg-white/70 rounded-[10px] border border-red-100">
-            <p className="text-[#585A59] text-sm leading-relaxed">
-              <span className="font-semibold text-[#131413]">The research confirms it:</span>{" "}
+          <div className="mt-8 p-5 bg-white/5 rounded-[10px] border border-white/10">
+            <p className="text-[#BFC1C0] text-sm leading-relaxed">
+              <span className="font-semibold text-[#CDFF00]">The research confirms it:</span>{" "}
               Clinical studies show that up to 40% of weight lost on GLP-1 medications can come from
               lean muscle, not fat (Wilding et al., STEP trials). Without adequate protein
               intake and resistance training, the weight you lose may include the muscle
@@ -227,8 +227,8 @@ export default function LandingPage() {
           </p>
           <div className="grid md:grid-cols-3 gap-6">
             <div className="p-8 rounded-[10px] border border-black/5 bg-white space-y-4">
-              <div className="h-12 w-12 bg-red-50 rounded-[10px] flex items-center justify-center">
-                <AlertTriangle className="h-6 w-6 text-red-500" />
+              <div className="h-12 w-12 bg-[#CDFF00]/10 rounded-[10px] flex items-center justify-center">
+                <AlertTriangle className="h-6 w-6 text-[#131413]" />
               </div>
               <h3 className="font-medium text-[#131413] text-lg">Your doctor may not mention it</h3>
               <p className="text-[#585A59] leading-relaxed">
@@ -238,8 +238,8 @@ export default function LandingPage() {
               </p>
             </div>
             <div className="p-8 rounded-[10px] border border-black/5 bg-white space-y-4">
-              <div className="h-12 w-12 bg-amber-50 rounded-[10px] flex items-center justify-center">
-                <Zap className="h-6 w-6 text-amber-500" />
+              <div className="h-12 w-12 bg-[#CDFF00]/10 rounded-[10px] flex items-center justify-center">
+                <Zap className="h-6 w-6 text-[#131413]" />
               </div>
               <h3 className="font-medium text-[#131413] text-lg">Other apps are not built for this</h3>
               <p className="text-[#585A59] leading-relaxed">
@@ -342,7 +342,7 @@ export default function LandingPage() {
                       (val, i) => (
                         <td key={i} className="text-center py-4 px-3">
                           {val ? (
-                            <Check className="h-5 w-5 text-[#131413] mx-auto opacity-60" />
+                            <Check className={`h-5 w-5 mx-auto ${row.highlight ? "text-[#131413]" : "text-[#131413] opacity-40"}`} />
                           ) : (
                             <span className="text-[#BFC1C0] text-xs">Not available</span>
                           )}
@@ -396,7 +396,7 @@ export default function LandingPage() {
               },
             ].map((s) => (
               <div key={s.step} className="text-center">
-                <div className="h-14 w-14 bg-[#131413] text-white rounded-[10px] flex items-center justify-center mx-auto text-xl font-medium mb-5">
+                <div className="h-14 w-14 bg-[#CDFF00] text-[#131413] rounded-[10px] flex items-center justify-center mx-auto text-xl font-medium mb-5">
                   {s.step}
                 </div>
                 <h3 className="font-medium text-[#131413] text-lg mb-2">{s.title}</h3>
@@ -433,7 +433,7 @@ export default function LandingPage() {
             Simple, transparent pricing
           </h2>
           <div className="rounded-[10px] bg-white border border-black/5 overflow-hidden">
-            <div className="bg-[#131413] text-white text-center py-2.5 text-sm font-medium tracking-wide">
+            <div className="bg-[#CDFF00] text-[#131413] text-center py-2.5 text-sm font-medium tracking-wide">
               7-day free trial included
             </div>
             <div className="p-8">
@@ -461,7 +461,7 @@ export default function LandingPage() {
               </ul>
               <Link
                 href="/login"
-                className="flex items-center justify-center gap-2 mt-8 w-full py-3.5 bg-[#131413] text-white font-medium rounded-lg hover:bg-[#202222] transition-colors"
+                className="flex items-center justify-center gap-2 mt-8 w-full py-3.5 bg-[#CDFF00] text-[#131413] font-medium rounded-lg hover:bg-[#b8e600] transition-colors"
               >
                 Start free trial <ArrowRight className="h-4 w-4" />
               </Link>
@@ -508,7 +508,7 @@ export default function LandingPage() {
           </p>
           <Link
             href="/login"
-            className="inline-flex items-center justify-center gap-2 mt-10 px-10 py-3.5 bg-white text-[#131413] font-medium rounded-lg hover:bg-[#ECEEED] transition-colors"
+            className="inline-flex items-center justify-center gap-2 mt-10 px-10 py-3.5 bg-[#CDFF00] text-[#131413] font-medium rounded-lg hover:bg-[#b8e600] transition-colors"
           >
             Start your free trial <ArrowRight className="h-4 w-4" />
           </Link>
