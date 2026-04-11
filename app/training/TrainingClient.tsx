@@ -66,13 +66,12 @@ export function TrainingClient({
     setToggling(null);
   }
 
-  // Strength sessions to show in the weekly progress bar
-  const strengthSessions =
-    protocol.needsComplementaryStrength
-      ? COMPLEMENTARY_STRENGTH_SESSIONS
-      : protocol.primarySessions;
-  const strengthIds = strengthSessions.map((s) => s.id);
-  const strengthDoneCount = done.filter((d) => strengthIds.includes(d)).length;
+  // All trackable sessions for the weekly progress bar
+  const trackedSessions = protocol.needsComplementaryStrength
+    ? [...protocol.primarySessions, ...COMPLEMENTARY_STRENGTH_SESSIONS]
+    : protocol.primarySessions;
+  const trackedIds = trackedSessions.map((s) => s.id);
+  const trackedDoneCount = done.filter((d) => trackedIds.includes(d)).length;
 
   // Intensity banner colors
   const intensityBg =
@@ -157,16 +156,16 @@ export function TrainingClient({
       {/* Weekly progress */}
       <div className="flex gap-2 items-center bg-white border border-gray-200 rounded-xl px-4 py-3">
         <span className="text-sm text-gray-500 mr-1">This week</span>
-        {strengthSessions.map((session) => (
+        {trackedSessions.map((session) => (
           <div
             key={session.id}
             className={`h-2.5 flex-1 rounded-full transition-colors ${done.includes(session.id) ? "bg-green-500" : "bg-gray-200"}`}
           />
         ))}
         <span className="text-sm font-semibold text-green-700 ml-1">
-          {strengthDoneCount}/{strengthSessions.length}
+          {trackedDoneCount}/{trackedSessions.length}
         </span>
-        {strengthDoneCount === strengthSessions.length && strengthSessions.length > 0 && (
+        {trackedDoneCount === trackedSessions.length && trackedSessions.length > 0 && (
           <span className="text-sm">🏆</span>
         )}
       </div>
@@ -184,10 +183,16 @@ export function TrainingClient({
             <h2 className="text-base font-semibold text-gray-800 mb-1">
               {protocol.emoji} {protocol.displayName} Sessions
             </h2>
-            <p className="text-xs text-gray-500">Log your sessions to track your activity.</p>
+            <p className="text-xs text-gray-500">Mark each session when you complete it.</p>
           </div>
           {protocol.primarySessions.map((session) => (
-            <PrimarySessionCard key={session.id} session={session} />
+            <StrengthCard
+              key={session.id}
+              session={session}
+              isDone={done.includes(session.id)}
+              toggling={toggling === session.id}
+              onToggle={() => toggleDay(session.id)}
+            />
           ))}
         </div>
       )}
@@ -315,20 +320,3 @@ function StrengthCard({ session, isDone, toggling, onToggle }: StrengthCardProps
   );
 }
 
-interface PrimarySessionCardProps {
-  session: WorkoutSession;
-}
-
-function PrimarySessionCard({ session }: PrimarySessionCardProps) {
-  return (
-    <Card>
-      <CardHeader className="pb-2">
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-base">{session.label}</CardTitle>
-          <Badge variant="outline">{session.duration}</Badge>
-        </div>
-        <p className="text-sm text-gray-500">{session.description}</p>
-      </CardHeader>
-    </Card>
-  );
-}
