@@ -187,17 +187,16 @@ export default function LandingPage() {
         <div className="max-w-4xl mx-auto px-6 py-14">
           <div className="flex items-start gap-5">
             <AlertTriangle className="h-7 w-7 text-red-500 mt-1 shrink-0" />
-            <div>
-              <p className="font-semibold text-red-900 text-lg leading-relaxed">
-                &ldquo;I lost 40 lbs on Ozempic but my doctor said I&apos;ve lost significant muscle mass.
-                I look demacrada. Nobody told me about protein.&rdquo;
-              </p>
-              <p className="text-sm text-red-600 mt-3">Posted on Reddit r/Ozempic (viral thread)</p>
-            </div>
+            <p className="font-semibold text-red-900 text-lg leading-relaxed">
+              Thousands of posts across Reddit, TikTok, and GLP-1 communities share the same
+              story: dramatic weight loss followed by unexpected muscle loss, weakness, and
+              metabolic slowdown. The pattern is consistent, and most users say the same
+              thing: nobody warned them about protein.
+            </p>
           </div>
           <div className="mt-8 p-5 bg-white/70 rounded-xl border border-red-100">
             <p className="text-gray-700 text-sm leading-relaxed">
-              <span className="font-semibold text-gray-900">The research is clear:</span>{" "}
+              <span className="font-semibold text-gray-900">The research confirms it:</span>{" "}
               Clinical studies show that up to 40% of weight lost on GLP-1 medications can come from
               lean muscle, not fat (Wilding et al., STEP trials). Without adequate protein
               intake and resistance training, the weight you lose may include the muscle
