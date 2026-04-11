@@ -20,9 +20,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ foods });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Failed to search foods";
-    return NextResponse.json(
-      { error: message, foods: [] },
-      { status: 500 }
-    );
+    console.error("[food/search]", message);
+    // Return 200 with empty array + error so the client can show it
+    return NextResponse.json({ error: message, foods: [] });
   }
 }

@@ -25,18 +25,23 @@ export function QuickLogForm({ userId, onLogged }: Props) {
   const [portionG, setPortionG] = useState("100");
   const [searching, setSearching] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [searchError, setSearchError] = useState<string | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
   const supabase = createClient();
 
   useEffect(() => {
-    if (!query || query.length < 2) { setResults([]); return; }
+    if (!query || query.length < 2) { setResults([]); setSearchError(null); return; }
     clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(async () => {
       setSearching(true);
+      setSearchError(null);
       try {
         const res = await fetch(`/api/food/search?q=${encodeURIComponent(query)}`);
         const data = await res.json();
+        if (data.error) setSearchError(data.error);
         setResults(data.foods ?? []);
+      } catch {
+        setSearchError("Search failed — check your connection.");
       } finally {
         setSearching(false);
       }
@@ -85,6 +90,11 @@ export function QuickLogForm({ userId, onLogged }: Props) {
           </span>
         )}
       </div>
+
+      {/* Search error */}
+      {searchError && (
+        <p className="text-xs text-red-500 px-1">{searchError}</p>
+      )}
 
       {/* Dropdown results */}
       {results.length > 0 && !selected && (
