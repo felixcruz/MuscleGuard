@@ -72,20 +72,20 @@ export function TestimonialCarousel() {
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
-      <div className="bg-white rounded-2xl border p-8 sm:p-10 min-h-[220px] flex flex-col justify-center">
-        <Quote className="h-8 w-8 text-brand-200 mb-4" />
-        <p className="text-gray-700 leading-relaxed text-base sm:text-lg">
+      <div className="bg-white rounded-[10px] border border-black/5 p-8 sm:p-10 min-h-[220px] flex flex-col justify-center">
+        <Quote className="h-8 w-8 text-[#BFC1C0] mb-4" />
+        <p className="text-[#131413] leading-relaxed text-base sm:text-lg">
           &ldquo;{t.text}&rdquo;
         </p>
-        <p className="mt-5 font-semibold text-gray-900">{t.name}</p>
-        <p className="text-xs text-gray-400">MuscleGuard user</p>
+        <p className="mt-5 font-medium text-[#131413]">{t.name}</p>
+        <p className="text-xs text-[#BFC1C0]">MuscleGuard user</p>
       </div>
 
       {/* Controls */}
       <div className="flex items-center justify-center gap-4 mt-6">
         <button
           onClick={prev}
-          className="h-9 w-9 rounded-full border border-gray-200 bg-white flex items-center justify-center text-gray-400 hover:text-gray-700 hover:border-gray-300 transition-colors"
+          className="h-9 w-9 rounded-full border border-black/10 bg-white flex items-center justify-center text-[#BFC1C0] hover:text-[#131413] hover:border-black/20 transition-colors"
           aria-label="Previous testimonial"
         >
           <ChevronLeft className="h-4 w-4" />
@@ -96,7 +96,7 @@ export function TestimonialCarousel() {
               key={i}
               onClick={() => setCurrent(i)}
               className={`h-2 rounded-full transition-all ${
-                i === current ? "w-6 bg-brand-600" : "w-2 bg-gray-200"
+                i === current ? "w-6 bg-[#131413]" : "w-2 bg-[#BFC1C0]/40"
               }`}
               aria-label={`Go to testimonial ${i + 1}`}
             />
@@ -104,7 +104,7 @@ export function TestimonialCarousel() {
         </div>
         <button
           onClick={next}
-          className="h-9 w-9 rounded-full border border-gray-200 bg-white flex items-center justify-center text-gray-400 hover:text-gray-700 hover:border-gray-300 transition-colors"
+          className="h-9 w-9 rounded-full border border-black/10 bg-white flex items-center justify-center text-[#BFC1C0] hover:text-[#131413] hover:border-black/20 transition-colors"
           aria-label="Next testimonial"
         >
           <ChevronRight className="h-4 w-4" />

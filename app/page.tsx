@@ -15,8 +15,8 @@ import {
   Star,
   ArrowRight,
   Activity,
+  Check,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { TestimonialCarousel } from "@/components/landing/TestimonialCarousel";
 
 const features = [
@@ -142,44 +142,50 @@ const faqs = [
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-[#f7f7f7]">
       {/* Nav */}
-      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b">
+      <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-black/5">
         <div className="flex items-center justify-between px-6 py-4 max-w-6xl mx-auto">
           <div className="flex items-center gap-2">
-            <Shield className="h-6 w-6 text-brand-600" />
-            <span className="font-bold text-lg text-gray-900">MuscleGuard</span>
+            <Shield className="h-6 w-6 text-[#131413]" />
+            <span className="font-semibold text-lg text-[#131413] tracking-tight">MuscleGuard</span>
           </div>
-          <Link href="/login">
-            <Button variant="outline" size="sm">Sign in</Button>
+          <Link
+            href="/login"
+            className="px-4 py-2 text-sm font-medium text-[#131413] border border-black/10 rounded-lg hover:bg-[#f7f7f7] transition-colors"
+          >
+            Sign in
           </Link>
         </div>
       </header>
 
       {/* Hero */}
-      <section className="max-w-4xl mx-auto px-6 pt-20 pb-24 text-center">
-        <div className="inline-flex items-center gap-2 bg-brand-50 text-brand-700 text-sm font-medium px-4 py-1.5 rounded-full mb-8">
-          <Shield className="h-3.5 w-3.5" /> The only app built for GLP-1 muscle protection
+      <section className="bg-white">
+        <div className="max-w-4xl mx-auto px-6 pt-24 pb-28 text-center">
+          <p className="text-sm font-medium tracking-widest text-[#585A59] uppercase mb-8">
+            The only app built for GLP-1 muscle protection
+          </p>
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-medium text-[#131413] leading-[1.1] tracking-tight">
+            Up to 40% of your weight loss<br />
+            could be <span className="text-red-500">muscle, not fat.</span>
+          </h1>
+          <p className="text-lg text-[#585A59] mt-8 max-w-2xl mx-auto leading-relaxed">
+            GLP-1 medications like Ozempic, Wegovy, and Mounjaro suppress your appetite, but eating
+            too little protein can cost you the lean muscle you have worked to build. MuscleGuard
+            is designed to support you in hitting your dose-adjusted protein targets every day.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center mt-10">
+            <Link
+              href="/login"
+              className="inline-flex items-center justify-center gap-2 px-10 py-3.5 bg-[#131413] text-white text-base font-medium rounded-lg hover:bg-[#202222] transition-colors"
+            >
+              Start free trial <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+          <p className="text-sm text-[#585A59] mt-4">
+            7-day free trial · $14.99/mo after trial · Cancel anytime
+          </p>
         </div>
-        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight tracking-tight">
-          Up to 40% of your weight loss<br />
-          could be <span className="text-red-500">muscle, not fat.</span>
-        </h1>
-        <p className="text-xl text-gray-500 mt-8 max-w-2xl mx-auto leading-relaxed">
-          GLP-1 medications like Ozempic, Wegovy, and Mounjaro suppress your appetite, but eating
-          too little protein can cost you the lean muscle you have worked to build. MuscleGuard
-          is designed to support you in hitting your dose-adjusted protein targets every day.
-        </p>
-        <div className="flex flex-col sm:flex-row gap-4 justify-center mt-10">
-          <Link href="/login">
-            <Button size="lg" className="px-10 text-base h-12">
-              Start free trial <ArrowRight className="h-4 w-4 ml-1" />
-            </Button>
-          </Link>
-        </div>
-        <p className="text-sm text-gray-400 mt-4">
-          7-day free trial · $14.99/mo after trial · Cancel anytime
-        </p>
       </section>
 
       {/* Pain Point */}
@@ -187,16 +193,16 @@ export default function LandingPage() {
         <div className="max-w-4xl mx-auto px-6 py-14">
           <div className="flex items-start gap-5">
             <AlertTriangle className="h-7 w-7 text-red-500 mt-1 shrink-0" />
-            <p className="font-semibold text-red-900 text-lg leading-relaxed">
+            <p className="font-medium text-red-900 text-lg leading-relaxed">
               Thousands of posts across Reddit, TikTok, and GLP-1 communities share the same
               story: dramatic weight loss followed by unexpected muscle loss, weakness, and
               metabolic slowdown. The pattern is consistent, and most users say the same
               thing: nobody warned them about protein.
             </p>
           </div>
-          <div className="mt-8 p-5 bg-white/70 rounded-xl border border-red-100">
-            <p className="text-gray-700 text-sm leading-relaxed">
-              <span className="font-semibold text-gray-900">The research confirms it:</span>{" "}
+          <div className="mt-8 p-5 bg-white/70 rounded-[10px] border border-red-100">
+            <p className="text-[#585A59] text-sm leading-relaxed">
+              <span className="font-semibold text-[#131413]">The research confirms it:</span>{" "}
               Clinical studies show that up to 40% of weight lost on GLP-1 medications can come from
               lean muscle, not fat (Wilding et al., STEP trials). Without adequate protein
               intake and resistance training, the weight you lose may include the muscle
@@ -207,58 +213,66 @@ export default function LandingPage() {
       </section>
 
       {/* The Problem Explained */}
-      <section className="max-w-6xl mx-auto px-6 py-20">
-        <h2 className="text-3xl font-bold text-gray-900 text-center mb-4">
-          The problem nobody is talking about
-        </h2>
-        <p className="text-gray-500 text-center max-w-2xl mx-auto mb-14">
-          GLP-1 medications are transformative for weight loss, but the muscle loss side of the
-          equation is often overlooked.
-        </p>
-        <div className="grid md:grid-cols-3 gap-6">
-          <div className="p-8 rounded-2xl border bg-white space-y-4">
-            <div className="h-12 w-12 bg-red-50 rounded-xl flex items-center justify-center">
-              <AlertTriangle className="h-6 w-6 text-red-500" />
+      <section className="bg-white">
+        <div className="max-w-6xl mx-auto px-6 py-24">
+          <p className="text-sm font-medium tracking-widest text-[#585A59] uppercase text-center mb-4">
+            Why this matters
+          </p>
+          <h2 className="text-3xl sm:text-4xl font-medium text-[#131413] text-center mb-4 tracking-tight">
+            The problem nobody is talking about
+          </h2>
+          <p className="text-[#585A59] text-center max-w-2xl mx-auto mb-16">
+            GLP-1 medications are transformative for weight loss, but the muscle loss side of the
+            equation is often overlooked.
+          </p>
+          <div className="grid md:grid-cols-3 gap-6">
+            <div className="p-8 rounded-[10px] border border-black/5 bg-white space-y-4">
+              <div className="h-12 w-12 bg-red-50 rounded-[10px] flex items-center justify-center">
+                <AlertTriangle className="h-6 w-6 text-red-500" />
+              </div>
+              <h3 className="font-medium text-[#131413] text-lg">Your doctor may not mention it</h3>
+              <p className="text-[#585A59] leading-relaxed">
+                Most prescribing physicians focus on weight and metabolic markers. Detailed protein
+                guidance adjusted to your specific GLP-1 dose is rarely part of the conversation,
+                and this is an area where many patients feel unsupported.
+              </p>
             </div>
-            <h3 className="font-semibold text-gray-900 text-lg">Your doctor may not mention it</h3>
-            <p className="text-gray-500 leading-relaxed">
-              Most prescribing physicians focus on weight and metabolic markers. Detailed protein
-              guidance adjusted to your specific GLP-1 dose is rarely part of the conversation,
-              and this is an area where many patients feel unsupported.
-            </p>
-          </div>
-          <div className="p-8 rounded-2xl border bg-white space-y-4">
-            <div className="h-12 w-12 bg-amber-50 rounded-xl flex items-center justify-center">
-              <Zap className="h-6 w-6 text-amber-500" />
+            <div className="p-8 rounded-[10px] border border-black/5 bg-white space-y-4">
+              <div className="h-12 w-12 bg-amber-50 rounded-[10px] flex items-center justify-center">
+                <Zap className="h-6 w-6 text-amber-500" />
+              </div>
+              <h3 className="font-medium text-[#131413] text-lg">Other apps are not built for this</h3>
+              <p className="text-[#585A59] leading-relaxed">
+                Generic calorie trackers do not account for GLP-1 appetite suppression,
+                dose-specific protein multipliers, or the unique training considerations
+                that come with these medications.
+              </p>
             </div>
-            <h3 className="font-semibold text-gray-900 text-lg">Other apps are not built for this</h3>
-            <p className="text-gray-500 leading-relaxed">
-              Generic calorie trackers do not account for GLP-1 appetite suppression,
-              dose-specific protein multipliers, or the unique training considerations
-              that come with these medications.
-            </p>
-          </div>
-          <div className="p-8 rounded-2xl border bg-white space-y-4">
-            <div className="h-12 w-12 bg-brand-50 rounded-xl flex items-center justify-center">
-              <Dumbbell className="h-6 w-6 text-brand-600" />
+            <div className="p-8 rounded-[10px] border border-black/5 bg-white space-y-4">
+              <div className="h-12 w-12 bg-[#f7f7f7] rounded-[10px] flex items-center justify-center">
+                <Dumbbell className="h-6 w-6 text-[#131413]" />
+              </div>
+              <h3 className="font-medium text-[#131413] text-lg">Your muscles need a signal to stay</h3>
+              <p className="text-[#585A59] leading-relaxed">
+                When you eat in a caloric deficit, your body can break down muscle for energy.
+                Adequate protein plus resistance training helps send the biological signal to
+                preserve lean mass during weight loss.
+              </p>
             </div>
-            <h3 className="font-semibold text-gray-900 text-lg">Your muscles need a signal to stay</h3>
-            <p className="text-gray-500 leading-relaxed">
-              When you eat in a caloric deficit, your body can break down muscle for energy.
-              Adequate protein plus resistance training helps send the biological signal to
-              preserve lean mass during weight loss.
-            </p>
           </div>
         </div>
       </section>
 
       {/* Features */}
-      <section className="bg-gray-50 border-y">
-        <div className="max-w-6xl mx-auto px-6 py-20">
-          <h2 className="text-3xl font-bold text-gray-900 text-center mb-4">
+      <section className="bg-[#f7f7f7]">
+        <div className="max-w-6xl mx-auto px-6 py-24">
+          <p className="text-sm font-medium tracking-widest text-[#585A59] uppercase text-center mb-4">
+            Built for GLP-1 users
+          </p>
+          <h2 className="text-3xl sm:text-4xl font-medium text-[#131413] text-center mb-4 tracking-tight">
             Everything you need to protect your muscle
           </h2>
-          <p className="text-gray-500 text-center max-w-2xl mx-auto mb-14">
+          <p className="text-[#585A59] text-center max-w-2xl mx-auto mb-16">
             7 integrated tools designed to support GLP-1 users in preserving lean mass
             during their weight loss journey.
           </p>
@@ -268,13 +282,13 @@ export default function LandingPage() {
               return (
                 <div
                   key={f.title}
-                  className="p-6 rounded-2xl border bg-white space-y-4 hover:shadow-md transition-shadow"
+                  className="p-6 rounded-[10px] border border-black/5 bg-white space-y-4 hover:shadow-md transition-shadow"
                 >
-                  <div className="h-11 w-11 bg-brand-50 rounded-xl flex items-center justify-center">
-                    <Icon className="h-5 w-5 text-brand-600" />
+                  <div className="h-11 w-11 bg-[#f7f7f7] rounded-[10px] flex items-center justify-center">
+                    <Icon className="h-5 w-5 text-[#131413]" />
                   </div>
-                  <h3 className="font-semibold text-gray-900 text-lg">{f.title}</h3>
-                  <p className="text-gray-500 leading-relaxed text-sm">{f.description}</p>
+                  <h3 className="font-medium text-[#131413] text-lg">{f.title}</h3>
+                  <p className="text-[#585A59] leading-relaxed text-sm">{f.description}</p>
                 </div>
               );
             })}
@@ -283,143 +297,153 @@ export default function LandingPage() {
       </section>
 
       {/* Comparison Table */}
-      <section className="max-w-5xl mx-auto px-6 py-20">
-        <h2 className="text-3xl font-bold text-gray-900 text-center mb-4">
-          How MuscleGuard compares
-        </h2>
-        <p className="text-gray-500 text-center max-w-2xl mx-auto mb-12">
-          Most fitness apps were not designed for the unique challenges of GLP-1-assisted
-          weight loss. Here is how the landscape looks.
-        </p>
-        <div className="overflow-x-auto rounded-xl border">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="bg-gray-50 border-b">
-                <th className="text-left py-4 px-4 font-medium text-gray-500">App</th>
-                <th className="text-center py-4 px-3 font-medium text-gray-500">GLP-1 Aware</th>
-                <th className="text-center py-4 px-3 font-medium text-gray-500">Dose-Adjusted Protein</th>
-                <th className="text-center py-4 px-3 font-medium text-gray-500">Meal Planner</th>
-                <th className="text-center py-4 px-3 font-medium text-gray-500">Training Plan</th>
-                <th className="text-center py-4 px-3 font-medium text-gray-500">Med Reminders</th>
-                <th className="text-center py-4 px-3 font-medium text-gray-500">Price</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y">
-              {comparisonRows.map((row) => (
-                <tr
-                  key={row.name}
-                  className={row.highlight ? "bg-brand-50" : ""}
-                >
-                  <td
-                    className={`py-4 px-4 font-medium ${
-                      row.highlight ? "text-brand-800" : "text-gray-700"
-                    }`}
-                  >
-                    {row.highlight && (
-                      <Shield className="h-3.5 w-3.5 inline mr-1.5 text-brand-600" />
-                    )}
-                    {row.name}
-                  </td>
-                  {[row.glp1, row.doseProtein, row.mealPlanner, row.training, row.medReminders].map(
-                    (val, i) => (
-                      <td key={i} className="text-center py-4 px-3">
-                        {val ? (
-                          <CheckCircle2 className="h-5 w-5 text-brand-600 mx-auto" />
-                        ) : (
-                          <span className="text-gray-300 text-xs">Not available</span>
-                        )}
-                      </td>
-                    )
-                  )}
-                  <td className="text-center py-4 px-3 text-gray-600 font-medium">{row.price}</td>
+      <section className="bg-white">
+        <div className="max-w-5xl mx-auto px-6 py-24">
+          <p className="text-sm font-medium tracking-widest text-[#585A59] uppercase text-center mb-4">
+            See the difference
+          </p>
+          <h2 className="text-3xl sm:text-4xl font-medium text-[#131413] text-center mb-4 tracking-tight">
+            How MuscleGuard compares
+          </h2>
+          <p className="text-[#585A59] text-center max-w-2xl mx-auto mb-14">
+            Most fitness apps were not designed for the unique challenges of GLP-1-assisted
+            weight loss. Here is how the landscape looks.
+          </p>
+          <div className="overflow-x-auto rounded-[10px] border border-black/5">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-[#f7f7f7] border-b border-black/5">
+                  <th className="text-left py-4 px-4 font-medium text-[#585A59]">App</th>
+                  <th className="text-center py-4 px-3 font-medium text-[#585A59]">GLP-1 Aware</th>
+                  <th className="text-center py-4 px-3 font-medium text-[#585A59]">Dose-Adjusted Protein</th>
+                  <th className="text-center py-4 px-3 font-medium text-[#585A59]">Meal Planner</th>
+                  <th className="text-center py-4 px-3 font-medium text-[#585A59]">Training Plan</th>
+                  <th className="text-center py-4 px-3 font-medium text-[#585A59]">Med Reminders</th>
+                  <th className="text-center py-4 px-3 font-medium text-[#585A59]">Price</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-black/5">
+                {comparisonRows.map((row) => (
+                  <tr
+                    key={row.name}
+                    className={row.highlight ? "bg-[#f7f7f7]" : ""}
+                  >
+                    <td
+                      className={`py-4 px-4 font-medium ${
+                        row.highlight ? "text-[#131413]" : "text-[#585A59]"
+                      }`}
+                    >
+                      {row.highlight && (
+                        <Shield className="h-3.5 w-3.5 inline mr-1.5 text-[#131413]" />
+                      )}
+                      {row.name}
+                    </td>
+                    {[row.glp1, row.doseProtein, row.mealPlanner, row.training, row.medReminders].map(
+                      (val, i) => (
+                        <td key={i} className="text-center py-4 px-3">
+                          {val ? (
+                            <Check className="h-5 w-5 text-[#131413] mx-auto opacity-60" />
+                          ) : (
+                            <span className="text-[#BFC1C0] text-xs">Not available</span>
+                          )}
+                        </td>
+                      )
+                    )}
+                    <td className="text-center py-4 px-3 text-[#585A59] font-medium">{row.price}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className="text-xs text-[#BFC1C0] mt-4 text-center">
+            Comparison based on publicly available information as of April 2026.
+            Features and pricing may have changed.
+          </p>
         </div>
-        <p className="text-xs text-gray-400 mt-4 text-center">
-          Comparison based on publicly available information as of April 2026.
-          Features and pricing may have changed.
-        </p>
       </section>
 
       {/* How It Works */}
-      <section className="bg-gray-50 border-y">
-        <div className="max-w-4xl mx-auto px-6 py-20">
-          <h2 className="text-3xl font-bold text-gray-900 text-center mb-4">
-            Get started in 3 minutes
+      <section className="bg-[#f7f7f7]">
+        <div className="max-w-4xl mx-auto px-6 py-24">
+          <p className="text-sm font-medium tracking-widest text-[#585A59] uppercase text-center mb-4">
+            Get started
+          </p>
+          <h2 className="text-3xl sm:text-4xl font-medium text-[#131413] text-center mb-4 tracking-tight">
+            Set up in 3 minutes
           </h2>
-          <p className="text-gray-500 text-center max-w-xl mx-auto mb-14">
+          <p className="text-[#585A59] text-center max-w-xl mx-auto mb-16">
             No complex setup. No overwhelming dashboards. Just the information you need.
           </p>
           <div className="grid md:grid-cols-3 gap-8">
             {[
               {
                 step: "1",
-                icon: Star,
                 title: "Sign up",
                 description:
                   "Create your account and start your 7-day free trial. Takes less than a minute.",
               },
               {
                 step: "2",
-                icon: Clock,
                 title: "Complete onboarding",
                 description:
                   "Answer 3 quick screens about your medication, your current weight, and your activity preferences.",
               },
               {
                 step: "3",
-                icon: Zap,
                 title: "Get your personalized plan",
                 description:
                   "Receive your dose-adjusted protein target, personalized meal suggestions, and a training protocol tailored to your sport.",
               },
-            ].map((s) => {
-              const Icon = s.icon;
-              return (
-                <div key={s.step} className="text-center">
-                  <div className="h-14 w-14 bg-brand-600 text-white rounded-2xl flex items-center justify-center mx-auto text-xl font-bold mb-5">
-                    {s.step}
-                  </div>
-                  <h3 className="font-semibold text-gray-900 text-lg mb-2">{s.title}</h3>
-                  <p className="text-gray-500 leading-relaxed text-sm">{s.description}</p>
+            ].map((s) => (
+              <div key={s.step} className="text-center">
+                <div className="h-14 w-14 bg-[#131413] text-white rounded-[10px] flex items-center justify-center mx-auto text-xl font-medium mb-5">
+                  {s.step}
                 </div>
-              );
-            })}
+                <h3 className="font-medium text-[#131413] text-lg mb-2">{s.title}</h3>
+                <p className="text-[#585A59] leading-relaxed text-sm">{s.description}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* Testimonials */}
-      <section className="max-w-4xl mx-auto px-6 py-20">
-        <h2 className="text-3xl font-bold text-gray-900 text-center mb-4">
-          Real people, real results
-        </h2>
-        <p className="text-gray-500 text-center max-w-xl mx-auto mb-12">
-          Hear from GLP-1 users who are protecting their muscle with MuscleGuard.
-        </p>
-        <TestimonialCarousel />
+      <section className="bg-white">
+        <div className="max-w-4xl mx-auto px-6 py-24">
+          <p className="text-sm font-medium tracking-widest text-[#585A59] uppercase text-center mb-4">
+            What users are saying
+          </p>
+          <h2 className="text-3xl sm:text-4xl font-medium text-[#131413] text-center mb-4 tracking-tight">
+            Real people, real results
+          </h2>
+          <p className="text-[#585A59] text-center max-w-xl mx-auto mb-14">
+            Hear from GLP-1 users who are protecting their muscle with MuscleGuard.
+          </p>
+          <TestimonialCarousel />
+        </div>
       </section>
 
       {/* Pricing */}
-      <section className="bg-gray-50 border-y">
-        <div className="max-w-lg mx-auto px-6 py-20">
-          <h2 className="text-3xl font-bold text-gray-900 text-center mb-12">
+      <section className="bg-[#f7f7f7]">
+        <div className="max-w-lg mx-auto px-6 py-24">
+          <p className="text-sm font-medium tracking-widest text-[#585A59] uppercase text-center mb-4">
+            Choose your path
+          </p>
+          <h2 className="text-3xl sm:text-4xl font-medium text-[#131413] text-center mb-14 tracking-tight">
             Simple, transparent pricing
           </h2>
-          <div className="rounded-2xl border-2 border-brand-600 bg-white overflow-hidden shadow-lg">
-            <div className="bg-brand-600 text-white text-center py-2 text-sm font-medium">
+          <div className="rounded-[10px] bg-white border border-black/5 overflow-hidden">
+            <div className="bg-[#131413] text-white text-center py-2.5 text-sm font-medium tracking-wide">
               7-day free trial included
             </div>
             <div className="p-8">
-              <h3 className="text-xl font-bold text-gray-900">MuscleGuard Pro</h3>
+              <h3 className="text-lg font-medium text-[#131413]">MuscleGuard Pro</h3>
               <div className="mt-4 flex items-baseline gap-1">
-                <span className="text-4xl font-bold text-gray-900">$14.99</span>
-                <span className="text-gray-500">/month</span>
+                <span className="text-5xl font-medium text-[#131413]">$14.99</span>
+                <span className="text-[#585A59]">/mo</span>
               </div>
-              <p className="text-sm text-gray-400 mt-1">after 7-day free trial</p>
-              <ul className="mt-8 space-y-3">
+              <p className="text-sm text-[#BFC1C0] mt-1">after 7-day free trial</p>
+              <ul className="mt-8 space-y-4">
                 {[
                   "Dose-adjusted daily protein targets",
                   "Smart meal planner for suppressed appetites",
@@ -429,18 +453,19 @@ export default function LandingPage() {
                   "Weekly A/B/C performance reports",
                   "5 communication style options",
                 ].map((item) => (
-                  <li key={item} className="flex items-start gap-3 text-sm text-gray-600">
-                    <CheckCircle2 className="h-4 w-4 text-brand-600 mt-0.5 shrink-0" />
+                  <li key={item} className="flex items-start gap-3 text-sm text-[#585A59]">
+                    <Check className="h-5 w-5 text-[#131413] shrink-0 opacity-50" />
                     {item}
                   </li>
                 ))}
               </ul>
-              <Link href="/login" className="block mt-8">
-                <Button size="lg" className="w-full text-base h-12">
-                  Start free trial <ArrowRight className="h-4 w-4 ml-1" />
-                </Button>
+              <Link
+                href="/login"
+                className="flex items-center justify-center gap-2 mt-8 w-full py-3.5 bg-[#131413] text-white font-medium rounded-lg hover:bg-[#202222] transition-colors"
+              >
+                Start free trial <ArrowRight className="h-4 w-4" />
               </Link>
-              <p className="text-xs text-gray-400 text-center mt-3">
+              <p className="text-xs text-[#BFC1C0] text-center mt-3">
                 Cancel anytime from your Settings page
               </p>
             </div>
@@ -449,79 +474,82 @@ export default function LandingPage() {
       </section>
 
       {/* FAQ */}
-      <section className="max-w-3xl mx-auto px-6 py-20">
-        <h2 className="text-3xl font-bold text-gray-900 text-center mb-12">
-          Frequently asked questions
-        </h2>
-        <div className="divide-y">
-          {faqs.map((faq) => (
-            <details key={faq.q} className="group py-5">
-              <summary className="flex items-center justify-between cursor-pointer list-none">
-                <span className="font-medium text-gray-900">{faq.q}</span>
-                <ChevronDown className="h-5 w-5 text-gray-400 group-open:rotate-180 transition-transform" />
-              </summary>
-              <p className="text-gray-500 mt-3 leading-relaxed text-sm">{faq.a}</p>
-            </details>
-          ))}
+      <section className="bg-white">
+        <div className="max-w-3xl mx-auto px-6 py-24">
+          <p className="text-sm font-medium tracking-widest text-[#585A59] uppercase text-center mb-4">
+            Questions
+          </p>
+          <h2 className="text-3xl sm:text-4xl font-medium text-[#131413] text-center mb-14 tracking-tight">
+            Frequently asked questions
+          </h2>
+          <div className="divide-y divide-black/5">
+            {faqs.map((faq) => (
+              <details key={faq.q} className="group py-6">
+                <summary className="flex items-center justify-between cursor-pointer list-none">
+                  <span className="font-medium text-[#131413]">{faq.q}</span>
+                  <ChevronDown className="h-5 w-5 text-[#BFC1C0] group-open:rotate-180 transition-transform" />
+                </summary>
+                <p className="text-[#585A59] mt-4 leading-relaxed text-sm">{faq.a}</p>
+              </details>
+            ))}
+          </div>
         </div>
       </section>
 
       {/* Final CTA */}
-      <section className="bg-brand-600">
-        <div className="max-w-3xl mx-auto px-6 py-20 text-center">
-          <h2 className="text-3xl font-bold text-white">
+      <section className="bg-[#131413]">
+        <div className="max-w-3xl mx-auto px-6 py-24 text-center">
+          <h2 className="text-3xl sm:text-4xl font-medium text-white tracking-tight">
             Protect the muscle you have worked for.
           </h2>
-          <p className="text-brand-100 mt-4 text-lg max-w-xl mx-auto">
+          <p className="text-[#BFC1C0] mt-5 text-lg max-w-xl mx-auto leading-relaxed">
             Your GLP-1 medication is helping you lose weight. MuscleGuard is designed to
             help you make sure it is the right kind of weight.
           </p>
-          <Link href="/login" className="inline-block mt-8">
-            <Button
-              size="lg"
-              className="bg-white text-brand-700 hover:bg-brand-50 px-10 text-base h-12"
-            >
-              Start your free trial <ArrowRight className="h-4 w-4 ml-1" />
-            </Button>
+          <Link
+            href="/login"
+            className="inline-flex items-center justify-center gap-2 mt-10 px-10 py-3.5 bg-white text-[#131413] font-medium rounded-lg hover:bg-[#ECEEED] transition-colors"
+          >
+            Start your free trial <ArrowRight className="h-4 w-4" />
           </Link>
-          <p className="text-brand-200 text-sm mt-4">
+          <p className="text-[#585A59] text-sm mt-4">
             7-day free trial · $14.99/mo after · Cancel anytime
           </p>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="border-t bg-white">
+      <footer className="bg-white border-t border-black/5">
         <div className="max-w-6xl mx-auto px-6 py-12">
           <div className="flex flex-col md:flex-row items-start justify-between gap-8">
             <div>
               <div className="flex items-center gap-2 mb-3">
-                <Shield className="h-5 w-5 text-brand-600" />
-                <span className="font-bold text-gray-900">MuscleGuard</span>
+                <Shield className="h-5 w-5 text-[#131413]" />
+                <span className="font-semibold text-[#131413]">MuscleGuard</span>
               </div>
-              <p className="text-sm text-gray-400 max-w-xs">
+              <p className="text-sm text-[#585A59] max-w-xs">
                 A wellness tool designed to support GLP-1 medication users in
                 preserving lean muscle during weight loss.
               </p>
             </div>
-            <div className="flex flex-wrap gap-6 text-sm text-gray-500">
-              <Link href="/legal/terms" className="hover:text-gray-900 transition-colors">
+            <div className="flex flex-wrap gap-6 text-sm text-[#585A59]">
+              <Link href="/legal/terms" className="hover:text-[#131413] transition-colors">
                 Terms of Use
               </Link>
-              <Link href="/legal/privacy" className="hover:text-gray-900 transition-colors">
+              <Link href="/legal/privacy" className="hover:text-[#131413] transition-colors">
                 Privacy Policy
               </Link>
-              <Link href="/legal/cookies" className="hover:text-gray-900 transition-colors">
+              <Link href="/legal/cookies" className="hover:text-[#131413] transition-colors">
                 Cookie Policy
               </Link>
-              <Link href="/legal/refund" className="hover:text-gray-900 transition-colors">
+              <Link href="/legal/refund" className="hover:text-[#131413] transition-colors">
                 Refund Policy
               </Link>
             </div>
           </div>
-          <div className="mt-10 pt-6 border-t">
-            <p className="text-xs text-gray-400 leading-relaxed">
-              <span className="font-semibold text-gray-500">Medical Disclaimer:</span>{" "}
+          <div className="mt-10 pt-6 border-t border-black/5">
+            <p className="text-xs text-[#BFC1C0] leading-relaxed">
+              <span className="font-semibold text-[#585A59]">Medical Disclaimer:</span>{" "}
               MuscleGuard is not a medical device and is not intended to diagnose, treat, cure,
               or prevent any disease. The information provided by MuscleGuard is for educational
               and informational purposes only and is not a substitute for professional medical
@@ -529,7 +557,7 @@ export default function LandingPage() {
               diet, exercise routine, or medication regimen. Individual results may vary.
               Testimonials reflect individual experiences and are not guaranteed outcomes.
             </p>
-            <p className="text-xs text-gray-400 mt-4">
+            <p className="text-xs text-[#BFC1C0] mt-4">
               &copy; {new Date().getFullYear()} MuscleGuard. All rights reserved.
             </p>
           </div>
