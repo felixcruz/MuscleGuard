@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,6 +15,8 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const supabase = createClient();
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirect");
 
   async function handleMagicLink(e: React.FormEvent) {
     e.preventDefault();
@@ -43,9 +46,13 @@ export default function LoginPage() {
         throw new Error('Application URL is not configured');
       }
 
+      const callbackUrl = redirectTo
+        ? `${appUrl}/auth/callback?redirect=${encodeURIComponent(redirectTo)}`
+        : `${appUrl}/auth/callback`;
+
       const { error: authError } = await supabase.auth.signInWithOtp({
         email,
-        options: { emailRedirectTo: `${appUrl}/auth/callback` },
+        options: { emailRedirectTo: callbackUrl },
       });
       if (authError) throw authError;
       setSent(true);

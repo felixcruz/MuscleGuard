@@ -36,6 +36,7 @@ export async function GET(req: NextRequest) {
   const admin = createAdminClient();
   const today = new Date();
   const todayStr = today.toISOString().split("T")[0];
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://muscle-guard.vercel.app";
 
   interface ProfileRow {
     id: string;
@@ -111,7 +112,7 @@ export async function GET(req: NextRequest) {
         `Your ${doseMg}mg ${medLabel} dose is due today`,
         `<p>Hi,</p>
 <p>This is a friendly reminder that your <strong>${doseMg}mg ${medLabel}</strong> dose is scheduled for today.</p>
-<p>Log it in <a href="https://muscleguard.app/medication">MuscleGuard</a> to keep your protein and training plan accurate.</p>
+<p>Log it in <a href="${appUrl}/medication">MuscleGuard</a> to keep your protein and training plan accurate.</p>
 <p>Your body, your muscle — stay consistent.</p>
 <p>— The MuscleGuard Team</p>`
       );
@@ -124,7 +125,7 @@ export async function GET(req: NextRequest) {
         `<p>Hi,</p>
 <p>It looks like you haven't logged your <strong>${doseMg}mg ${medLabel}</strong> dose yet — it was due ${daysOverdue} day${daysOverdue !== 1 ? "s" : ""} ago.</p>
 <p>Your MuscleGuard protein and training plan is personalized to your medication schedule. Logging your dose helps us keep your recommendations accurate.</p>
-<p><a href="https://muscleguard.app/medication">Log your dose now →</a></p>
+<p><a href="${appUrl}/medication">Log your dose now →</a></p>
 <p>— The MuscleGuard Team</p>`
       );
       processed++;
@@ -136,7 +137,7 @@ export async function GET(req: NextRequest) {
         `<p>Hi,</p>
 <p>Your <strong>${doseMg}mg ${medLabel}</strong> dose is now <strong>${daysOverdue} days overdue</strong>.</p>
 <p>When your medication schedule changes, your protein targets and training intensity may also need to adjust. Please log your dose or any changes to keep your plan accurate.</p>
-<p><a href="https://muscleguard.app/medication">Update your medication status →</a></p>
+<p><a href="${appUrl}/medication">Update your medication status →</a></p>
 <p>If you've paused or changed your medication, you can log that too — your plan will automatically adjust.</p>
 <p>— The MuscleGuard Team</p>`
       );

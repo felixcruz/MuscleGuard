@@ -41,11 +41,13 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(new URL("/login?error=Failed to verify user", request.url));
     }
 
-    // Redirect to dashboard on successful auth
-    const dashboardUrl = new URL(request.nextUrl);
-    dashboardUrl.pathname = "/dashboard";
-    dashboardUrl.searchParams.delete("code");
-    return NextResponse.redirect(dashboardUrl);
+    // Redirect to original page or dashboard
+    const redirect = searchParams.get("redirect");
+    const targetUrl = new URL(request.nextUrl);
+    targetUrl.pathname = redirect && redirect.startsWith("/") ? redirect : "/dashboard";
+    targetUrl.searchParams.delete("code");
+    targetUrl.searchParams.delete("redirect");
+    return NextResponse.redirect(targetUrl);
   } catch (err) {
     const message = err instanceof Error ? err.message : "Authentication failed";
     console.error("Callback error:", message);

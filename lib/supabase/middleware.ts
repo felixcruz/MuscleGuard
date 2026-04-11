@@ -44,12 +44,15 @@ export async function updateSession(request: NextRequest) {
     "/progress",
     "/settings",
     "/onboarding",
+    "/medication",
+    "/reports",
   ];
   const isProtected = protectedPaths.some((p) => pathname.startsWith(p));
 
   if (isProtected && !user) {
     const loginUrl = request.nextUrl.clone();
     loginUrl.pathname = "/login";
+    loginUrl.searchParams.set("redirect", pathname);
     return NextResponse.redirect(loginUrl);
   }
 
