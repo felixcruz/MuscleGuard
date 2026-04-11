@@ -17,49 +17,50 @@ import {
   Activity,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { TestimonialCarousel } from "@/components/landing/TestimonialCarousel";
 
 const features = [
   {
     icon: Dumbbell,
     title: "Dose-Adjusted Protein Targets",
     description:
-      "Your protein needs change with every dose increase. MuscleGuard calculates your daily target using your weight, base protein needs, and GLP-1 dose multiplier — so you always know your number.",
+      "Your protein needs change with every dose increase. MuscleGuard calculates your daily target using your weight, your goals, and your specific GLP-1 dose multiplier, so you always know exactly what to aim for.",
   },
   {
     icon: Sparkles,
-    title: "AI Meal Wizard",
+    title: "Smart Meal Planner",
     description:
-      "Answer 3 quick questions about your appetite, and get high-protein meal ideas in small, manageable portions. Designed to support users experiencing appetite suppression.",
+      "Answer 3 quick questions about your appetite and get high-protein meal ideas in small, manageable portions. Built specifically for users experiencing appetite suppression on GLP-1 medications.",
   },
   {
     icon: Activity,
     title: "Smart Training Protocols",
     description:
-      "Choose from 8 sport types — each with GLP-1-specific intensity adjustments. Resistance training helps signal your body to preserve muscle during weight loss.",
+      "Choose from 8 sport types, each with GLP-1-specific intensity adjustments. Resistance training helps signal your body to preserve muscle during weight loss, and MuscleGuard adapts your plan to how you feel each day.",
   },
   {
     icon: Pill,
     title: "Medication Tracker",
     description:
-      "Log your injections, track dose changes, and receive automated email reminders with 3 escalation levels so you never miss a dose.",
+      "Log your injections, track dose changes, and receive automated email reminders with 3 escalation levels so you never miss a dose. When your dose changes, your entire plan updates automatically.",
   },
   {
     icon: BarChart2,
     title: "Progress Analytics",
     description:
-      "Interactive charts track your weight, body composition, and protein intake over time — with dose-change markers so you can see how adjustments affect your progress.",
+      "Interactive charts track your weight, body composition, and protein intake over time, with dose-change markers so you can see exactly how medication adjustments affect your progress.",
   },
   {
     icon: TrendingUp,
     title: "Weekly Reports",
     description:
-      "Get a clear A/B/C grade each week across protein, training, and consistency. Know exactly where you stand and what to focus on next.",
+      "Get a clear A/B/C grade each week across protein consistency and training completion. Know exactly where you stand and what to focus on next with a personalized weekly summary.",
   },
   {
     icon: MessageSquare,
     title: "Personalized Communication",
     description:
-      "Choose from 5 communication styles — from gentle encouragement to direct accountability. MuscleGuard adapts its tone to match what motivates you.",
+      "Choose from 5 communication styles, from gentle encouragement to direct accountability. MuscleGuard adapts its tone across every section of the app to match what motivates you best.",
   },
 ];
 
@@ -68,7 +69,7 @@ const comparisonRows = [
     name: "MuscleGuard",
     glp1: true,
     doseProtein: true,
-    aiMeals: true,
+    mealPlanner: true,
     training: true,
     medReminders: true,
     price: "$14.99/mo",
@@ -78,7 +79,7 @@ const comparisonRows = [
     name: "MyFitnessPal",
     glp1: false,
     doseProtein: false,
-    aiMeals: false,
+    mealPlanner: false,
     training: false,
     medReminders: false,
     price: "$19.99/mo",
@@ -88,7 +89,7 @@ const comparisonRows = [
     name: "Noom Med",
     glp1: true,
     doseProtein: false,
-    aiMeals: false,
+    mealPlanner: false,
     training: false,
     medReminders: false,
     price: "$149+/mo",
@@ -98,7 +99,7 @@ const comparisonRows = [
     name: "Calibrate",
     glp1: true,
     doseProtein: false,
-    aiMeals: false,
+    mealPlanner: false,
     training: true,
     medReminders: false,
     price: "$135+/mo",
@@ -108,7 +109,7 @@ const comparisonRows = [
     name: "MacroFactor",
     glp1: false,
     doseProtein: false,
-    aiMeals: false,
+    mealPlanner: false,
     training: false,
     medReminders: false,
     price: "$11.99/mo",
@@ -118,24 +119,24 @@ const comparisonRows = [
 
 const faqs = [
   {
+    q: "Who is MuscleGuard for?",
+    a: "MuscleGuard is designed for anyone taking GLP-1 medications such as Ozempic, Wegovy, Mounjaro, or Zepbound who wants to preserve lean muscle during weight loss. Whether you are a gym-goer, a runner, a swimmer, or someone just getting started with fitness, MuscleGuard adapts to your activity level and gives you a plan that fits your lifestyle and your specific dose.",
+  },
+  {
     q: "Is MuscleGuard a medical app?",
     a: "No. MuscleGuard is an educational wellness tool designed to support your nutrition and fitness goals. It is not a medical device and does not diagnose, treat, cure, or prevent any disease. Always consult your healthcare provider about your GLP-1 medication and exercise plan.",
+  },
+  {
+    q: "Which GLP-1 medications does MuscleGuard support?",
+    a: "MuscleGuard is designed to support users on semaglutide (Ozempic, Wegovy) and tirzepatide (Mounjaro, Zepbound). The dose-adjusted protein formula accounts for the appetite suppression profile of each medication at every dose level.",
   },
   {
     q: "Do I need to enter a credit card for the free trial?",
     a: "Yes. Your 7-day free trial requires a payment method on file. You will not be charged during the trial period. If you cancel before the trial ends, you will not be billed. After the trial, your subscription renews at $14.99/month.",
   },
   {
-    q: "Which GLP-1 medications does MuscleGuard support?",
-    a: "MuscleGuard is designed to support users on semaglutide (Ozempic, Wegovy) and tirzepatide (Mounjaro, Zepbound). The dose-adjusted protein formula accounts for the appetite suppression profile of these medications.",
-  },
-  {
-    q: "How is this different from a regular calorie tracker?",
-    a: "Most calorie trackers are built for the general population. MuscleGuard focuses specifically on protein preservation during GLP-1-assisted weight loss — adjusting your targets based on your medication dose, generating meals sized for suppressed appetites, and providing training protocols that help signal your body to retain lean mass.",
-  },
-  {
     q: "Can I cancel anytime?",
-    a: "Yes. You can cancel your subscription at any time from your Settings page via the Stripe billing portal. There are no long-term contracts or cancellation fees.",
+    a: "Yes. You can cancel your subscription at any time from your Settings page through the Stripe billing portal. There are no long-term contracts, no cancellation fees, and your access continues until the end of your current billing period.",
   },
 ];
 
@@ -165,7 +166,7 @@ export default function LandingPage() {
           could be <span className="text-red-500">muscle, not fat.</span>
         </h1>
         <p className="text-xl text-gray-500 mt-8 max-w-2xl mx-auto leading-relaxed">
-          GLP-1 medications like Ozempic, Wegovy, and Mounjaro suppress your appetite — but eating
+          GLP-1 medications like Ozempic, Wegovy, and Mounjaro suppress your appetite, but eating
           too little protein can cost you the lean muscle you have worked to build. MuscleGuard
           is designed to support you in hitting your dose-adjusted protein targets every day.
         </p>
@@ -191,13 +192,13 @@ export default function LandingPage() {
                 &ldquo;I lost 40 lbs on Ozempic but my doctor said I&apos;ve lost significant muscle mass.
                 I look demacrada. Nobody told me about protein.&rdquo;
               </p>
-              <p className="text-sm text-red-600 mt-3">— Reddit r/Ozempic (viral thread)</p>
+              <p className="text-sm text-red-600 mt-3">Posted on Reddit r/Ozempic (viral thread)</p>
             </div>
           </div>
           <div className="mt-8 p-5 bg-white/70 rounded-xl border border-red-100">
             <p className="text-gray-700 text-sm leading-relaxed">
               <span className="font-semibold text-gray-900">The research is clear:</span>{" "}
-              Clinical studies show up to 40% of weight lost on GLP-1 medications can come from
+              Clinical studies show that up to 40% of weight lost on GLP-1 medications can come from
               lean muscle, not fat (Wilding et al., STEP trials). Without adequate protein
               intake and resistance training, the weight you lose may include the muscle
               that keeps you strong, metabolically healthy, and functional.
@@ -212,7 +213,7 @@ export default function LandingPage() {
           The problem nobody is talking about
         </h2>
         <p className="text-gray-500 text-center max-w-2xl mx-auto mb-14">
-          GLP-1 medications are transformative for weight loss — but the muscle loss side of the
+          GLP-1 medications are transformative for weight loss, but the muscle loss side of the
           equation is often overlooked.
         </p>
         <div className="grid md:grid-cols-3 gap-6">
@@ -223,8 +224,8 @@ export default function LandingPage() {
             <h3 className="font-semibold text-gray-900 text-lg">Your doctor may not mention it</h3>
             <p className="text-gray-500 leading-relaxed">
               Most prescribing physicians focus on weight and metabolic markers. Detailed protein
-              guidance adjusted to your specific GLP-1 dose is rarely part of the conversation.
-              This is an area where many patients feel unsupported.
+              guidance adjusted to your specific GLP-1 dose is rarely part of the conversation,
+              and this is an area where many patients feel unsupported.
             </p>
           </div>
           <div className="p-8 rounded-2xl border bg-white space-y-4">
@@ -298,7 +299,7 @@ export default function LandingPage() {
                 <th className="text-left py-4 px-4 font-medium text-gray-500">App</th>
                 <th className="text-center py-4 px-3 font-medium text-gray-500">GLP-1 Aware</th>
                 <th className="text-center py-4 px-3 font-medium text-gray-500">Dose-Adjusted Protein</th>
-                <th className="text-center py-4 px-3 font-medium text-gray-500">AI Meals</th>
+                <th className="text-center py-4 px-3 font-medium text-gray-500">Meal Planner</th>
                 <th className="text-center py-4 px-3 font-medium text-gray-500">Training Plan</th>
                 <th className="text-center py-4 px-3 font-medium text-gray-500">Med Reminders</th>
                 <th className="text-center py-4 px-3 font-medium text-gray-500">Price</th>
@@ -320,13 +321,13 @@ export default function LandingPage() {
                     )}
                     {row.name}
                   </td>
-                  {[row.glp1, row.doseProtein, row.aiMeals, row.training, row.medReminders].map(
+                  {[row.glp1, row.doseProtein, row.mealPlanner, row.training, row.medReminders].map(
                     (val, i) => (
                       <td key={i} className="text-center py-4 px-3">
                         {val ? (
                           <CheckCircle2 className="h-5 w-5 text-brand-600 mx-auto" />
                         ) : (
-                          <span className="text-gray-300">—</span>
+                          <span className="text-gray-300 text-xs">Not available</span>
                         )}
                       </td>
                     )
@@ -366,14 +367,14 @@ export default function LandingPage() {
                 icon: Clock,
                 title: "Complete onboarding",
                 description:
-                  "Answer 3 quick screens: your medication and dose, your current weight, and your activity preferences.",
+                  "Answer 3 quick screens about your medication, your current weight, and your activity preferences.",
               },
               {
                 step: "3",
                 icon: Zap,
                 title: "Get your personalized plan",
                 description:
-                  "Receive your dose-adjusted protein target, AI meal suggestions, and a training protocol tailored to your sport.",
+                  "Receive your dose-adjusted protein target, personalized meal suggestions, and a training protocol tailored to your sport.",
               },
             ].map((s) => {
               const Icon = s.icon;
@@ -391,19 +392,15 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Social Proof */}
-      <section className="max-w-4xl mx-auto px-6 py-20 text-center">
-        <div className="h-14 w-14 bg-brand-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
-          <Shield className="h-7 w-7 text-brand-600" />
-        </div>
-        <h2 className="text-3xl font-bold text-gray-900 mb-4">
-          Join thousands of GLP-1 users protecting their muscle
+      {/* Testimonials */}
+      <section className="max-w-4xl mx-auto px-6 py-20">
+        <h2 className="text-3xl font-bold text-gray-900 text-center mb-4">
+          Real people, real results
         </h2>
-        <p className="text-gray-500 max-w-xl mx-auto leading-relaxed">
-          People on Ozempic, Wegovy, and Mounjaro are using MuscleGuard to stay
-          on top of their protein intake, follow structured training, and track their
-          medication — all in one place.
+        <p className="text-gray-500 text-center max-w-xl mx-auto mb-12">
+          Hear from GLP-1 users who are protecting their muscle with MuscleGuard.
         </p>
+        <TestimonialCarousel />
       </section>
 
       {/* Pricing */}
@@ -426,7 +423,7 @@ export default function LandingPage() {
               <ul className="mt-8 space-y-3">
                 {[
                   "Dose-adjusted daily protein targets",
-                  "AI meal wizard for suppressed appetites",
+                  "Smart meal planner for suppressed appetites",
                   "8 sport-specific training protocols",
                   "Medication tracking with email reminders",
                   "Progress charts with dose-change markers",
@@ -530,7 +527,8 @@ export default function LandingPage() {
               or prevent any disease. The information provided by MuscleGuard is for educational
               and informational purposes only and is not a substitute for professional medical
               advice. Always consult your healthcare provider before making changes to your
-              diet, exercise routine, or medication regimen. Results may vary.
+              diet, exercise routine, or medication regimen. Individual results may vary.
+              Testimonials reflect individual experiences and are not guaranteed outcomes.
             </p>
             <p className="text-xs text-gray-400 mt-4">
               &copy; {new Date().getFullYear()} MuscleGuard. All rights reserved.
