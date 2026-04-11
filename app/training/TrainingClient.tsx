@@ -46,19 +46,20 @@ interface Props {
   weekKey: string;
   initialDone: string[];
   workoutStreakDays: number;
+  proteinStreakDays: number;
   totalPoints: number;
 }
 
-export function TrainingClient({ weekKey, initialDone, workoutStreakDays, totalPoints }: Props) {
+export function TrainingClient({ weekKey, initialDone, workoutStreakDays, proteinStreakDays, totalPoints }: Props) {
   const [done, setDone] = useState<string[]>(initialDone);
   const [streak, setStreak] = useState(workoutStreakDays);
   const [points, setPoints] = useState(totalPoints);
   const [toggling, setToggling] = useState<string | null>(null);
 
   const milestoneLabel =
-    streak >= 30 ? "🏆 Iron Will badge!" :
-    streak >= 14 ? "⭐ Dedicated badge!" :
-    streak >= 7  ? "🎖 Consistent badge!" : null;
+    streak >= 30 ? "🏆 Iron Will — 30 workouts!" :
+    streak >= 14 ? "⭐ Dedicated — 14 workouts!" :
+    streak >= 7  ? "🎖 Consistent — 7 workouts!" : null;
 
   async function toggleDay(id: string) {
     setToggling(id);
@@ -83,7 +84,7 @@ export function TrainingClient({ weekKey, initialDone, workoutStreakDays, totalP
   return (
     <div className="max-w-lg mx-auto px-4 py-8 space-y-6">
 
-      {/* ── Header + streak ── */}
+      {/* ── Header + streak badges ── */}
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Strength training</h1>
@@ -92,13 +93,25 @@ export function TrainingClient({ weekKey, initialDone, workoutStreakDays, totalP
             muscle on GLP-1.
           </p>
         </div>
-        <div className={`flex items-center gap-1 px-2.5 py-1.5 rounded-full border flex-shrink-0 ${
-          streak >= 1 ? "bg-orange-50 border-orange-100" : "bg-gray-50 border-gray-200"
-        }`}>
-          <span className="text-sm">{streak >= 7 ? "🔥🔥" : streak >= 1 ? "🔥" : "💤"}</span>
-          <span className={`text-xs font-semibold ${streak >= 1 ? "text-orange-700" : "text-gray-400"}`}>
-            {streak}d streak
-          </span>
+        <div className="flex flex-col items-end gap-1.5">
+          {/* Workout streak */}
+          <div className={`flex items-center gap-1 px-2.5 py-1.5 rounded-full border flex-shrink-0 ${
+            streak >= 1 ? "bg-orange-50 border-orange-100" : "bg-gray-50 border-gray-200"
+          }`}>
+            <span className="text-sm">{streak >= 7 ? "🔥🔥" : streak >= 1 ? "🔥" : "💤"}</span>
+            <span className={`text-xs font-semibold ${streak >= 1 ? "text-orange-700" : "text-gray-400"}`}>
+              {streak} workout{streak !== 1 ? "s" : ""}
+            </span>
+          </div>
+          {/* Protein streak (cross-context) */}
+          {proteinStreakDays >= 1 && (
+            <div className="flex items-center gap-1 bg-green-50 border border-green-100 px-2.5 py-1.5 rounded-full">
+              <span className="text-xs">🥩</span>
+              <span className="text-xs font-semibold text-green-700">
+                {proteinStreakDays}d protein
+              </span>
+            </div>
+          )}
         </div>
       </div>
 
@@ -106,9 +119,7 @@ export function TrainingClient({ weekKey, initialDone, workoutStreakDays, totalP
       {milestoneLabel && (
         <div className="flex items-center gap-2 px-3 py-2 bg-yellow-50 border border-yellow-200 rounded-lg">
           <Trophy className="h-4 w-4 text-yellow-600 flex-shrink-0" />
-          <span className="text-sm font-medium text-yellow-800">
-            {milestoneLabel} {streak}-day workout streak!
-          </span>
+          <span className="text-sm font-medium text-yellow-800">{milestoneLabel}</span>
         </div>
       )}
 

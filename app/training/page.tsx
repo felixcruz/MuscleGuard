@@ -1,14 +1,18 @@
+export const dynamic = "force-dynamic";
+
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { TrainingClient } from "./TrainingClient";
 
-function getWeekKey() {
+// Monday-anchored week key: "mg-w-2026-04-07"
+function getWeekKey(): string {
   const now = new Date();
-  const startOfYear = new Date(now.getFullYear(), 0, 1);
-  const week = Math.ceil(
-    ((now.getTime() - startOfYear.getTime()) / 86400000 + startOfYear.getDay() + 1) / 7
-  );
-  return `mg-training-week-${now.getFullYear()}-${week}`;
+  const day = now.getUTCDay(); // 0=Sun
+  const toMonday = day === 0 ? -6 : 1 - day;
+  const monday = new Date(now);
+  monday.setUTCDate(now.getUTCDate() + toMonday);
+  const ymd = monday.toISOString().split("T")[0];
+  return `mg-w-${ymd}`;
 }
 
 export default async function TrainingPage() {
@@ -21,7 +25,7 @@ export default async function TrainingPage() {
   const [profileResult, logsResult] = await Promise.all([
     supabase
       .from("profiles")
-      .select("workout_streak_days, total_points")
+      .select("workout_streak_days, protein_streak_days, total_points")
       .eq("id", user.id)
       .single(),
     supabase
@@ -36,6 +40,7 @@ export default async function TrainingPage() {
       weekKey={weekKey}
       initialDone={logsResult.data?.map(l => l.workout_day) ?? []}
       workoutStreakDays={profileResult.data?.workout_streak_days ?? 0}
+      proteinStreakDays={profileResult.data?.protein_streak_days ?? 0}
       totalPoints={profileResult.data?.total_points ?? 0}
     />
   );
