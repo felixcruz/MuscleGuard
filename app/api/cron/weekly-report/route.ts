@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Failed to fetch users" }, { status: 500 });
   }
 
-  const userIds = (profiles ?? []).map((p) => p.id as string);
+  const userIds = ((profiles ?? []) as { id: string }[]).map((p) => p.id);
   let generated = 0;
   let skipped = 0;
   let failed = 0;
