@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Shield, LayoutDashboard, Sparkles, Dumbbell, TrendingUp, Settings } from "lucide-react";
+import { Shield, LayoutDashboard, Sparkles, Dumbbell, TrendingUp, BarChart2, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
@@ -10,6 +10,7 @@ const NAV_ITEMS = [
   { href: "/meals", label: "Meals", icon: Sparkles },
   { href: "/training", label: "Training", icon: Dumbbell },
   { href: "/progress", label: "Progress", icon: TrendingUp },
+  { href: "/reports", label: "Reports", icon: BarChart2 },
   { href: "/settings", label: "Settings", icon: Settings },
 ];
 
