@@ -2,9 +2,9 @@
 
 import { useState, useEffect, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { MealCard, type Meal } from "@/components/meals/MealCard";
 import { Button } from "@/components/ui/button";
-import { Check, Search, Plus, Sparkles, Salad } from "lucide-react";
+import { Check, Search, Plus } from "lucide-react";
+import { MealWizard } from "@/components/meals/MealWizard";
 
 interface USDAFood {
   fdcId: number;
@@ -19,13 +19,6 @@ interface Props {
   proteinLoggedG: number;
   dietaryPrefs: string[];
 }
-
-const QUICK_INGREDIENTS = [
-  "Chicken breast", "Eggs", "Greek yogurt", "Cottage cheese",
-  "Canned tuna", "Salmon", "Ground turkey", "Shrimp",
-  "Tofu", "Edamame", "Lentils", "Black beans",
-  "Quinoa", "Protein powder", "Lean beef", "Tempeh",
-];
 
 export function MealsClient({ userId, proteinGoalG, proteinLoggedG: initialLogged, dietaryPrefs }: Props) {
   const supabase = createClient();
@@ -46,14 +39,6 @@ export function MealsClient({ userId, proteinGoalG, proteinLoggedG: initialLogge
   const [searchError, setSearchError] = useState<string | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // ── AI generation ──
-  const [genMode, setGenMode] = useState<"magic" | "custom">("magic");
-  const [selectedIngredients, setSelectedIngredients] = useState<string[]>([]);
-  const [meals, setMeals] = useState<Meal[]>([]);
-  const [loggedMeals, setLoggedMeals] = useState<Set<string>>(new Set());
-  const [loggingId, setLoggingId] = useState<string | null>(null);
-  const [generating, setGenerating] = useState(false);
-  const [aiError, setAiError] = useState<string | null>(null);
 
   // Debounced USDA search
   useEffect(() => {
@@ -119,60 +104,6 @@ export function MealsClient({ userId, proteinGoalG, proteinLoggedG: initialLogge
       setSearchError(err instanceof Error ? err.message : "Failed to log food");
     } finally {
       setLogging(false);
-    }
-  }
-
-  function toggleIngredient(ing: string) {
-    setSelectedIngredients((prev) =>
-      prev.includes(ing) ? prev.filter((i) => i !== ing) : [...prev, ing]
-    );
-  }
-
-  async function handleGenerate() {
-    setGenerating(true);
-    setMeals([]);
-    setLoggedMeals(new Set());
-    setAiError(null);
-    try {
-      const body: Record<string, unknown> = { proteinRemainingG: proteinRemaining, dietaryPrefs };
-      if (genMode === "custom" && selectedIngredients.length > 0) {
-        body.ingredients = selectedIngredients;
-      }
-      const res = await fetch("/api/generate-meals", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-      if (!res.ok) {
-        const d = await res.json().catch(() => ({}));
-        throw new Error(d.error || `API error: ${res.status}`);
-      }
-      const data = await res.json();
-      setMeals(data.meals ?? []);
-    } catch (err) {
-      setAiError(err instanceof Error ? err.message : "Failed to generate meals");
-    } finally {
-      setGenerating(false);
-    }
-  }
-
-  async function handleLogMeal(meal: Meal) {
-    setLoggingId(meal.name);
-    try {
-      const { error: dbError } = await supabase.from("food_logs").insert({
-        user_id: userId,
-        food_name: meal.name,
-        protein_g: meal.protein_g,
-        calories: meal.calories,
-        portion_g: meal.portion_g,
-      });
-      if (dbError) throw dbError;
-      setLoggedMeals((prev) => new Set(prev).add(meal.name));
-      setProteinLogged((p) => p + meal.protein_g);
-    } catch (err) {
-      setAiError(err instanceof Error ? err.message : "Failed to log meal");
-    } finally {
-      setLoggingId(null);
     }
   }
 
@@ -306,112 +237,13 @@ export function MealsClient({ userId, proteinGoalG, proteinLoggedG: initialLogge
         <div className="h-px flex-1 bg-gray-200" />
       </div>
 
-      {/* ── AI Meal Generation ── */}
-      <div className="space-y-4">
-
-        {/* Mode toggle */}
-        <div className="flex gap-2 p-1 bg-gray-100 rounded-lg">
-          <button
-            type="button"
-            onClick={() => setGenMode("magic")}
-            className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-md text-sm font-medium transition-colors ${
-              genMode === "magic"
-                ? "bg-white text-gray-900 shadow-sm"
-                : "text-gray-500 hover:text-gray-700"
-            }`}
-          >
-            <Sparkles className="h-4 w-4" />
-            Magic
-          </button>
-          <button
-            type="button"
-            onClick={() => setGenMode("custom")}
-            className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-md text-sm font-medium transition-colors ${
-              genMode === "custom"
-                ? "bg-white text-gray-900 shadow-sm"
-                : "text-gray-500 hover:text-gray-700"
-            }`}
-          >
-            <Salad className="h-4 w-4" />
-            Choose ingredients
-          </button>
-        </div>
-
-        {/* Custom: ingredient chips */}
-        {genMode === "custom" && (
-          <div className="space-y-2">
-            <p className="text-xs text-gray-500">Select what you have available:</p>
-            <div className="flex flex-wrap gap-2">
-              {QUICK_INGREDIENTS.map((ing) => {
-                const on = selectedIngredients.includes(ing);
-                return (
-                  <button
-                    key={ing}
-                    type="button"
-                    onClick={() => toggleIngredient(ing)}
-                    className={`px-3 py-1.5 rounded-full text-sm border transition-colors ${
-                      on
-                        ? "border-brand-700 bg-brand-50 text-brand-800 font-medium"
-                        : "border-gray-200 bg-white text-gray-600 hover:border-gray-300"
-                    }`}
-                    style={on ? { borderColor: "#2e7d32", backgroundColor: "#f1f8f1", color: "#1b5e20" } : {}}
-                  >
-                    {on && <span className="mr-1 text-xs">✓</span>}{ing}
-                  </button>
-                );
-              })}
-            </div>
-            {selectedIngredients.length > 0 && (
-              <p className="text-xs text-gray-400">
-                {selectedIngredients.length} ingredient{selectedIngredients.length !== 1 ? "s" : ""} selected
-              </p>
-            )}
-          </div>
-        )}
-
-        <Button
-          onClick={handleGenerate}
-          disabled={generating || (genMode === "custom" && selectedIngredients.length === 0)}
-          className="w-full"
-          size="lg"
-        >
-          <Sparkles className="h-4 w-4 mr-2" />
-          {generating
-            ? "Generating…"
-            : genMode === "custom" && selectedIngredients.length > 0
-              ? `Generate meals with ${selectedIngredients.length} ingredient${selectedIngredients.length !== 1 ? "s" : ""}`
-              : "Generate today's meal ideas"
-          }
-        </Button>
-
-        {aiError && (
-          <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
-            {aiError}
-          </div>
-        )}
-
-        {generating && (
-          <div className="space-y-3">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="h-48 rounded-lg bg-gray-100 animate-pulse" />
-            ))}
-          </div>
-        )}
-
-        {meals.length > 0 && (
-          <div className="space-y-4">
-            {meals.map((meal, index) => (
-              <MealCard
-                key={`${index}-${meal.name}`}
-                meal={meal}
-                onLog={handleLogMeal}
-                logging={loggingId === meal.name}
-                logged={loggedMeals.has(meal.name)}
-              />
-            ))}
-          </div>
-        )}
-      </div>
+      {/* ── AI Meal Wizard ── */}
+      <MealWizard
+        userId={userId}
+        proteinRemainingG={proteinRemaining}
+        dietaryPrefs={dietaryPrefs}
+        onMealLogged={(proteinG) => setProteinLogged((p) => p + proteinG)}
+      />
 
     </div>
   );

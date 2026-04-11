@@ -10,7 +10,13 @@ export interface ValidationError {
 
 export function validateMealGenerationRequest(data: unknown): {
   valid: boolean;
-  data?: { proteinRemainingG: number; dietaryPrefs: string[]; ingredients?: string[] };
+  data?: {
+    proteinRemainingG: number;
+    dietaryPrefs: string[];
+    ingredients?: string[];
+    mealTime?: string;
+    hungerLevel?: string;
+  };
   errors?: ValidationError[];
 } {
   const errors: ValidationError[] = [];
@@ -69,6 +75,28 @@ export function validateMealGenerationRequest(data: unknown): {
     }
   }
 
+  // Validate optional mealTime
+  let mealTime: string | undefined;
+  const validMealTimes = ["breakfast", "lunch", "dinner", "snack"];
+  if (obj.mealTime !== undefined) {
+    if (typeof obj.mealTime !== "string" || !validMealTimes.includes(obj.mealTime)) {
+      errors.push({ field: "mealTime", message: "Must be one of: breakfast, lunch, dinner, snack" });
+    } else {
+      mealTime = obj.mealTime;
+    }
+  }
+
+  // Validate optional hungerLevel
+  let hungerLevel: string | undefined;
+  const validHungerLevels = ["low", "moderate", "high"];
+  if (obj.hungerLevel !== undefined) {
+    if (typeof obj.hungerLevel !== "string" || !validHungerLevels.includes(obj.hungerLevel)) {
+      errors.push({ field: "hungerLevel", message: "Must be one of: low, moderate, high" });
+    } else {
+      hungerLevel = obj.hungerLevel;
+    }
+  }
+
   if (errors.length > 0) {
     return { valid: false, errors };
   }
@@ -79,6 +107,8 @@ export function validateMealGenerationRequest(data: unknown): {
       proteinRemainingG: obj.proteinRemainingG as number,
       dietaryPrefs: obj.dietaryPrefs as string[],
       ingredients,
+      mealTime,
+      hungerLevel,
     },
   };
 }
