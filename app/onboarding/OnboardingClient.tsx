@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { Shield, Check } from "lucide-react";
 import { calculateProteinGoal, type Goal } from "@/lib/personalization";
 
 const TOTAL_STEPS = 3;
@@ -32,17 +33,14 @@ const APPETITE_OPTIONS = [
 const DAYS_OF_WEEK = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 type Form = {
-  // Screen 1
   weight_kg: string;
   primary_goal: string;
-  // Screen 2
   medication: string;
   dose_mg: string;
   dose_other: string;
   frequency: string;
   injection_day: string;
   appetite_level: string;
-  // Screen 3
   activity_types: string[];
   primary_activity: string;
   activity_frequency: string;
@@ -84,7 +82,6 @@ export default function OnboardingPage() {
       const next = f.activity_types.includes(val)
         ? f.activity_types.filter((v) => v !== val)
         : [...f.activity_types, val];
-      // Reset primary_activity if removed
       const primary =
         f.primary_activity && next.includes(f.primary_activity)
           ? f.primary_activity
@@ -166,7 +163,6 @@ export default function OnboardingPage() {
         : parseFloat(form.dose_mg);
     const proteinGoalG = calculateProteinGoal(weightKg, goal, doseMg);
 
-    // Compute primary_activity
     const primaryActivity =
       form.activity_types.length === 1
         ? form.activity_types[0]
@@ -174,7 +170,6 @@ export default function OnboardingPage() {
 
     const today = new Date().toISOString().split("T")[0];
 
-    // Upsert profile
     await supabase.from("profiles").upsert({
       id: user.id,
       weight_kg: weightKg,
@@ -198,7 +193,6 @@ export default function OnboardingPage() {
       updated_at: new Date().toISOString(),
     });
 
-    // Insert medication log
     await supabase.from("medication_logs").insert({
       user_id: user.id,
       medication: form.medication,
@@ -210,7 +204,6 @@ export default function OnboardingPage() {
     setDone(true);
     setSaving(false);
 
-    // Redirect to dashboard after brief pause
     setTimeout(() => {
       router.push("/dashboard");
     }, 3000);
@@ -219,245 +212,105 @@ export default function OnboardingPage() {
   const progress = Math.round((step / TOTAL_STEPS) * 100);
   const doses = getDoses();
 
+  // Pill button helper
+  const pillClass = (selected: boolean) =>
+    `px-4 py-2.5 rounded-lg text-sm border transition-colors cursor-pointer ${
+      selected
+        ? "border-obsidian bg-obsidian text-white font-medium"
+        : "border-black/5 bg-white text-mgray hover:border-black/10"
+    }`;
+
+  // Option card helper
+  const optionClass = (selected: boolean) =>
+    `w-full text-left px-4 py-3.5 rounded-[10px] border transition-colors cursor-pointer ${
+      selected
+        ? "border-obsidian bg-obsidian text-white"
+        : "border-black/5 bg-white hover:border-black/10"
+    }`;
+
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: "#f7f7f7",
-        fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        padding: "32px 16px 48px",
-      }}
-    >
+    <div className="min-h-screen bg-surface flex flex-col items-center px-4 py-8 pb-12">
       {/* Logo */}
-      <div
-        style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 24 }}
-      >
-        <svg
-          width="22"
-          height="22"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="#131413"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-        </svg>
-        <span style={{ fontWeight: 700, fontSize: 17, color: "#1a1a1a" }}>
-          MuscleGuard
-        </span>
+      <div className="flex items-center gap-2 mb-6">
+        <Shield className="h-5 w-5 text-obsidian" />
+        <span className="font-semibold text-obsidian tracking-tight">MuscleGuard</span>
       </div>
 
-      <div style={{ width: "100%", maxWidth: 540 }}>
+      <div className="w-full max-w-[540px]">
         {/* Progress bar */}
         {!done && (
-          <div style={{ marginBottom: 20 }}>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                marginBottom: 6,
-              }}
-            >
-              <span style={{ fontSize: 13, color: "#666" }}>
-                Step {step} of {TOTAL_STEPS}
-              </span>
-              <span style={{ fontSize: 13, color: "#666" }}>{progress}%</span>
+          <div className="mb-5">
+            <div className="flex justify-between mb-1.5">
+              <span className="text-xs text-mgray">Step {step} of {TOTAL_STEPS}</span>
+              <span className="text-xs text-mgray">{progress}%</span>
             </div>
-            <div style={{ height: 6, background: "rgba(191,193,192,0.3)", borderRadius: 99 }}>
+            <div className="h-1.5 bg-muted/30 rounded-full overflow-hidden">
               <div
-                style={{
-                  height: 6,
-                  background: "#131413",
-                  borderRadius: 99,
-                  width: `${progress}%`,
-                  transition: "width 0.4s ease",
-                }}
+                className="h-full bg-obsidian rounded-full transition-all duration-400"
+                style={{ width: `${progress}%` }}
               />
             </div>
           </div>
         )}
 
         {/* Card */}
-        <div
-          style={{
-            background: "#fff",
-            border: "1px solid rgba(0,0,0,0.05)",
-            borderRadius: 10,
-            padding: "28px 24px",
-          }}
-        >
+        <div className="bg-white border border-black/5 rounded-[14px] p-6 sm:p-7">
+
           {/* ── DONE SCREEN ── */}
           {done && (
-            <div style={{ textAlign: "center" }}>
-              <div style={{ fontSize: 40, marginBottom: 12 }}>✓</div>
-              <h2
-                style={{
-                  fontSize: 20,
-                  fontWeight: 700,
-                  color: "#1a1a1a",
-                  marginBottom: 8,
-                }}
-              >
-                Assessment complete
-              </h2>
-              <p
-                style={{
-                  color: "#666",
-                  fontSize: 14,
-                  marginBottom: 24,
-                }}
-              >
-                Your personalized muscle preservation protocol is being
-                generated:
+            <div className="text-center py-4">
+              <div className="w-14 h-14 rounded-full bg-[#CDFF00] flex items-center justify-center mx-auto mb-4">
+                <Check className="h-7 w-7 text-obsidian" />
+              </div>
+              <h2 className="text-xl font-bold text-obsidian mb-2">Assessment complete</h2>
+              <p className="text-sm text-mgray mb-6">
+                Your personalized muscle preservation protocol is being generated:
               </p>
-              <div
-                style={{
-                  textAlign: "left",
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 10,
-                }}
-              >
+              <div className="text-left space-y-3">
                 {[
                   "Protein target adjusted to your dose",
                   "Resistance plan to protect lean mass",
                   "Activity-specific training protocol",
                   "Body composition monitoring (not just weight)",
                 ].map((item) => (
-                  <div
-                    key={item}
-                    style={{
-                      display: "flex",
-                      alignItems: "flex-start",
-                      gap: 10,
-                    }}
-                  >
-                    <span
-                      style={{ color: "#131413", fontWeight: 700, marginTop: 1 }}
-                    >
-                      ✓
-                    </span>
-                    <span style={{ fontSize: 14, color: "#1a1a1a" }}>
-                      {item}
-                    </span>
+                  <div key={item} className="flex items-center gap-3">
+                    <div className="w-5 h-5 rounded-full bg-[#CDFF00] flex items-center justify-center shrink-0">
+                      <Check className="h-3 w-3 text-obsidian" />
+                    </div>
+                    <span className="text-sm text-obsidian">{item}</span>
                   </div>
                 ))}
               </div>
-              <p
-                style={{ fontSize: 12, color: "#999", marginTop: 20 }}
-              >
-                Redirecting in a moment…
-              </p>
+              <p className="text-xs text-mgray mt-6">Redirecting in a moment…</p>
             </div>
           )}
 
           {/* ── STEP 1: Body & Goal ── */}
           {!done && step === 1 && (
             <div>
-              <h2
-                style={{
-                  fontSize: 20,
-                  fontWeight: 700,
-                  color: "#1a1a1a",
-                  marginBottom: 4,
-                }}
-              >
-                Your body &amp; goal
-              </h2>
-              <p style={{ fontSize: 14, color: "#666", marginBottom: 20 }}>
+              <h2 className="text-xl font-bold text-obsidian mb-1">Your body and goal</h2>
+              <p className="text-sm text-mgray mb-6">
                 This helps us calculate your personalized protein target.
               </p>
 
-              {/* Weight input */}
-              <label
-                style={{
-                  fontSize: 13,
-                  fontWeight: 600,
-                  color: "#1a1a1a",
-                  display: "block",
-                  marginBottom: 8,
-                }}
-              >
-                Current weight
-              </label>
-              <div
-                style={{
-                  position: "relative",
-                  marginBottom: 24,
-                  maxWidth: 160,
-                }}
-              >
+              <label className="text-xs font-medium text-obsidian block mb-2">Current weight</label>
+              <div className="relative mb-6 max-w-[160px]">
                 <input
                   type="number"
                   placeholder="e.g. 82"
                   value={form.weight_kg}
                   onChange={(e) => set("weight_kg", e.target.value)}
-                  style={{
-                    width: "100%",
-                    padding: "10px 40px 10px 12px",
-                    borderRadius: 8,
-                    border: "1px solid rgba(0,0,0,0.1)",
-                    fontSize: 15,
-                    color: "#1a1a1a",
-                    background: "#fff",
-                    boxSizing: "border-box",
-                  }}
+                  className="w-full px-3 py-2.5 pr-10 border border-black/10 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-obsidian/20 bg-white"
                 />
-                <span
-                  style={{
-                    position: "absolute",
-                    right: 12,
-                    top: "50%",
-                    transform: "translateY(-50%)",
-                    fontSize: 13,
-                    color: "#999",
-                    fontWeight: 600,
-                  }}
-                >
-                  kg
-                </span>
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-mgray font-medium">kg</span>
               </div>
 
-              {/* Primary goal */}
-              <label
-                style={{
-                  fontSize: 13,
-                  fontWeight: 600,
-                  color: "#1a1a1a",
-                  display: "block",
-                  marginBottom: 8,
-                }}
-              >
-                What is your primary goal?
-              </label>
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 10,
-                }}
-              >
+              <label className="text-xs font-medium text-obsidian block mb-2">What is your primary goal?</label>
+              <div className="space-y-2.5">
                 {[
-                  {
-                    value: "preserve_muscle",
-                    label: "Preserve muscle",
-                    desc: "Maintain lean mass while losing weight on GLP-1",
-                  },
-                  {
-                    value: "build_strength",
-                    label: "Build strength",
-                    desc: "Add muscle while managing weight",
-                  },
-                  {
-                    value: "general_health",
-                    label: "General health",
-                    desc: "Stay active and feel better",
-                  },
+                  { value: "preserve_muscle", label: "Preserve muscle", desc: "Maintain lean mass while losing weight on GLP-1" },
+                  { value: "build_strength", label: "Build strength", desc: "Add muscle while managing weight" },
+                  { value: "general_health", label: "General health", desc: "Stay active and feel better" },
                 ].map((opt) => {
                   const selected = form.primary_goal === opt.value;
                   return (
@@ -465,34 +318,12 @@ export default function OnboardingPage() {
                       key={opt.value}
                       type="button"
                       onClick={() => set("primary_goal", opt.value)}
-                      style={{
-                        textAlign: "left",
-                        padding: "14px 16px",
-                        borderRadius: 10,
-                        border: selected
-                          ? "2px solid #131413"
-                          : "1px solid rgba(0,0,0,0.1)",
-                        background: selected ? "#f7f7f7" : "#fff",
-                        color: "#1a1a1a",
-                        cursor: "pointer",
-                      }}
+                      className={optionClass(selected)}
                     >
-                      <div
-                        style={{
-                          fontSize: 15,
-                          fontWeight: selected ? 700 : 600,
-                          color: selected ? "#131413" : "#585A59",
-                        }}
-                      >
+                      <div className={`text-sm font-medium ${selected ? "text-white" : "text-obsidian"}`}>
                         {opt.label}
                       </div>
-                      <div
-                        style={{
-                          fontSize: 13,
-                          color: "#666",
-                          marginTop: 3,
-                        }}
-                      >
+                      <div className={`text-xs mt-1 ${selected ? "text-white/60" : "text-mgray"}`}>
                         {opt.desc}
                       </div>
                     </button>
@@ -505,152 +336,60 @@ export default function OnboardingPage() {
           {/* ── STEP 2: GLP-1 Medication ── */}
           {!done && step === 2 && (
             <div>
-              <h2
-                style={{
-                  fontSize: 20,
-                  fontWeight: 700,
-                  color: "#1a1a1a",
-                  marginBottom: 4,
-                }}
-              >
-                Your GLP-1 medication
-              </h2>
-              <p style={{ fontSize: 14, color: "#666", marginBottom: 20 }}>
+              <h2 className="text-xl font-bold text-obsidian mb-1">Your GLP-1 medication</h2>
+              <p className="text-sm text-mgray mb-6">
                 We use this to adjust your protein and training intensity.
               </p>
 
-              {/* Medication type */}
-              <label
-                style={{
-                  fontSize: 13,
-                  fontWeight: 600,
-                  color: "#1a1a1a",
-                  display: "block",
-                  marginBottom: 8,
-                }}
-              >
-                Medication type
-              </label>
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 8,
-                  marginBottom: 20,
-                }}
-              >
+              <label className="text-xs font-medium text-obsidian block mb-2">Medication type</label>
+              <div className="space-y-2 mb-5">
                 {[
-                  {
-                    value: "semaglutide",
-                    label: "Semaglutide (Ozempic / Wegovy)",
-                  },
-                  {
-                    value: "tirzepatide",
-                    label: "Tirzepatide (Mounjaro / Zepbound)",
-                  },
+                  { value: "semaglutide", label: "Semaglutide (Ozempic / Wegovy)" },
+                  { value: "tirzepatide", label: "Tirzepatide (Mounjaro / Zepbound)" },
                   { value: "other", label: "Other GLP-1" },
-                ].map((med) => (
-                  <button
-                    key={med.value}
-                    type="button"
-                    onClick={() => {
-                      set("medication", med.value);
-                      set("dose_mg", "");
-                    }}
-                    style={{
-                      textAlign: "left",
-                      padding: "11px 14px",
-                      borderRadius: 8,
-                      fontSize: 14,
-                      border:
-                        form.medication === med.value
-                          ? "2px solid #131413"
-                          : "1px solid rgba(0,0,0,0.1)",
-                      background:
-                        form.medication === med.value ? "#f7f7f7" : "#fff",
-                      color: "#1a1a1a",
-                      cursor: "pointer",
-                      fontWeight: form.medication === med.value ? 600 : 400,
-                    }}
-                  >
-                    {med.label}
-                  </button>
-                ))}
+                ].map((med) => {
+                  const selected = form.medication === med.value;
+                  return (
+                    <button
+                      key={med.value}
+                      type="button"
+                      onClick={() => { set("medication", med.value); set("dose_mg", ""); }}
+                      className={`w-full text-left px-4 py-3 rounded-lg border text-sm transition-colors ${
+                        selected
+                          ? "border-obsidian bg-obsidian text-white font-medium"
+                          : "border-black/5 bg-white text-mgray hover:border-black/10"
+                      }`}
+                    >
+                      {med.label}
+                    </button>
+                  );
+                })}
               </div>
 
-              {/* Dose */}
               {form.medication && (
                 <>
-                  <label
-                    style={{
-                      fontSize: 13,
-                      fontWeight: 600,
-                      color: "#1a1a1a",
-                      display: "block",
-                      marginBottom: 8,
-                    }}
-                  >
-                    Current dose
-                  </label>
+                  <label className="text-xs font-medium text-obsidian block mb-2">Current dose</label>
                   {form.medication === "other" ? (
-                    <div
-                      style={{
-                        position: "relative",
-                        marginBottom: 20,
-                        maxWidth: 160,
-                      }}
-                    >
+                    <div className="relative mb-5 max-w-[160px]">
                       <input
                         type="number"
                         placeholder="e.g. 1.0"
                         value={form.dose_other}
                         onChange={(e) => set("dose_other", e.target.value)}
-                        style={{
-                          width: "100%",
-                          padding: "10px 40px 10px 12px",
-                          borderRadius: 8,
-                          border: "1px solid rgba(0,0,0,0.1)",
-                          fontSize: 15,
-                          color: "#1a1a1a",
-                          background: "#fff",
-                          boxSizing: "border-box",
-                        }}
+                        className="w-full px-3 py-2.5 pr-10 border border-black/10 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-obsidian/20 bg-white"
                       />
-                      <span
-                        style={{
-                          position: "absolute",
-                          right: 12,
-                          top: "50%",
-                          transform: "translateY(-50%)",
-                          fontSize: 13,
-                          color: "#999",
-                          fontWeight: 600,
-                        }}
-                      >
-                        mg
-                      </span>
+                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-mgray font-medium">mg</span>
                     </div>
                   ) : (
-                    <div style={{ marginBottom: 20 }}>
+                    <div className="mb-5">
                       <select
                         value={form.dose_mg}
                         onChange={(e) => set("dose_mg", e.target.value)}
-                        style={{
-                          padding: "10px 12px",
-                          borderRadius: 8,
-                          border: "1px solid rgba(0,0,0,0.1)",
-                          fontSize: 14,
-                          color: form.dose_mg ? "#1a1a1a" : "#999",
-                          background: "#fff",
-                          cursor: "pointer",
-                          minWidth: 160,
-                        }}
+                        className="px-3 py-2.5 border border-black/10 rounded-lg text-sm bg-white min-w-[160px] focus:outline-none focus:ring-2 focus:ring-obsidian/20"
                       >
                         <option value="">Select dose…</option>
                         {doses.map((d) => (
-                          <option key={d} value={String(d)}>
-                            {d} mg
-                          </option>
+                          <option key={d} value={String(d)}>{d} mg</option>
                         ))}
                       </select>
                     </div>
@@ -658,26 +397,8 @@ export default function OnboardingPage() {
                 </>
               )}
 
-              {/* Frequency */}
-              <label
-                style={{
-                  fontSize: 13,
-                  fontWeight: 600,
-                  color: "#1a1a1a",
-                  display: "block",
-                  marginBottom: 8,
-                }}
-              >
-                Injection frequency
-              </label>
-              <div
-                style={{
-                  display: "flex",
-                  gap: 8,
-                  marginBottom: 20,
-                  flexWrap: "wrap",
-                }}
-              >
+              <label className="text-xs font-medium text-obsidian block mb-2">Injection frequency</label>
+              <div className="flex flex-wrap gap-2 mb-5">
                 {[
                   { value: "weekly", label: "Weekly" },
                   { value: "biweekly", label: "Every 2 weeks" },
@@ -686,128 +407,59 @@ export default function OnboardingPage() {
                   <button
                     key={opt.value}
                     type="button"
-                    onClick={() => {
-                      set("frequency", opt.value);
-                      if (opt.value !== "weekly") set("injection_day", "");
-                    }}
-                    style={{
-                      padding: "10px 16px",
-                      borderRadius: 8,
-                      fontSize: 13,
-                      border:
-                        form.frequency === opt.value
-                          ? "2px solid #131413"
-                          : "1px solid rgba(0,0,0,0.1)",
-                      background:
-                        form.frequency === opt.value ? "#f7f7f7" : "#fff",
-                      color: "#1a1a1a",
-                      cursor: "pointer",
-                      fontWeight: form.frequency === opt.value ? 600 : 400,
-                    }}
+                    onClick={() => { set("frequency", opt.value); if (opt.value !== "weekly") set("injection_day", ""); }}
+                    className={pillClass(form.frequency === opt.value)}
                   >
                     {opt.label}
                   </button>
                 ))}
               </div>
 
-              {/* Injection day (weekly only) */}
               {form.frequency === "weekly" && (
                 <>
-                  <label
-                    style={{
-                      fontSize: 13,
-                      fontWeight: 600,
-                      color: "#1a1a1a",
-                      display: "block",
-                      marginBottom: 8,
-                    }}
-                  >
-                    Injection day
-                  </label>
-                  <div
-                    style={{
-                      display: "grid",
-                      gridTemplateColumns: "repeat(7, 1fr)",
-                      gap: 6,
-                      marginBottom: 20,
-                    }}
-                  >
-                    {DAYS_OF_WEEK.map((day) => (
-                      <button
-                        key={day}
-                        type="button"
-                        onClick={() => set("injection_day", day)}
-                        style={{
-                          padding: "8px 4px",
-                          borderRadius: 8,
-                          fontSize: 12,
-                          border:
-                            form.injection_day === day
-                              ? "2px solid #131413"
-                              : "1px solid rgba(0,0,0,0.1)",
-                          background:
-                            form.injection_day === day ? "#f7f7f7" : "#fff",
-                          color:
-                            form.injection_day === day ? "#1b5e20" : "#1a1a1a",
-                          cursor: "pointer",
-                          fontWeight: form.injection_day === day ? 700 : 400,
-                          textAlign: "center",
-                        }}
-                      >
-                        {day}
-                      </button>
-                    ))}
+                  <label className="text-xs font-medium text-obsidian block mb-2">Injection day</label>
+                  <div className="grid grid-cols-7 gap-1.5 mb-5">
+                    {DAYS_OF_WEEK.map((day) => {
+                      const selected = form.injection_day === day;
+                      return (
+                        <button
+                          key={day}
+                          type="button"
+                          onClick={() => set("injection_day", day)}
+                          className={`py-2 rounded-lg text-xs text-center transition-colors ${
+                            selected
+                              ? "bg-obsidian text-white font-semibold"
+                              : "border border-black/5 bg-white text-mgray hover:border-black/10"
+                          }`}
+                        >
+                          {day}
+                        </button>
+                      );
+                    })}
                   </div>
                 </>
               )}
 
-              {/* Appetite */}
-              <label
-                style={{
-                  fontSize: 13,
-                  fontWeight: 600,
-                  color: "#1a1a1a",
-                  display: "block",
-                  marginBottom: 8,
-                }}
-              >
-                Appetite suppression right now
-              </label>
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 8,
-                }}
-              >
-                {APPETITE_OPTIONS.map((opt) => (
-                  <button
-                    key={opt.value}
-                    type="button"
-                    onClick={() => set("appetite_level", opt.value)}
-                    style={{
-                      textAlign: "left",
-                      padding: "10px 14px",
-                      borderRadius: 8,
-                      fontSize: 14,
-                      border:
-                        form.appetite_level === opt.value
-                          ? "2px solid #131413"
-                          : "1px solid rgba(0,0,0,0.1)",
-                      background:
-                        form.appetite_level === opt.value ? "#f7f7f7" : "#fff",
-                      color: "#1a1a1a",
-                      cursor: "pointer",
-                      fontWeight: form.appetite_level === opt.value ? 600 : 400,
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 10,
-                    }}
-                  >
-                    <span style={{ fontSize: 16 }}>{opt.emoji}</span>
-                    {opt.label}
-                  </button>
-                ))}
+              <label className="text-xs font-medium text-obsidian block mb-2">Appetite suppression right now</label>
+              <div className="space-y-2">
+                {APPETITE_OPTIONS.map((opt) => {
+                  const selected = form.appetite_level === opt.value;
+                  return (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      onClick={() => set("appetite_level", opt.value)}
+                      className={`w-full text-left px-4 py-2.5 rounded-lg border text-sm flex items-center gap-2.5 transition-colors ${
+                        selected
+                          ? "border-obsidian bg-obsidian text-white font-medium"
+                          : "border-black/5 bg-white text-mgray hover:border-black/10"
+                      }`}
+                    >
+                      <span className="text-base">{opt.emoji}</span>
+                      {opt.label}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           )}
@@ -815,44 +467,16 @@ export default function OnboardingPage() {
           {/* ── STEP 3: Activity ── */}
           {!done && step === 3 && (
             <div>
-              <h2
-                style={{
-                  fontSize: 20,
-                  fontWeight: 700,
-                  color: "#1a1a1a",
-                  marginBottom: 4,
-                }}
-              >
-                Your activity
-              </h2>
-              <p style={{ fontSize: 14, color: "#666", marginBottom: 20 }}>
-                Tell us about your exercise habits so we can build your training
-                protocol.
+              <h2 className="text-xl font-bold text-obsidian mb-1">Your activity</h2>
+              <p className="text-sm text-mgray mb-6">
+                Tell us about your exercise habits so we can build your training protocol.
               </p>
 
-              {/* Activity types */}
-              <label
-                style={{
-                  fontSize: 13,
-                  fontWeight: 600,
-                  color: "#1a1a1a",
-                  display: "block",
-                  marginBottom: 8,
-                }}
-              >
+              <label className="text-xs font-medium text-obsidian block mb-2">
                 What types of exercise do you do?{" "}
-                <span style={{ color: "#666", fontWeight: 400 }}>
-                  (select all that apply)
-                </span>
+                <span className="text-mgray font-normal">(select all that apply)</span>
               </label>
-              <div
-                style={{
-                  display: "flex",
-                  flexWrap: "wrap",
-                  gap: 8,
-                  marginBottom: 20,
-                }}
-              >
+              <div className="flex flex-wrap gap-2 mb-5">
                 {ACTIVITY_OPTIONS.map((opt) => {
                   const selected = form.activity_types.includes(opt.value);
                   return (
@@ -860,21 +484,11 @@ export default function OnboardingPage() {
                       key={opt.value}
                       type="button"
                       onClick={() => toggleActivity(opt.value)}
-                      style={{
-                        padding: "8px 14px",
-                        borderRadius: 20,
-                        fontSize: 13,
-                        border: selected
-                          ? "2px solid #131413"
-                          : "1px solid rgba(0,0,0,0.1)",
-                        background: selected ? "#f7f7f7" : "#fff",
-                        color: selected ? "#131413" : "#585A59",
-                        cursor: "pointer",
-                        fontWeight: selected ? 600 : 400,
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 6,
-                      }}
+                      className={`px-3.5 py-2 rounded-full text-xs flex items-center gap-1.5 border transition-colors ${
+                        selected
+                          ? "border-obsidian bg-obsidian text-white font-medium"
+                          : "border-black/5 bg-white text-mgray hover:border-black/10"
+                      }`}
                     >
                       <span>{opt.emoji}</span>
                       {opt.label}
@@ -883,44 +497,20 @@ export default function OnboardingPage() {
                 })}
               </div>
 
-              {/* Primary activity (only if 2+ selected) */}
               {form.activity_types.length >= 2 && (
                 <>
-                  <label
-                    style={{
-                      fontSize: 13,
-                      fontWeight: 600,
-                      color: "#1a1a1a",
-                      display: "block",
-                      marginBottom: 8,
-                    }}
-                  >
-                    Which is your primary activity?
-                  </label>
-                  <div style={{ marginBottom: 20 }}>
+                  <label className="text-xs font-medium text-obsidian block mb-2">Which is your primary activity?</label>
+                  <div className="mb-5">
                     <select
                       value={form.primary_activity}
                       onChange={(e) => set("primary_activity", e.target.value)}
-                      style={{
-                        padding: "10px 12px",
-                        borderRadius: 8,
-                        border: "1px solid rgba(0,0,0,0.1)",
-                        fontSize: 14,
-                        color: form.primary_activity ? "#1a1a1a" : "#999",
-                        background: "#fff",
-                        cursor: "pointer",
-                        minWidth: 200,
-                      }}
+                      className="px-3 py-2.5 border border-black/10 rounded-lg text-sm bg-white min-w-[200px] focus:outline-none focus:ring-2 focus:ring-obsidian/20"
                     >
                       <option value="">Select primary activity…</option>
                       {form.activity_types.map((act) => {
-                        const opt = ACTIVITY_OPTIONS.find(
-                          (o) => o.value === act
-                        );
+                        const opt = ACTIVITY_OPTIONS.find((o) => o.value === act);
                         return opt ? (
-                          <option key={act} value={act}>
-                            {opt.emoji} {opt.label}
-                          </option>
+                          <option key={act} value={act}>{opt.emoji} {opt.label}</option>
                         ) : null;
                       })}
                     </select>
@@ -928,26 +518,8 @@ export default function OnboardingPage() {
                 </>
               )}
 
-              {/* Frequency */}
-              <label
-                style={{
-                  fontSize: 13,
-                  fontWeight: 600,
-                  color: "#1a1a1a",
-                  display: "block",
-                  marginBottom: 8,
-                }}
-              >
-                How often do you exercise?
-              </label>
-              <div
-                style={{
-                  display: "flex",
-                  gap: 8,
-                  marginBottom: 20,
-                  flexWrap: "wrap",
-                }}
-              >
+              <label className="text-xs font-medium text-obsidian block mb-2">How often do you exercise?</label>
+              <div className="flex flex-wrap gap-2 mb-5">
                 {[
                   { value: "1_2x", label: "1-2x/week" },
                   { value: "3_4x", label: "3-4x/week" },
@@ -957,49 +529,15 @@ export default function OnboardingPage() {
                     key={opt.value}
                     type="button"
                     onClick={() => set("activity_frequency", opt.value)}
-                    style={{
-                      padding: "10px 16px",
-                      borderRadius: 8,
-                      fontSize: 13,
-                      border:
-                        form.activity_frequency === opt.value
-                          ? "2px solid #131413"
-                          : "1px solid rgba(0,0,0,0.1)",
-                      background:
-                        form.activity_frequency === opt.value
-                          ? "#f1f8f1"
-                          : "#fff",
-                      color: "#1a1a1a",
-                      cursor: "pointer",
-                      fontWeight:
-                        form.activity_frequency === opt.value ? 600 : 400,
-                    }}
+                    className={pillClass(form.activity_frequency === opt.value)}
                   >
                     {opt.label}
                   </button>
                 ))}
               </div>
 
-              {/* Experience */}
-              <label
-                style={{
-                  fontSize: 13,
-                  fontWeight: 600,
-                  color: "#1a1a1a",
-                  display: "block",
-                  marginBottom: 8,
-                }}
-              >
-                Experience level
-              </label>
-              <div
-                style={{
-                  display: "flex",
-                  gap: 8,
-                  marginBottom: 20,
-                  flexWrap: "wrap",
-                }}
-              >
+              <label className="text-xs font-medium text-obsidian block mb-2">Experience level</label>
+              <div className="flex flex-wrap gap-2 mb-5">
                 {[
                   { value: "beginner", label: "Beginner" },
                   { value: "intermediate", label: "Intermediate" },
@@ -1009,90 +547,39 @@ export default function OnboardingPage() {
                     key={opt.value}
                     type="button"
                     onClick={() => set("experience_level", opt.value)}
-                    style={{
-                      padding: "10px 16px",
-                      borderRadius: 8,
-                      fontSize: 13,
-                      border:
-                        form.experience_level === opt.value
-                          ? "2px solid #131413"
-                          : "1px solid rgba(0,0,0,0.1)",
-                      background:
-                        form.experience_level === opt.value
-                          ? "#f1f8f1"
-                          : "#fff",
-                      color: "#1a1a1a",
-                      cursor: "pointer",
-                      fontWeight:
-                        form.experience_level === opt.value ? 600 : 400,
-                    }}
+                    className={pillClass(form.experience_level === opt.value)}
                   >
                     {opt.label}
                   </button>
                 ))}
               </div>
 
-              {/* Equipment (only if strength selected) */}
               {form.activity_types.includes("strength") && (
                 <>
-                  <label
-                    style={{
-                      fontSize: 13,
-                      fontWeight: 600,
-                      color: "#1a1a1a",
-                      display: "block",
-                      marginBottom: 8,
-                    }}
-                  >
-                    Equipment available
-                  </label>
-                  <div
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: 8,
-                    }}
-                  >
+                  <label className="text-xs font-medium text-obsidian block mb-2">Equipment available</label>
+                  <div className="space-y-2">
                     {[
                       { value: "gym", label: "Full gym", emoji: "🏋️" },
-                      {
-                        value: "dumbbells",
-                        label: "Dumbbells at home",
-                        emoji: "💪",
-                      },
-                      {
-                        value: "bodyweight",
-                        label: "Bodyweight only",
-                        emoji: "🤸",
-                      },
-                    ].map((opt) => (
-                      <button
-                        key={opt.value}
-                        type="button"
-                        onClick={() => set("equipment", opt.value)}
-                        style={{
-                          textAlign: "left",
-                          padding: "10px 14px",
-                          borderRadius: 8,
-                          fontSize: 14,
-                          border:
-                            form.equipment === opt.value
-                              ? "2px solid #131413"
-                              : "1px solid rgba(0,0,0,0.1)",
-                          background:
-                            form.equipment === opt.value ? "#f7f7f7" : "#fff",
-                          color: "#1a1a1a",
-                          cursor: "pointer",
-                          fontWeight: form.equipment === opt.value ? 600 : 400,
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 10,
-                        }}
-                      >
-                        <span style={{ fontSize: 16 }}>{opt.emoji}</span>
-                        {opt.label}
-                      </button>
-                    ))}
+                      { value: "dumbbells", label: "Dumbbells at home", emoji: "💪" },
+                      { value: "bodyweight", label: "Bodyweight only", emoji: "🤸" },
+                    ].map((opt) => {
+                      const selected = form.equipment === opt.value;
+                      return (
+                        <button
+                          key={opt.value}
+                          type="button"
+                          onClick={() => set("equipment", opt.value)}
+                          className={`w-full text-left px-4 py-2.5 rounded-lg border text-sm flex items-center gap-2.5 transition-colors ${
+                            selected
+                              ? "border-obsidian bg-obsidian text-white font-medium"
+                              : "border-black/5 bg-white text-mgray hover:border-black/10"
+                          }`}
+                        >
+                          <span className="text-base">{opt.emoji}</span>
+                          {opt.label}
+                        </button>
+                      );
+                    })}
                   </div>
                 </>
               )}
@@ -1101,79 +588,39 @@ export default function OnboardingPage() {
 
           {/* Field error */}
           {fieldError && !done && (
-            <div
-              style={{
-                background: "#ffebee",
-                border: "1px solid #f44336",
-                borderRadius: 8,
-                padding: "10px 14px",
-                marginTop: 16,
-              }}
-            >
-              <p style={{ fontSize: 13, color: "#c62828", margin: 0 }}>
-                {fieldError}
-              </p>
+            <div className="mt-4 p-3 bg-[#FFB4AB]/10 border border-[#FFB4AB]/20 rounded-lg">
+              <p className="text-sm text-obsidian">{fieldError}</p>
             </div>
           )}
 
           {/* Navigation buttons */}
           {!done && (
-            <div style={{ display: "flex", gap: 10, marginTop: 24 }}>
+            <div className="flex gap-3 mt-6">
               {step > 1 && (
                 <button
                   type="button"
                   onClick={handleBack}
-                  style={{
-                    flex: 1,
-                    padding: "12px",
-                    borderRadius: 8,
-                    fontSize: 14,
-                    fontWeight: 600,
-                    border: "1px solid rgba(0,0,0,0.1)",
-                    background: "#fff",
-                    color: "#1a1a1a",
-                    cursor: "pointer",
-                  }}
+                  className="flex-1 py-2.5 rounded-lg text-sm font-medium border border-black/10 bg-white text-obsidian hover:bg-surface transition-colors"
                 >
-                  ← Back
+                  Back
                 </button>
               )}
               {step < TOTAL_STEPS ? (
                 <button
                   type="button"
                   onClick={handleNext}
-                  style={{
-                    flex: 1,
-                    padding: "12px",
-                    borderRadius: 8,
-                    fontSize: 14,
-                    fontWeight: 600,
-                    border: "none",
-                    background: "#131413",
-                    color: "#fff",
-                    cursor: "pointer",
-                  }}
+                  className="flex-1 py-2.5 rounded-lg text-sm font-medium bg-obsidian text-white hover:bg-obsidian-light transition-colors"
                 >
-                  Next →
+                  Next
                 </button>
               ) : (
                 <button
                   type="button"
                   onClick={handleFinish}
                   disabled={saving}
-                  style={{
-                    flex: 1,
-                    padding: "12px",
-                    borderRadius: 8,
-                    fontSize: 14,
-                    fontWeight: 600,
-                    border: "none",
-                    background: saving ? "#ccc" : "#131413",
-                    color: "#fff",
-                    cursor: saving ? "not-allowed" : "pointer",
-                  }}
+                  className="flex-1 py-2.5 rounded-lg text-sm font-medium bg-obsidian text-white hover:bg-obsidian-light transition-colors disabled:opacity-50"
                 >
-                  {saving ? "Saving…" : "Complete →"}
+                  {saving ? "Saving…" : "Complete"}
                 </button>
               )}
             </div>
