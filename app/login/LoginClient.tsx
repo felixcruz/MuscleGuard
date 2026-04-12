@@ -1,31 +1,42 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { Shield, ArrowLeft } from "lucide-react";
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("");
+  const supabase = createClient();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirect");
+  const prefillEmail = searchParams.get("email");
+  const autoSend = searchParams.get("auto") === "1";
+
+  const [email, setEmail] = useState(prefillEmail ?? "");
   const [step, setStep] = useState<"email" | "code">("email");
   const [code, setCode] = useState(["", "", "", "", "", ""]);
   const [loading, setLoading] = useState(false);
   const [verifying, setVerifying] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const supabase = createClient();
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const redirectTo = searchParams.get("redirect");
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const autoSentRef = useRef(false);
 
-  async function handleSendCode(e: React.FormEvent) {
-    e.preventDefault();
+  // Auto-send code when coming from invite link
+  useEffect(() => {
+    if (prefillEmail && autoSend && !autoSentRef.current) {
+      autoSentRef.current = true;
+      sendCode(prefillEmail);
+    }
+  }, [prefillEmail, autoSend]);
+
+  async function sendCode(targetEmail: string) {
     setLoading(true);
     setError(null);
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
+    if (!emailRegex.test(targetEmail)) {
       setError("Please enter a valid email address");
       setLoading(false);
       return;
@@ -33,7 +44,7 @@ export default function LoginPage() {
 
     try {
       const { error: authError } = await supabase.auth.signInWithOtp({
-        email,
+        email: targetEmail,
         options: { shouldCreateUser: true },
       });
       if (authError) throw authError;
@@ -44,6 +55,11 @@ export default function LoginPage() {
     } finally {
       setLoading(false);
     }
+  }
+
+  async function handleSendCode(e: React.FormEvent) {
+    e.preventDefault();
+    await sendCode(email);
   }
 
   function handleCodeChange(index: number, value: string) {
@@ -204,7 +220,7 @@ export default function LoginPage() {
                   Use a different email
                 </button>
                 <button
-                  onClick={(e) => { handleSendCode(e as unknown as React.FormEvent); }}
+                  onClick={() => sendCode(email)}
                   disabled={loading}
                   className="text-xs text-mgray hover:text-obsidian transition-colors"
                 >

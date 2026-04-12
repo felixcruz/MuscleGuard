@@ -69,21 +69,10 @@ export async function POST(req: NextRequest) {
     onboarding_done: false,
   });
 
-  // Generate magic link for the user
+  // Send branded invite email with auto-login link
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://muscleguard.app";
-  const { data: linkData } = await supabase.auth.admin.generateLink({
-    type: "magiclink",
-    email,
-    options: { redirectTo: `${appUrl}/auth/callback` },
-  });
-
-  // Send branded invite email with direct login link
-  if (linkData?.properties?.action_link) {
-    await sendInviteEmail(email, linkData.properties.action_link);
-  } else {
-    // Fallback: send to login page
-    await sendInviteEmail(email, `${appUrl}/login`);
-  }
+  const loginUrl = `${appUrl}/login?email=${encodeURIComponent(email)}&auto=1`;
+  await sendInviteEmail(email, loginUrl);
 
   await auditLog({
     adminUserId: session.userId,
