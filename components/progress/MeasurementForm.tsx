@@ -74,7 +74,7 @@ export function MeasurementForm({ userId, onSaved }: Props) {
           />
         </div>
       </div>
-      <p className="text-xs text-muted">
+      <p className="text-xs text-mgray">
         Muscle mass from smart scale (Withings, Renpho, etc.) or DEXA scan.
       </p>
       <button
