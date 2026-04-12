@@ -17,8 +17,35 @@ interface Props {
     full_name?: string;
     language?: string;
     comm_style?: string;
+    dietary_prefs?: string[];
+    favorite_proteins?: string[];
   };
 }
+
+const PROTEIN_SOURCES = [
+  { id: "chicken", label: "Chicken", emoji: "🍗" },
+  { id: "eggs", label: "Eggs", emoji: "🥚" },
+  { id: "greek_yogurt", label: "Greek yogurt", emoji: "🥛" },
+  { id: "cottage_cheese", label: "Cottage cheese", emoji: "🧀" },
+  { id: "protein_shake", label: "Protein shake", emoji: "🥤" },
+  { id: "tuna", label: "Tuna", emoji: "🐟" },
+  { id: "salmon", label: "Salmon", emoji: "🐠" },
+  { id: "turkey", label: "Turkey", emoji: "🦃" },
+  { id: "beef", label: "Beef", emoji: "🥩" },
+  { id: "shrimp", label: "Shrimp", emoji: "🦐" },
+  { id: "tofu", label: "Tofu", emoji: "🫘" },
+  { id: "edamame", label: "Edamame", emoji: "🌱" },
+  { id: "protein_bar", label: "Protein bar", emoji: "🍫" },
+  { id: "lentils", label: "Lentils", emoji: "🫘" },
+];
+
+const DIETARY_OPTIONS = [
+  { value: "none", label: "No restrictions" },
+  { value: "vegetarian", label: "Vegetarian" },
+  { value: "vegan", label: "Vegan" },
+  { value: "pescatarian", label: "Pescatarian" },
+  { value: "dairy_free", label: "Dairy-free" },
+];
 
 const STATUS_LABELS: Record<string, string> = {
   trial: "Free trial",
@@ -48,6 +75,8 @@ export function SettingsClient({ userId, email, profile }: Props) {
 
   const [fullName, setFullName] = useState(profile.full_name ?? "");
   const [commStyle, setCommStyle] = useState(profile.comm_style ?? "balanced");
+  const [dietaryPref, setDietaryPref] = useState(profile.dietary_prefs?.[0] ?? "none");
+  const [favProteins, setFavProteins] = useState<string[]>(profile.favorite_proteins ?? []);
 
   const router = useRouter();
   const supabase = createClient();
@@ -61,9 +90,15 @@ export function SettingsClient({ userId, email, profile }: Props) {
 
   async function handleSave() {
     setSaving(true);
+    const prefs = dietaryPref && dietaryPref !== "none" ? [dietaryPref] : [];
     await supabase
       .from("profiles")
-      .update({ full_name: fullName || null, comm_style: commStyle })
+      .update({
+        full_name: fullName || null,
+        comm_style: commStyle,
+        dietary_prefs: prefs,
+        favorite_proteins: favProteins.length > 0 ? favProteins : null,
+      })
       .eq("id", userId);
     setSaving(false);
     setSaved(true);
@@ -207,6 +242,60 @@ export function SettingsClient({ userId, email, profile }: Props) {
                   </button>
                 );
               })}
+            </div>
+          </div>
+
+          {/* Food preferences */}
+          <div className="bg-white border border-black/5 rounded-[10px] p-5 space-y-3">
+            <div>
+              <p className="text-[10px] font-medium text-mgray uppercase tracking-widest">Food preferences</p>
+              <p className="text-xs text-mgray mt-1">Used to personalize your quick meal suggestions.</p>
+            </div>
+
+            <div>
+              <p className="text-xs font-medium text-obsidian mb-2">Dietary preference</p>
+              <div className="flex flex-wrap gap-2">
+                {DIETARY_OPTIONS.map((opt) => (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => setDietaryPref(opt.value)}
+                    className={`px-3 py-1.5 rounded-lg text-xs border transition-colors ${
+                      dietaryPref === opt.value
+                        ? "border-obsidian bg-obsidian text-white font-medium"
+                        : "border-black/5 bg-white text-mgray hover:border-black/10"
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <p className="text-xs font-medium text-obsidian mb-2">Favorite protein sources</p>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                {PROTEIN_SOURCES.map((src) => {
+                  const selected = favProteins.includes(src.id);
+                  return (
+                    <button
+                      key={src.id}
+                      type="button"
+                      onClick={() => setFavProteins(prev =>
+                        selected ? prev.filter(f => f !== src.id) : [...prev, src.id]
+                      )}
+                      className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs border transition-colors ${
+                        selected
+                          ? "border-obsidian bg-obsidian text-white font-medium"
+                          : "border-black/5 bg-white text-mgray hover:border-black/10"
+                      }`}
+                    >
+                      <span>{src.emoji}</span>
+                      {src.label}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           </div>
 

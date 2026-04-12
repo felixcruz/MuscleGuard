@@ -504,11 +504,11 @@ export function DashboardClient({
       </div>
 
       {/* ── Quick Actions ── */}
-      <div className="space-y-3 relative">
+      <div className="space-y-3">
 
-        {/* Setup overlay (first time) */}
-        {!setupDone && (
-          <div className="absolute inset-0 z-10 bg-white border border-black/5 rounded-[14px] p-5 space-y-4 shadow-lg">
+        {!setupDone ? (
+          /* First-time food preferences setup */
+          <div className="bg-white border border-black/5 rounded-[14px] p-5 space-y-4">
             <div>
               <p className="text-sm font-medium text-obsidian">Personalize your quick meals</p>
               <p className="text-xs text-mgray mt-1">Tell us your preferences so we can suggest the right foods for you.</p>
@@ -569,10 +569,9 @@ export function DashboardClient({
               {setupSaving ? "Saving…" : `Save preferences (${setupFavorites.length} selected)`}
             </button>
           </div>
-        )}
-
-        {/* Meal buttons (visible but blurred when setup not done) */}
-        <div className={`${!setupDone ? "opacity-20 pointer-events-none blur-[2px]" : ""}`}>
+        ) : (
+          /* Meal buttons (after setup) */
+          <>
         <div className="flex items-center gap-2">
           <div className="flex-1 grid grid-cols-4 gap-2">
             {(["breakfast", "lunch", "dinner", "snack"] as MealType[]).map((key) => {
@@ -647,7 +646,8 @@ export function DashboardClient({
           <Zap className="h-4 w-4" />
           {quickAdding ? "Adding…" : `Quick add ${quickAddFood.name} (+${quickAddFood.protein_g}g)`}
         </button>
-        </div>
+          </>
+        )}
       </div>
 
       {/* ── Log food (USDA search) ── */}
