@@ -56,6 +56,8 @@ export default function OnboardingPage() {
   const [done, setDone] = useState(false);
   const [fieldError, setFieldError] = useState<string | null>(null);
 
+  const [weightUnit, setWeightUnit] = useState<"kg" | "lbs">("kg");
+
   const [form, setForm] = useState<Form>({
     weight_kg: "",
     primary_goal: "",
@@ -155,7 +157,9 @@ export default function OnboardingPage() {
       return;
     }
 
-    const weightKg = parseFloat(form.weight_kg);
+    const weightKg = weightUnit === "lbs"
+      ? Math.round(parseFloat(form.weight_kg) * 0.453592 * 10) / 10
+      : parseFloat(form.weight_kg);
     const goal = form.primary_goal as Goal;
     const doseMg =
       form.medication === "other"
@@ -294,15 +298,37 @@ export default function OnboardingPage() {
               </p>
 
               <label className="text-xs font-medium text-obsidian block mb-2">Current weight</label>
-              <div className="relative mb-6 max-w-[160px]">
-                <input
-                  type="number"
-                  placeholder="e.g. 82"
-                  value={form.weight_kg}
-                  onChange={(e) => set("weight_kg", e.target.value)}
-                  className="w-full px-3 py-2.5 pr-10 border border-black/10 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-obsidian/20 bg-white"
-                />
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-mgray font-medium">kg</span>
+              <div className="flex items-center gap-3 mb-6">
+                <div className="relative max-w-[160px]">
+                  <input
+                    type="number"
+                    placeholder={weightUnit === "kg" ? "e.g. 82" : "e.g. 180"}
+                    value={form.weight_kg}
+                    onChange={(e) => set("weight_kg", e.target.value)}
+                    className="w-full px-3 py-2.5 pr-12 border border-black/10 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-obsidian/20 bg-white"
+                  />
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-mgray font-medium">{weightUnit}</span>
+                </div>
+                <div className="flex bg-surface rounded-lg p-0.5">
+                  <button
+                    type="button"
+                    onClick={() => setWeightUnit("kg")}
+                    className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                      weightUnit === "kg" ? "bg-obsidian text-white" : "text-mgray"
+                    }`}
+                  >
+                    kg
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setWeightUnit("lbs")}
+                    className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                      weightUnit === "lbs" ? "bg-obsidian text-white" : "text-mgray"
+                    }`}
+                  >
+                    lbs
+                  </button>
+                </div>
               </div>
 
               <label className="text-xs font-medium text-obsidian block mb-2">What is your primary goal?</label>
@@ -341,84 +367,90 @@ export default function OnboardingPage() {
                 We use this to adjust your protein and training intensity.
               </p>
 
-              <label className="text-xs font-medium text-obsidian block mb-2">Medication type</label>
-              <div className="space-y-2 mb-5">
-                {[
-                  { value: "semaglutide", label: "Semaglutide (Ozempic / Wegovy)" },
-                  { value: "tirzepatide", label: "Tirzepatide (Mounjaro / Zepbound)" },
-                  { value: "other", label: "Other GLP-1" },
-                ].map((med) => {
-                  const selected = form.medication === med.value;
-                  return (
-                    <button
-                      key={med.value}
-                      type="button"
-                      onClick={() => { set("medication", med.value); set("dose_mg", ""); }}
-                      className={`w-full text-left px-4 py-3 rounded-lg border text-sm transition-colors ${
-                        selected
-                          ? "border-obsidian bg-obsidian text-white font-medium"
-                          : "border-black/5 bg-white text-mgray hover:border-black/10"
-                      }`}
-                    >
-                      {med.label}
-                    </button>
-                  );
-                })}
+              {/* Section: Medication type */}
+              <div className="bg-surface rounded-[10px] p-4 mb-4">
+                <label className="text-xs font-medium text-obsidian block mb-2">Medication type</label>
+                <div className="space-y-2">
+                  {[
+                    { value: "semaglutide", label: "Semaglutide (Ozempic / Wegovy)" },
+                    { value: "tirzepatide", label: "Tirzepatide (Mounjaro / Zepbound)" },
+                    { value: "other", label: "Other GLP-1" },
+                  ].map((med) => {
+                    const selected = form.medication === med.value;
+                    return (
+                      <button
+                        key={med.value}
+                        type="button"
+                        onClick={() => { set("medication", med.value); set("dose_mg", ""); }}
+                        className={`w-full text-left px-4 py-3 rounded-lg border text-sm transition-colors ${
+                          selected
+                            ? "border-obsidian bg-obsidian text-white font-medium"
+                            : "border-black/5 bg-white text-mgray hover:border-black/10"
+                        }`}
+                      >
+                        {med.label}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
 
+              {/* Section: Current dose */}
               {form.medication && (
-                <>
+                <div className="bg-surface rounded-[10px] p-4 mb-4">
                   <label className="text-xs font-medium text-obsidian block mb-2">Current dose</label>
                   {form.medication === "other" ? (
-                    <div className="relative mb-5 max-w-[160px]">
+                    <div className="relative max-w-[160px]">
                       <input
                         type="number"
                         placeholder="e.g. 1.0"
                         value={form.dose_other}
                         onChange={(e) => set("dose_other", e.target.value)}
-                        className="w-full px-3 py-2.5 pr-10 border border-black/10 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-obsidian/20 bg-white"
+                        className="w-full px-3 py-2.5 pr-10 border border-black/10 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-obsidian/20 bg-white"
                       />
                       <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-mgray font-medium">mg</span>
                     </div>
                   ) : (
-                    <div className="mb-5">
-                      <select
-                        value={form.dose_mg}
-                        onChange={(e) => set("dose_mg", e.target.value)}
-                        className="px-3 py-2.5 border border-black/10 rounded-lg text-sm bg-white min-w-[160px] focus:outline-none focus:ring-2 focus:ring-obsidian/20"
-                      >
-                        <option value="">Select dose…</option>
-                        {doses.map((d) => (
-                          <option key={d} value={String(d)}>{d} mg</option>
-                        ))}
-                      </select>
-                    </div>
+                    <select
+                      value={form.dose_mg}
+                      onChange={(e) => set("dose_mg", e.target.value)}
+                      className="px-3 py-2.5 border border-black/10 rounded-lg text-base bg-white min-w-[160px] focus:outline-none focus:ring-2 focus:ring-obsidian/20"
+                    >
+                      <option value="">Select dose…</option>
+                      {doses.map((d) => (
+                        <option key={d} value={String(d)}>{d} mg</option>
+                      ))}
+                    </select>
                   )}
-                </>
+                </div>
               )}
 
-              <label className="text-xs font-medium text-obsidian block mb-2">Injection frequency</label>
-              <div className="flex flex-wrap gap-2 mb-5">
-                {[
-                  { value: "weekly", label: "Weekly" },
-                  { value: "biweekly", label: "Every 2 weeks" },
-                  { value: "monthly", label: "Monthly" },
-                ].map((opt) => (
-                  <button
-                    key={opt.value}
-                    type="button"
-                    onClick={() => { set("frequency", opt.value); if (opt.value !== "weekly") set("injection_day", ""); }}
-                    className={pillClass(form.frequency === opt.value)}
-                  >
-                    {opt.label}
-                  </button>
-                ))}
+              {/* Section: Injection frequency */}
+              <div className="bg-surface rounded-[10px] p-4 mb-4">
+                <label className="text-xs font-medium text-obsidian block mb-2">Injection frequency</label>
+                <div className="flex flex-wrap gap-2">
+                  {[
+                    { value: "weekly", label: "Weekly" },
+                    { value: "biweekly", label: "Every 2 weeks" },
+                    { value: "monthly", label: "Monthly" },
+                  ].map((opt) => (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      onClick={() => { set("frequency", opt.value); if (opt.value !== "weekly") set("injection_day", ""); }}
+                      className={pillClass(form.frequency === opt.value)}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
               </div>
 
+              {/* Section: Injection day */}
               {form.frequency === "weekly" && (
-                <>
+                <div className="bg-surface rounded-[10px] p-4 mb-4">
                   <label className="text-xs font-medium text-obsidian block mb-2">Injection day</label>
-                  <div className="grid grid-cols-7 gap-1.5 mb-5">
+                  <div className="grid grid-cols-7 gap-1.5">
                     {DAYS_OF_WEEK.map((day) => {
                       const selected = form.injection_day === day;
                       return (
@@ -437,11 +469,13 @@ export default function OnboardingPage() {
                       );
                     })}
                   </div>
-                </>
+                </div>
               )}
 
-              <label className="text-xs font-medium text-obsidian block mb-2">Appetite suppression right now</label>
-              <div className="space-y-2">
+              {/* Section: Appetite */}
+              <div className="bg-surface rounded-[10px] p-4">
+                <label className="text-xs font-medium text-obsidian block mb-2">Appetite suppression right now</label>
+                <div className="space-y-2">
                 {APPETITE_OPTIONS.map((opt) => {
                   const selected = form.appetite_level === opt.value;
                   return (
@@ -460,6 +494,7 @@ export default function OnboardingPage() {
                     </button>
                   );
                 })}
+              </div>
               </div>
             </div>
           )}
