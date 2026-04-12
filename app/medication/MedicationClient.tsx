@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Pill, Check, ChevronDown, ChevronRight } from "lucide-react";
-import { SEMAGLUTIDE_DOSES, TIRZEPATIDE_DOSES } from "@/lib/personalization";
+import { SEMAGLUTIDE_DOSES, TIRZEPATIDE_DOSES, getNextDueDate, getMedicationStatus } from "@/lib/personalization";
 
 interface MedLog {
   id: string;
@@ -77,6 +77,8 @@ export function MedicationClient({
   currentIntensityPct,
 }: Props) {
   const [logs, setLogs] = useState<MedLog[]>(initialLogs);
+  const [lastDoseDate, setLastDoseDate] = useState<string | null>(nextDueDate ? null : null);
+  const [currentStatus, setCurrentStatus] = useState({ status, statusLabel, statusColorClass, nextDueDate });
   const [logTakenLoading, setLogTakenLoading] = useState(false);
   const [logTakenSuccess, setLogTakenSuccess] = useState(false);
   const [showDoseForm, setShowDoseForm] = useState(false);
@@ -106,12 +108,13 @@ export function MedicationClient({
       const data = await res.json();
       if (data.ok) {
         setLogTakenSuccess(true);
+        const today = new Date().toISOString().split("T")[0];
         setLogs((prev) => [
           {
             id: String(Date.now()),
             medication,
             dose_mg: doseMg,
-            change_date: new Date().toISOString().split("T")[0],
+            change_date: today,
             change_type: "dose_taken",
             previous_dose_mg: null,
             appetite_level: null,
@@ -120,6 +123,15 @@ export function MedicationClient({
           },
           ...prev,
         ]);
+        // Recalculate status
+        const newNextDue = getNextDueDate(today, frequency);
+        const newStatus = getMedicationStatus(newNextDue);
+        setCurrentStatus({
+          status: newStatus.status,
+          statusLabel: newStatus.label,
+          statusColorClass: newStatus.colorClass,
+          nextDueDate: newNextDue ? newNextDue.toISOString().split("T")[0] : null,
+        });
         setTimeout(() => setLogTakenSuccess(false), 4000);
       }
     } catch {
@@ -186,8 +198,8 @@ export function MedicationClient({
       : "Monthly";
 
   const statusBg =
-    statusColorClass === "green" ? "bg-[#CDFF00]" :
-    statusColorClass === "amber" ? "bg-[#FFB4AB]" :
+    currentStatus.statusColorClass === "green" ? "bg-[#CDFF00]" :
+    currentStatus.statusColorClass === "amber" ? "bg-[#FFB4AB]" :
     "bg-[#FFB4AB]";
   const statusTextColor = "text-obsidian";
 
@@ -210,11 +222,11 @@ export function MedicationClient({
 
           <div className="mt-4 sm:mt-0 flex flex-col items-start sm:items-end gap-2">
             <span className={`px-3 py-1 rounded-full text-xs font-semibold ${statusBg} ${statusTextColor}`}>
-              {status === "on_schedule" ? "On schedule" : statusLabel}
+              {currentStatus.status === "on_schedule" ? "On schedule" : currentStatus.statusLabel}
             </span>
-            {nextDueDate && (
+            {currentStatus.nextDueDate && (
               <p className="text-xs text-white/50">
-                Next dose: {formatDate(nextDueDate)}
+                Next dose: {formatDate(currentStatus.nextDueDate)}
               </p>
             )}
           </div>
