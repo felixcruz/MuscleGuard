@@ -35,6 +35,21 @@ export async function POST(request: NextRequest) {
       .eq("user_id", user.id)
       .eq("workout_day", workout_day)
       .eq("week_key", week_key);
+
+    // Decrement workout count
+    const { data: prof } = await supabase
+      .from("profiles")
+      .select("workout_streak_days, total_points")
+      .eq("id", user.id)
+      .single();
+    if (prof) {
+      const newStreak = Math.max(0, (prof.workout_streak_days ?? 1) - 1);
+      await supabase.from("profiles").update({
+        workout_streak_days: newStreak,
+        total_points: Math.max(0, (prof.total_points ?? 5) - 5),
+      }).eq("id", user.id);
+      return NextResponse.json({ ok: true, streak: newStreak });
+    }
     return NextResponse.json({ ok: true });
   }
 
@@ -55,17 +70,7 @@ export async function POST(request: NextRequest) {
     .single();
 
   if (profile) {
-    const lastDate = profile.workout_streak_last_date as string | null;
-    let newStreak = profile.workout_streak_days;
-
-    if (!lastDate) {
-      newStreak = 1;
-    } else if (lastDate !== today) {
-      const daysSince = Math.floor(
-        (new Date(today).getTime() - new Date(lastDate).getTime()) / (1000 * 60 * 60 * 24)
-      );
-      newStreak = daysSince <= 3 ? profile.workout_streak_days + 1 : 1;
-    }
+    const newStreak = (profile.workout_streak_days ?? 0) + 1;
 
     await supabase.from("profiles").update({
       workout_streak_days: newStreak,

@@ -62,6 +62,8 @@ export function TrainingClient({
       setPoints((p) => p + 5);
     } else {
       setDone((prev) => prev.filter((d) => d !== id));
+      if (typeof data.streak === "number") setStreak(data.streak);
+      setPoints((p) => Math.max(0, p - 5));
     }
     setToggling(null);
   }
