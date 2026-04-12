@@ -18,6 +18,7 @@ import {
   Check,
 } from "lucide-react";
 import { TestimonialCarousel } from "@/components/landing/TestimonialCarousel";
+import { MuscleChart } from "@/components/landing/MuscleChart";
 
 const features = [
   {
@@ -209,6 +210,24 @@ export default function LandingPage() {
               that keeps you strong, metabolically healthy, and functional.
             </p>
           </div>
+        </div>
+      </section>
+
+      {/* Animated Chart */}
+      <section className="bg-[#131413]">
+        <div className="max-w-4xl mx-auto px-6 py-20">
+          <p className="text-sm font-medium tracking-widest text-[#585A59] uppercase text-center mb-4">
+            The science
+          </p>
+          <h2 className="text-3xl sm:text-4xl font-medium text-white text-center mb-4 tracking-tight">
+            Same weight loss. Very different outcomes.
+          </h2>
+          <p className="text-white/50 text-center max-w-xl mx-auto mb-12">
+            Both lines show the same weight loss on GLP-1. The difference is what you lose.
+            Without adequate protein and resistance training, a significant portion of that
+            weight loss comes from lean muscle.
+          </p>
+          <MuscleChart />
         </div>
       </section>
 
