@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { Button } from "@/components/ui/button";
 import { Check, Search, Plus } from "lucide-react";
 import { MealWizard } from "@/components/meals/MealWizard";
 
@@ -30,7 +29,6 @@ export function MealsClient({
 }: Props) {
   const supabase = createClient();
 
-  // ── Protein tracker (live) ──
   const [proteinLogged, setProteinLogged] = useState(initialLogged);
   const proteinRemaining = Math.max(0, proteinGoalG - proteinLogged);
   const pct =
@@ -38,7 +36,6 @@ export function MealsClient({
       ? Math.min(100, Math.round((proteinLogged / proteinGoalG) * 100))
       : 0;
 
-  // ── Food search ──
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<USDAFood[]>([]);
   const [searching, setSearching] = useState(false);
@@ -49,7 +46,6 @@ export function MealsClient({
   const [searchError, setSearchError] = useState<string | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Debounced USDA search
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
     if (query.length < 2) {
@@ -126,59 +122,84 @@ export function MealsClient({
   }
 
   const nutrients = computedNutrients();
+  const maxBreakdown = proteinBreakdown
+    ? Math.max(proteinBreakdown.breakfast, proteinBreakdown.lunch, proteinBreakdown.dinner, proteinBreakdown.snack, 1)
+    : 1;
 
   return (
-    <div className="max-w-lg mx-auto px-4 py-8 space-y-8">
-      {/* ── Header + protein bar ── */}
-      <div className="space-y-3">
-        <div>
-          <h1 className="text-2xl font-bold text-obsidian">Meals</h1>
-          <p className="text-mgray mt-1 text-sm">
-            {proteinRemaining > 0 ? (
-              <>
-                <span className="text-obsidian font-semibold">
-                  {proteinRemaining}g protein
-                </span>{" "}
-                remaining today
-              </>
-            ) : (
-              <span className="text-green-600 font-semibold">
-                Daily protein goal reached!
-              </span>
-            )}
-          </p>
-        </div>
-        <div>
-          <div className="flex justify-between text-xs text-mgray mb-1">
-            <span>{proteinLogged}g logged</span>
-            <span>{proteinGoalG}g goal</span>
+    <div className="max-w-3xl mx-auto px-4 py-6 space-y-5">
+
+      {/* ── Hero: Protein Status (dark) ── */}
+      <div className="bg-obsidian rounded-[14px] p-6">
+        <div className="sm:flex sm:items-center sm:justify-between sm:gap-6">
+          <div className="space-y-2">
+            <h1 className="text-2xl font-bold text-white">Meals</h1>
+            <p className="text-sm text-white/50">
+              {proteinRemaining > 0 ? (
+                <>
+                  <span className="text-[#CDFF00] font-semibold">
+                    {proteinRemaining}g protein
+                  </span>{" "}
+                  remaining today
+                </>
+              ) : (
+                <span className="text-[#CDFF00] font-semibold">
+                  Daily protein goal reached!
+                </span>
+              )}
+            </p>
           </div>
-          <div className="h-2.5 bg-surface-alt rounded-full overflow-hidden">
-            <div
-              className="h-full rounded-full transition-all duration-500"
-              style={{
-                width: `${pct}%`,
-                background: pct >= 100 ? "#16a34a" : "#2e7d32",
-              }}
-            />
+
+          {/* Progress ring (compact) */}
+          <div className="mt-4 sm:mt-0 flex items-center gap-4 sm:gap-5">
+            <div className="relative w-16 h-16 sm:w-20 sm:h-20 shrink-0">
+              <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="8" />
+                <circle
+                  cx="50" cy="50" r="42" fill="none"
+                  stroke={pct >= 90 ? "#CDFF00" : "#CDFF00"}
+                  strokeWidth="8" strokeLinecap="round"
+                  strokeDasharray={`${2 * Math.PI * 42}`}
+                  strokeDashoffset={`${2 * Math.PI * 42 * (1 - Math.min(pct, 100) / 100)}`}
+                  style={{ transition: "stroke-dashoffset 0.5s ease" }}
+                />
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-sm font-bold text-white">{pct}%</span>
+              </div>
+            </div>
+            <div className="text-sm">
+              <p className="text-white font-medium">{proteinLogged}g logged</p>
+              <p className="text-white/40">{proteinGoalG}g goal</p>
+            </div>
           </div>
-          <p className="text-xs text-muted mt-1 text-right">
-            {pct}% complete
-          </p>
         </div>
 
-        {/* Meal distribution breakdown */}
+        {/* Meal target bars */}
         {proteinBreakdown && (
-          <p className="text-xs text-muted">
-            <span className="font-medium text-mgray">Targets:</span>{" "}
-            Breakfast: {proteinBreakdown.breakfast}g · Lunch: {proteinBreakdown.lunch}g · Dinner: {proteinBreakdown.dinner}g · Snack: {proteinBreakdown.snack}g
-          </p>
+          <div className="grid grid-cols-4 gap-3 mt-5 pt-4 border-t border-white/5">
+            {(["breakfast", "lunch", "dinner", "snack"] as const).map((meal) => {
+              const val = proteinBreakdown[meal];
+              const barPct = Math.round((val / maxBreakdown) * 100);
+              return (
+                <div key={meal} className="space-y-1.5">
+                  <div className="h-1.5 rounded-full bg-white/10 overflow-hidden">
+                    <div className="h-full rounded-full bg-[#CDFF00]" style={{ width: `${barPct}%` }} />
+                  </div>
+                  <div className="text-center">
+                    <p className="text-xs font-medium text-white">{val}g</p>
+                    <p className="text-[10px] text-white/30 capitalize">{meal}</p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         )}
       </div>
 
       {/* ── Food Search ── */}
-      <div className="space-y-3">
-        <h2 className="text-base font-medium text-obsidian">Log a food</h2>
+      <div className="bg-white border border-black/5 rounded-[10px] p-4 space-y-3">
+        <h2 className="text-sm font-medium text-obsidian">Log a food</h2>
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted pointer-events-none" />
           <input
@@ -253,27 +274,28 @@ export function MealsClient({
                 {nutrients.calories} kcal
               </div>
             </div>
-            <Button
-              size="sm"
+            <button
               onClick={handleLogFood}
               disabled={logging || !portionG || parseFloat(portionG) <= 0}
-              className="w-full bg-obsidian text-white hover:bg-obsidian-light"
+              className="w-full py-2.5 bg-obsidian text-white text-sm font-medium rounded-lg hover:bg-obsidian-light transition-colors disabled:opacity-50 flex items-center justify-center gap-1.5"
             >
-              <Plus className="h-4 w-4 mr-1" />
+              <Plus className="h-4 w-4" />
               {logging ? "Logging…" : "Log food"}
-            </Button>
+            </button>
           </div>
         )}
 
         {loggedFdcId && (
-          <div className="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded-lg text-green-700 text-sm">
-            <Check className="h-4 w-4 flex-shrink-0" />
-            Logged successfully!
+          <div className="flex items-center gap-2 p-3 bg-obsidian rounded-lg text-sm">
+            <div className="w-5 h-5 rounded-full bg-[#CDFF00] flex items-center justify-center">
+              <Check className="h-3 w-3 text-obsidian" />
+            </div>
+            <span className="text-white font-medium">Logged successfully!</span>
           </div>
         )}
 
         {searchError && (
-          <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+          <div className="p-3 bg-alert/10 border border-alert/20 rounded-lg text-obsidian text-sm">
             {searchError}
           </div>
         )}
@@ -282,13 +304,13 @@ export function MealsClient({
       {/* ── Divider ── */}
       <div className="flex items-center gap-3">
         <div className="h-px flex-1 bg-black/5" />
-        <span className="text-xs text-muted uppercase tracking-wide">
-          or get AI meal ideas
+        <span className="text-xs text-muted uppercase tracking-widest font-medium">
+          or get meal ideas
         </span>
         <div className="h-px flex-1 bg-black/5" />
       </div>
 
-      {/* ── AI Meal Wizard ── */}
+      {/* ── Meal Wizard ── */}
       <MealWizard
         userId={userId}
         proteinRemainingG={proteinRemaining}
