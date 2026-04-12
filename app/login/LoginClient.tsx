@@ -9,7 +9,7 @@ import { Shield, ArrowLeft } from "lucide-react";
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [step, setStep] = useState<"email" | "code">("email");
-  const [code, setCode] = useState(["", "", "", "", "", "", "", ""]);
+  const [code, setCode] = useState(["", "", "", "", "", ""]);
   const [loading, setLoading] = useState(false);
   const [verifying, setVerifying] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -55,14 +55,14 @@ export default function LoginPage() {
     setCode(newCode);
 
     // Auto-focus next input
-    if (value && index < 7) {
+    if (value && index < 5) {
       inputRefs.current[index + 1]?.focus();
     }
 
     // Auto-submit when all 6 digits entered
-    if (value && index === 7) {
+    if (value && index === 5) {
       const fullCode = newCode.join("");
-      if (fullCode.length === 8) {
+      if (fullCode.length === 6) {
         handleVerifyCode(fullCode);
       }
     }
@@ -76,14 +76,14 @@ export default function LoginPage() {
 
   function handlePaste(e: React.ClipboardEvent) {
     e.preventDefault();
-    const pasted = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 8);
+    const pasted = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
     if (!pasted) return;
     const newCode = [...code];
     for (let i = 0; i < pasted.length; i++) {
       newCode[i] = pasted[i];
     }
     setCode(newCode);
-    if (pasted.length === 8) {
+    if (pasted.length === 6) {
       handleVerifyCode(pasted);
     } else {
       inputRefs.current[pasted.length]?.focus();
@@ -109,7 +109,7 @@ export default function LoginPage() {
     } catch (err) {
       const message = err instanceof Error ? err.message : "Invalid code";
       setError(message);
-      setCode(["", "", "", "", "", "", "", ""]);
+      setCode(["", "", "", "", "", ""]);
       inputRefs.current[0]?.focus();
     } finally {
       setVerifying(false);
@@ -198,7 +198,7 @@ export default function LoginPage() {
 
               <div className="flex items-center justify-between">
                 <button
-                  onClick={() => { setStep("email"); setCode(["", "", "", "", "", "", "", ""]); setError(null); }}
+                  onClick={() => { setStep("email"); setCode(["", "", "", "", "", ""]); setError(null); }}
                   className="text-xs text-mgray hover:text-obsidian transition-colors"
                 >
                   Use a different email
