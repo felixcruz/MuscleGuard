@@ -35,31 +35,31 @@ export function TodayFoodLog({ entries, onDeleted }: Props) {
 
   if (entries.length === 0) {
     return (
-      <p className="text-sm text-gray-400 text-center py-4">
+      <p className="text-sm text-muted text-center py-4">
         Nothing logged yet today. Add your first meal above.
       </p>
     );
   }
 
   return (
-    <div className="divide-y">
+    <div className="divide-y divide-black/5">
       {entries.map((entry) => (
         <div key={entry.id} className="flex items-center justify-between py-2.5">
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-medium text-gray-800 line-clamp-1">{entry.food_name}</p>
-            <p className="text-xs text-gray-400">
+            <p className="text-sm font-medium text-obsidian line-clamp-1">{entry.food_name}</p>
+            <p className="text-xs text-muted">
               {entry.portion_g ? `${entry.portion_g}g · ` : ""}
               {entry.calories ? `${entry.calories} kcal` : ""}
               {entry.logged_at ? (
-                <span className="text-gray-300 ml-1">· {formatTime(entry.logged_at)}</span>
+                <span className="ml-1">· {formatTime(entry.logged_at)}</span>
               ) : null}
             </p>
           </div>
           <div className="flex items-center gap-3 flex-shrink-0 ml-2">
-            <span className="text-sm font-semibold text-brand-700">+{entry.protein_g}g</span>
+            <span className="text-sm font-semibold text-green-600">+{entry.protein_g}g</span>
             <button
               onClick={() => handleDelete(entry.id)}
-              className="text-gray-300 hover:text-red-400 transition-colors"
+              className="text-muted hover:text-[#FFB4AB] transition-colors"
               aria-label="Delete"
             >
               <Trash2 className="h-4 w-4" />

@@ -3,7 +3,6 @@
 import { useState, useRef, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { Plus, Search } from "lucide-react";
 
 interface USDAResult {
@@ -77,37 +76,35 @@ export function QuickLogForm({ userId, onLogged }: Props) {
   return (
     <div className="space-y-3">
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted" />
         <Input
           placeholder="Search food (e.g. chicken breast, Greek yogurt…)"
           value={query}
           onChange={(e) => { setQuery(e.target.value); setSelected(null); }}
-          className="pl-9"
+          className="pl-9 rounded-lg border-black/10"
         />
         {searching && (
-          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400">
+          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted">
             Searching…
           </span>
         )}
       </div>
 
-      {/* Search error */}
       {searchError && (
-        <p className="text-xs text-red-500 px-1">{searchError}</p>
+        <p className="text-xs text-[#FFB4AB] px-1">{searchError}</p>
       )}
 
-      {/* Dropdown results */}
       {results.length > 0 && !selected && (
-        <div className="border rounded-md shadow-sm bg-white max-h-52 overflow-y-auto divide-y">
+        <div className="border border-black/5 rounded-[10px] shadow-sm bg-white max-h-52 overflow-y-auto divide-y divide-black/5">
           {results.map((food) => (
             <button
               key={food.fdcId}
               type="button"
-              className="w-full text-left px-4 py-2.5 hover:bg-gray-50 text-sm"
+              className="w-full text-left px-4 py-2.5 hover:bg-surface text-sm transition-colors"
               onClick={() => { setSelected(food); setQuery(food.description); setResults([]); }}
             >
-              <span className="font-medium">{food.description}</span>
-              <span className="text-gray-400 ml-2">
+              <span className="font-medium text-obsidian">{food.description}</span>
+              <span className="text-muted ml-2">
                 {food.proteinPer100g.toFixed(1)}g protein / 100g
               </span>
             </button>
@@ -118,23 +115,28 @@ export function QuickLogForm({ userId, onLogged }: Props) {
       {selected && (
         <div className="flex gap-2 items-end">
           <div className="flex-1">
-            <label className="text-xs text-gray-500 block mb-1">Portion (g)</label>
+            <label className="text-xs text-mgray block mb-1">Portion (g)</label>
             <Input
               type="number"
               min="1"
               max="2000"
               value={portionG}
               onChange={(e) => setPortionG(e.target.value)}
+              className="rounded-lg border-black/10"
             />
           </div>
-          <div className="text-sm text-gray-600 pb-2.5 w-28">
-            <span className="font-semibold text-brand-700">{proteinG}g protein</span>
-            <span className="text-gray-400 block text-xs">{caloriesVal} kcal</span>
+          <div className="text-sm pb-2.5 w-28">
+            <span className="font-semibold text-green-600">{proteinG}g protein</span>
+            <span className="text-muted block text-xs">{caloriesVal} kcal</span>
           </div>
-          <Button onClick={handleLog} disabled={saving} size="sm" className="mb-0.5">
-            <Plus className="h-4 w-4 mr-1" />
-            {saving ? "Saving…" : "Log"}
-          </Button>
+          <button
+            onClick={handleLog}
+            disabled={saving}
+            className="mb-0.5 px-4 py-2 bg-obsidian text-white text-sm font-medium rounded-lg hover:bg-obsidian-light transition-colors disabled:opacity-50 flex items-center gap-1"
+          >
+            <Plus className="h-4 w-4" />
+            {saving ? "…" : "Log"}
+          </button>
         </div>
       )}
     </div>
