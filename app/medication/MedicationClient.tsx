@@ -381,18 +381,18 @@ export function MedicationClient({
       {/* ── Your Plan ── */}
       <div className="grid grid-cols-2 gap-4">
         <div className="bg-white border border-black/5 rounded-[10px] p-5 text-center">
-          <p className="text-[10px] font-medium text-muted uppercase tracking-widest mb-2">Protein goal</p>
-          <p className="text-3xl font-bold text-[#CDFF00]" style={{ textShadow: "0 0 20px rgba(205,255,0,0.15)" }}>
+          <p className="text-[10px] font-medium text-mgray uppercase tracking-widest mb-2">Protein goal</p>
+          <p className="text-3xl font-bold text-obsidian">
             {currentProteinGoal}g
           </p>
-          <p className="text-xs text-muted mt-1">per day</p>
+          <p className="text-xs text-mgray mt-1">per day</p>
         </div>
         <div className="bg-white border border-black/5 rounded-[10px] p-5 text-center">
-          <p className="text-[10px] font-medium text-muted uppercase tracking-widest mb-2">Training intensity</p>
+          <p className="text-[10px] font-medium text-mgray uppercase tracking-widest mb-2">Training intensity</p>
           <p className="text-3xl font-bold text-obsidian">
             {currentIntensityPct}%
           </p>
-          <p className="text-xs text-muted mt-1">
+          <p className="text-xs text-mgray mt-1">
             {currentIntensityPct >= 95
               ? "Full intensity"
               : currentIntensityPct >= 85
@@ -413,7 +413,7 @@ export function MedicationClient({
         >
           <span className="text-sm font-medium text-obsidian">Dose history</span>
           <div className="flex items-center gap-2">
-            <span className="text-xs text-muted">{logs.length} entries</span>
+            <span className="text-xs text-mgray">{logs.length} entries</span>
             {historyExpanded
               ? <ChevronDown className="h-4 w-4 text-muted" />
               : <ChevronRight className="h-4 w-4 text-muted" />
