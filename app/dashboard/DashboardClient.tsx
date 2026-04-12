@@ -67,9 +67,36 @@ interface RecentFoodLog {
   logged_at: string | null;
 }
 
+// All available protein sources for the setup overlay
+const PROTEIN_SOURCES = [
+  { id: "chicken", label: "Chicken", emoji: "🍗" },
+  { id: "eggs", label: "Eggs", emoji: "🥚" },
+  { id: "greek_yogurt", label: "Greek yogurt", emoji: "🥛" },
+  { id: "cottage_cheese", label: "Cottage cheese", emoji: "🧀" },
+  { id: "protein_shake", label: "Protein shake", emoji: "🥤" },
+  { id: "tuna", label: "Tuna", emoji: "🐟" },
+  { id: "salmon", label: "Salmon", emoji: "🐠" },
+  { id: "turkey", label: "Turkey", emoji: "🦃" },
+  { id: "beef", label: "Beef", emoji: "🥩" },
+  { id: "shrimp", label: "Shrimp", emoji: "🦐" },
+  { id: "tofu", label: "Tofu", emoji: "🫘" },
+  { id: "edamame", label: "Edamame", emoji: "🌱" },
+  { id: "protein_bar", label: "Protein bar", emoji: "🍫" },
+  { id: "lentils", label: "Lentils", emoji: "🫘" },
+];
+
+const DIETARY_OPTIONS = [
+  { value: "none", label: "No restrictions" },
+  { value: "vegetarian", label: "Vegetarian" },
+  { value: "vegan", label: "Vegan" },
+  { value: "pescatarian", label: "Pescatarian" },
+  { value: "dairy_free", label: "Dairy-free" },
+];
+
 function buildSmartPresets(
   recentFoods: RecentFoodLog[],
   dietaryPrefs: string[],
+  favoriteProteins: string[],
 ): Record<MealType, QuickFood[]> {
   const isVegetarian = dietaryPrefs.some(p =>
     p.toLowerCase().includes("vegetarian") || p.toLowerCase().includes("vegan")
@@ -107,17 +134,24 @@ function buildSmartPresets(
       .map(s => s.food);
 
     if (sorted.length >= 2) {
-      // User has enough history for this slot
       result[slot] = sorted.slice(0, 4);
     } else {
-      // Fill with defaults (filtered by dietary prefs)
       let defaults = [...DEFAULT_FOODS[slot]];
       if (isVegetarian) {
         defaults = defaults.filter(f =>
           !MEAT_KEYWORDS.some(k => f.name.toLowerCase().includes(k))
         );
       }
-      // Prepend any recents the user has
+      // Prioritize foods matching user's favorite proteins
+      if (favoriteProteins.length > 0) {
+        defaults.sort((a, b) => {
+          const aMatch = favoriteProteins.some(fp => a.name.toLowerCase().includes(fp.replace("_", " ")));
+          const bMatch = favoriteProteins.some(fp => b.name.toLowerCase().includes(fp.replace("_", " ")));
+          if (aMatch && !bMatch) return -1;
+          if (!aMatch && bMatch) return 1;
+          return 0;
+        });
+      }
       const combined = [...sorted, ...defaults.filter(d => !sorted.some(s => s.name === d.name))];
       result[slot] = combined.slice(0, 4);
     }
@@ -227,6 +261,7 @@ interface Props {
   commStyle: string;
   recentFoods: RecentFoodLog[];
   dietaryPrefs: string[];
+  favoriteProteins: string[] | null;
 }
 
 function formatTime(ts: string) {
@@ -250,7 +285,7 @@ export function DashboardClient({
   proteinStreakDays, workoutStreakDays, totalPoints,
   goalAlreadyHitToday, proteinGoalExplanation, proteinBreakdown,
   trainingIntensityPct, appetiteLevel, commStyle,
-  recentFoods, dietaryPrefs,
+  recentFoods, dietaryPrefs, favoriteProteins,
 }: Props) {
   const supabase = createClient();
 
@@ -261,7 +296,12 @@ export function DashboardClient({
   const goalHitRef = useRef(goalAlreadyHitToday);
   const confettiTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const smartPresets = buildSmartPresets(recentFoods, dietaryPrefs);
+  const [setupDone, setSetupDone] = useState(favoriteProteins !== null);
+  const [setupDietary, setSetupDietary] = useState("");
+  const [setupFavorites, setSetupFavorites] = useState<string[]>([]);
+  const [setupSaving, setSetupSaving] = useState(false);
+
+  const smartPresets = buildSmartPresets(recentFoods, dietaryPrefs, favoriteProteins ?? []);
   const quickAddFood = getQuickAddFood(recentFoods);
 
   const [activePreset, setActivePreset] = useState<MealType | null>(null);
@@ -322,6 +362,17 @@ export function DashboardClient({
     await refreshLogs();
     setLoggingPreset(null);
     setActivePreset(null);
+  }
+
+  async function handleSetupSave() {
+    setSetupSaving(true);
+    const prefs = setupDietary && setupDietary !== "none" ? [setupDietary] : [];
+    await supabase
+      .from("profiles")
+      .update({ dietary_prefs: prefs, favorite_proteins: setupFavorites })
+      .eq("id", userId);
+    setSetupDone(true);
+    setSetupSaving(false);
   }
 
   async function handleQuickAdd() {
@@ -453,9 +504,76 @@ export function DashboardClient({
       </div>
 
       {/* ── Quick Actions ── */}
-      <div className="space-y-3">
+      <div className="space-y-3 relative">
+
+        {/* Setup overlay (first time) */}
+        {!setupDone && (
+          <div className="absolute inset-0 z-10 bg-white border border-black/5 rounded-[14px] p-5 space-y-4 shadow-lg">
+            <div>
+              <p className="text-sm font-medium text-obsidian">Personalize your quick meals</p>
+              <p className="text-xs text-mgray mt-1">Tell us your preferences so we can suggest the right foods for you.</p>
+            </div>
+
+            <div>
+              <p className="text-xs font-medium text-obsidian mb-2">Dietary preference</p>
+              <div className="flex flex-wrap gap-2">
+                {DIETARY_OPTIONS.map((opt) => (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => setSetupDietary(opt.value)}
+                    className={`px-3 py-1.5 rounded-lg text-xs border transition-colors ${
+                      setupDietary === opt.value
+                        ? "border-obsidian bg-obsidian text-white font-medium"
+                        : "border-black/5 bg-white text-mgray hover:border-black/10"
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <p className="text-xs font-medium text-obsidian mb-2">Your go-to protein sources</p>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                {PROTEIN_SOURCES.map((src) => {
+                  const selected = setupFavorites.includes(src.id);
+                  return (
+                    <button
+                      key={src.id}
+                      type="button"
+                      onClick={() => setSetupFavorites(prev =>
+                        selected ? prev.filter(f => f !== src.id) : [...prev, src.id]
+                      )}
+                      className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs border transition-colors ${
+                        selected
+                          ? "border-obsidian bg-obsidian text-white font-medium"
+                          : "border-black/5 bg-white text-mgray hover:border-black/10"
+                      }`}
+                    >
+                      <span>{src.emoji}</span>
+                      {src.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={handleSetupSave}
+              disabled={setupSaving || setupFavorites.length === 0}
+              className="w-full py-2.5 bg-obsidian text-white text-sm font-medium rounded-lg hover:bg-obsidian-light transition-colors disabled:opacity-50"
+            >
+              {setupSaving ? "Saving…" : `Save preferences (${setupFavorites.length} selected)`}
+            </button>
+          </div>
+        )}
+
+        {/* Meal buttons (visible but blurred when setup not done) */}
+        <div className={`${!setupDone ? "opacity-20 pointer-events-none blur-[2px]" : ""}`}>
         <div className="flex items-center gap-2">
-          {/* Meal preset buttons */}
           <div className="flex-1 grid grid-cols-4 gap-2">
             {(["breakfast", "lunch", "dinner", "snack"] as MealType[]).map((key) => {
               const Icon = MEAL_ICONS[key];
@@ -529,6 +647,7 @@ export function DashboardClient({
           <Zap className="h-4 w-4" />
           {quickAdding ? "Adding…" : `Quick add ${quickAddFood.name} (+${quickAddFood.protein_g}g)`}
         </button>
+        </div>
       </div>
 
       {/* ── Log food (USDA search) ── */}

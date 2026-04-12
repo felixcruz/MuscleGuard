@@ -38,7 +38,7 @@ export default async function DashboardPage() {
     supabase
       .from("profiles")
       .select(
-        "protein_goal_g, weight_kg, protein_streak_days, protein_streak_last_date, workout_streak_days, total_points, primary_goal, glp1_dose_mg, glp1_medication, appetite_level, best_appetite_time, activity_types, primary_activity, comm_style, dietary_prefs"
+        "protein_goal_g, weight_kg, protein_streak_days, protein_streak_last_date, workout_streak_days, total_points, primary_goal, glp1_dose_mg, glp1_medication, appetite_level, best_appetite_time, activity_types, primary_activity, comm_style, dietary_prefs, favorite_proteins"
       )
       .eq("id", user.id)
       .single(),
@@ -97,6 +97,7 @@ export default async function DashboardPage() {
       commStyle={profile?.comm_style ?? "balanced"}
       recentFoods={recentFoodsResult.data ?? []}
       dietaryPrefs={profile?.dietary_prefs ?? []}
+      favoriteProteins={profile?.favorite_proteins ?? null}
     />
   );
 }
