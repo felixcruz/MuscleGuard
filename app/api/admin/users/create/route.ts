@@ -4,7 +4,7 @@ import { getAdminSession } from "@/lib/admin-session";
 import { auditLog } from "@/lib/admin-audit";
 import { brandedEmail } from "@/lib/email-template";
 
-async function sendInviteEmail(to: string, appUrl: string): Promise<void> {
+async function sendInviteEmail(to: string, loginUrl: string): Promise<void> {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) return;
 
@@ -13,8 +13,8 @@ async function sendInviteEmail(to: string, appUrl: string): Promise<void> {
     body: `<p style="margin:0 0 8px">Someone has created an account for you on MuscleGuard, the GLP-1 muscle protection companion.</p>
 <p style="margin:0">Click the button below to sign in and start protecting your muscle during weight loss.</p>`,
     ctaText: "Sign in to MuscleGuard",
-    ctaUrl: `${appUrl}/login`,
-    footer: "If you didn't expect this invitation, you can safely ignore this email.",
+    ctaUrl: loginUrl,
+    footer: "This link expires in 24 hours. If you didn't expect this invitation, you can safely ignore this email.",
   });
 
   await fetch("https://api.resend.com/emails", {
@@ -69,9 +69,21 @@ export async function POST(req: NextRequest) {
     onboarding_done: false,
   });
 
-  // Send invite email
+  // Generate magic link for the user
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://muscleguard.app";
-  await sendInviteEmail(email, appUrl);
+  const { data: linkData } = await supabase.auth.admin.generateLink({
+    type: "magiclink",
+    email,
+    options: { redirectTo: `${appUrl}/auth/callback` },
+  });
+
+  // Send branded invite email with direct login link
+  if (linkData?.properties?.action_link) {
+    await sendInviteEmail(email, linkData.properties.action_link);
+  } else {
+    // Fallback: send to login page
+    await sendInviteEmail(email, `${appUrl}/login`);
+  }
 
   await auditLog({
     adminUserId: session.userId,
