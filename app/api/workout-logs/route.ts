@@ -23,11 +23,19 @@ export async function POST(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { workout_day, week_key, action } = await request.json() as {
+  const body = await request.json();
+  const { workout_day, week_key, action } = body as {
     workout_day: string;
     week_key: string;
-    action: "complete" | "uncomplete";
+    action: string;
   };
+
+  if (!workout_day || !week_key || !action || typeof workout_day !== "string" || typeof week_key !== "string") {
+    return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+  }
+  if (action !== "complete" && action !== "uncomplete") {
+    return NextResponse.json({ error: "Action must be 'complete' or 'uncomplete'" }, { status: 400 });
+  }
 
   if (action === "uncomplete") {
     await supabase.from("workout_logs")

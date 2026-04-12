@@ -24,6 +24,15 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
   }
 
+  const validChangeTypes = ["increase", "decrease", "switch", "pause", "start"];
+  if (!validChangeTypes.includes(change_type)) {
+    return NextResponse.json({ error: "Invalid change type" }, { status: 400 });
+  }
+
+  if (typeof dose_mg !== "number" || dose_mg <= 0 || dose_mg > 100) {
+    return NextResponse.json({ error: "Invalid dose" }, { status: 400 });
+  }
+
   const today = new Date().toISOString().split("T")[0];
 
   // Fetch current profile
@@ -41,7 +50,7 @@ export async function POST(req: NextRequest) {
 
   const weightKg = profile.weight_kg ?? 80;
   const goal = (profile.primary_goal ?? "preserve_muscle") as Goal;
-  const newDoseMg = parseFloat(dose_mg);
+  const newDoseMg = Number(dose_mg);
   const newAppetite = (appetite_level ?? "moderate") as AppetiteLevel;
 
   // Compute new protein goal and intensity
