@@ -2,12 +2,13 @@
 
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Shield } from "lucide-react";
+import { Shield, ArrowLeft } from "lucide-react";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -65,7 +66,13 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-surface px-4">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-surface px-4">
+      <div className="w-full max-w-md mb-4">
+        <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-mgray hover:text-obsidian transition-colors">
+          <ArrowLeft className="h-4 w-4" />
+          Back to home
+        </Link>
+      </div>
       <Card className="w-full max-w-md rounded-[10px] border-black/5">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-2">
