@@ -143,8 +143,8 @@ export default function CookiePolicy() {
           <h2 className="text-lg font-semibold text-gray-900 mt-8 mb-3">5. Contact Us</h2>
           <p>
             If you have questions about our use of cookies, please contact us at{" "}
-            <a href="mailto:privacy@muscleguard.app" className="text-brand-600 hover:underline">
-              privacy@muscleguard.app
+            <a href="mailto:support@muscleguard.app" className="text-brand-600 hover:underline">
+              support@muscleguard.app
             </a>.
           </p>
         </section>

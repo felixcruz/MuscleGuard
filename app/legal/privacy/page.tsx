@@ -254,8 +254,8 @@ export default function PrivacyPolicy() {
           </ul>
           <p className="mt-3">
             To exercise these rights, contact us at{" "}
-            <a href="mailto:privacy@muscleguard.app" className="text-brand-600 hover:underline">
-              privacy@muscleguard.app
+            <a href="mailto:support@muscleguard.app" className="text-brand-600 hover:underline">
+              support@muscleguard.app
             </a>. We will respond to verifiable consumer requests within 45 days.
           </p>
         </section>
@@ -267,8 +267,8 @@ export default function PrivacyPolicy() {
             knowingly collect personal information from children under 18. If you are a parent or
             guardian and believe your child has provided us with personal information, please contact
             us at{" "}
-            <a href="mailto:privacy@muscleguard.app" className="text-brand-600 hover:underline">
-              privacy@muscleguard.app
+            <a href="mailto:support@muscleguard.app" className="text-brand-600 hover:underline">
+              support@muscleguard.app
             </a>{" "}
             and we will promptly delete such information.
           </p>
@@ -294,8 +294,8 @@ export default function PrivacyPolicy() {
           <ul className="list-none pl-0 mt-2 space-y-1">
             <li>
               Email:{" "}
-              <a href="mailto:privacy@muscleguard.app" className="text-brand-600 hover:underline">
-                privacy@muscleguard.app
+              <a href="mailto:support@muscleguard.app" className="text-brand-600 hover:underline">
+                support@muscleguard.app
               </a>
             </li>
           </ul>
