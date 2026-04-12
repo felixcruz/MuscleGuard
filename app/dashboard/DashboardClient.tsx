@@ -339,7 +339,7 @@ export function DashboardClient({
 
         {/* Protein explanation */}
         <div className="px-6 py-3 bg-white/5 border-t border-white/5">
-          <p className="text-xs text-white/40 leading-relaxed">{proteinGoalExplanation}</p>
+          <p className="text-xs text-white leading-relaxed">{proteinGoalExplanation}</p>
         </div>
       </div>
 
