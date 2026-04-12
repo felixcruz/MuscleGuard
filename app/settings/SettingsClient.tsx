@@ -180,7 +180,7 @@ export function SettingsClient({ userId, email, profile }: Props) {
           <div className="bg-white border border-black/5 rounded-[10px] p-5 space-y-3">
             <div>
               <p className="text-[10px] font-medium text-mgray uppercase tracking-widest">Communication style</p>
-              <p className="text-xs text-muted mt-1">How the app talks to you across all sections.</p>
+              <p className="text-xs text-mgray mt-1">How the app talks to you across all sections.</p>
             </div>
             <div className="space-y-2">
               {COMM_STYLES.map((s) => {
@@ -203,7 +203,7 @@ export function SettingsClient({ userId, email, profile }: Props) {
                       )}
                       <span className="font-medium">{s.label}</span>
                     </div>
-                    <span className={`text-xs ${isSelected ? "text-white/60" : "text-muted"}`}>{s.desc}</span>
+                    <span className={`text-xs ${isSelected ? "text-white/60" : "text-mgray"}`}>{s.desc}</span>
                   </button>
                 );
               })}
