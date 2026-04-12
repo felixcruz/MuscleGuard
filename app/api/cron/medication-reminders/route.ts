@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getNextDueDate } from "@/lib/personalization";
+import { brandedEmail } from "@/lib/email-template";
 
 async function sendEmail(
   to: string,
@@ -110,11 +111,13 @@ export async function GET(req: NextRequest) {
       await sendEmail(
         email,
         `Your ${doseMg}mg ${medLabel} dose is due today`,
-        `<p>Hi,</p>
-<p>This is a friendly reminder that your <strong>${doseMg}mg ${medLabel}</strong> dose is scheduled for today.</p>
-<p>Log it in <a href="${appUrl}/medication">MuscleGuard</a> to keep your protein and training plan accurate.</p>
-<p>Your body, your muscle — stay consistent.</p>
-<p>— The MuscleGuard Team</p>`
+        brandedEmail({
+          title: "Your dose is due today",
+          body: `<p style="margin:0 0 8px">Your <strong style="color:#ffffff">${doseMg}mg ${medLabel}</strong> dose is scheduled for today.</p>
+<p style="margin:0">Log it in MuscleGuard to keep your protein and training plan accurate.</p>`,
+          ctaText: "Log dose taken",
+          ctaUrl: `${appUrl}/medication`,
+        })
       );
       processed++;
     } else if (daysOverdue === 1 || daysOverdue === 2) {
@@ -122,24 +125,29 @@ export async function GET(req: NextRequest) {
       await sendEmail(
         email,
         `Haven't logged your ${medLabel} dose yet?`,
-        `<p>Hi,</p>
-<p>It looks like you haven't logged your <strong>${doseMg}mg ${medLabel}</strong> dose yet — it was due ${daysOverdue} day${daysOverdue !== 1 ? "s" : ""} ago.</p>
-<p>Your MuscleGuard protein and training plan is personalized to your medication schedule. Logging your dose helps us keep your recommendations accurate.</p>
-<p><a href="${appUrl}/medication">Log your dose now →</a></p>
-<p>— The MuscleGuard Team</p>`
+        brandedEmail({
+          title: `Your dose is ${daysOverdue} day${daysOverdue !== 1 ? "s" : ""} overdue`,
+          body: `<p style="margin:0 0 8px">It looks like you haven't logged your <strong style="color:#ffffff">${doseMg}mg ${medLabel}</strong> dose yet.</p>
+<p style="margin:0">Your protein and training plan is personalized to your medication schedule. Logging your dose keeps your recommendations accurate.</p>`,
+          ctaText: "Log your dose now",
+          ctaUrl: `${appUrl}/medication`,
+        })
       );
       processed++;
     } else if (daysOverdue >= 3) {
       // 3+ days overdue — critical reminder
       await sendEmail(
         email,
-        `Your dose is ${daysOverdue} days overdue — your plan may be less accurate`,
-        `<p>Hi,</p>
-<p>Your <strong>${doseMg}mg ${medLabel}</strong> dose is now <strong>${daysOverdue} days overdue</strong>.</p>
-<p>When your medication schedule changes, your protein targets and training intensity may also need to adjust. Please log your dose or any changes to keep your plan accurate.</p>
-<p><a href="${appUrl}/medication">Update your medication status →</a></p>
-<p>If you've paused or changed your medication, you can log that too — your plan will automatically adjust.</p>
-<p>— The MuscleGuard Team</p>`
+        `Your dose is ${daysOverdue} days overdue`,
+        brandedEmail({
+          title: `${daysOverdue} days since your last dose`,
+          body: `<p style="margin:0 0 8px">Your <strong style="color:#ffffff">${doseMg}mg ${medLabel}</strong> dose is now <strong style="color:#FFB4AB">${daysOverdue} days overdue</strong>.</p>
+<p style="margin:0 0 8px">When your medication schedule changes, your protein targets and training intensity may also need to adjust.</p>
+<p style="margin:0">If you've paused or changed your medication, you can log that too and your plan will automatically adjust.</p>`,
+          ctaText: "Update medication status",
+          ctaUrl: `${appUrl}/medication`,
+          footer: "Consistent medication tracking helps MuscleGuard keep your plan accurate.",
+        })
       );
       processed++;
     }
