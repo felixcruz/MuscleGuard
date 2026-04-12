@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { getAnthropic } from "./anthropic";
+import { createAdminClient } from "./supabase/admin";
 import { getAIToneInstruction, type CommStyle } from "./comm-style";
 
 export interface WeeklyReportData {
@@ -140,6 +141,18 @@ Write a 2-3 sentence personalized weekly summary. Be encouraging and specific ab
     });
     summaryText =
       msg.content[0].type === "text" ? msg.content[0].text.trim() : "";
+
+    // Log API usage
+    const adminSupabase = createAdminClient();
+    const reportUsage = msg.usage;
+    await adminSupabase.from("api_usage_logs").insert({
+      feature: "weekly_report",
+      model: "claude-haiku-4-5-20251001",
+      input_tokens: reportUsage?.input_tokens ?? 0,
+      output_tokens: reportUsage?.output_tokens ?? 0,
+      cost_usd: ((reportUsage?.input_tokens ?? 0) * 0.0000008) + ((reportUsage?.output_tokens ?? 0) * 0.000004),
+      user_id: userId,
+    });
   } catch {
     summaryText =
       grade === "A"

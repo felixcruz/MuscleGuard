@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { getAnthropic, MEAL_MODEL } from "@/lib/anthropic";
 import { validateMealGenerationRequest } from "@/lib/api-validation";
 import { checkRateLimit } from "@/lib/rate-limit";
@@ -123,6 +124,18 @@ Return a JSON array with exactly 3 items using this exact structure:
     if (!match) return NextResponse.json({ error: "Invalid response" }, { status: 500 });
     meals = JSON.parse(match[0]);
   }
+
+  // Log API usage
+  const usage = message.usage;
+  const adminSupabase = createAdminClient();
+  await adminSupabase.from("api_usage_logs").insert({
+    feature: "meal_generation",
+    model: MEAL_MODEL,
+    input_tokens: usage?.input_tokens ?? 0,
+    output_tokens: usage?.output_tokens ?? 0,
+    cost_usd: ((usage?.input_tokens ?? 0) * 0.0000008) + ((usage?.output_tokens ?? 0) * 0.000004),
+    user_id: user.id,
+  });
 
   // Save to DB for history
   await supabase.from("generated_meals").insert({
