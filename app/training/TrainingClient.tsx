@@ -1,9 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { CheckCircle2, Circle, Flame, Trophy, AlertTriangle } from "lucide-react";
 import { intensityInfo } from "@/lib/personalization";
 import { getIntensityAdvice, type CommStyle } from "@/lib/comm-style";
@@ -45,9 +42,9 @@ export function TrainingClient({
   const info = intensityInfo(intensityPct);
 
   const milestoneLabel =
-    streak >= 30 ? "🏆 Iron Will — 30 workouts!" :
-    streak >= 14 ? "⭐ Dedicated — 14 workouts!" :
-    streak >= 7  ? "🎖 Consistent — 7 workouts!" : null;
+    streak >= 30 ? "🏆 Iron Will, 30 workouts!" :
+    streak >= 14 ? "⭐ Dedicated, 14 workouts!" :
+    streak >= 7  ? "🎖 Consistent, 7 workouts!" : null;
 
   async function toggleDay(id: string) {
     setToggling(id);
@@ -69,115 +66,102 @@ export function TrainingClient({
     setToggling(null);
   }
 
-  // All trackable sessions for the weekly progress bar
   const trackedSessions = protocol.needsComplementaryStrength
     ? [...protocol.primarySessions, ...COMPLEMENTARY_STRENGTH_SESSIONS]
     : protocol.primarySessions;
   const trackedIds = trackedSessions.map((s) => s.id);
   const trackedDoneCount = done.filter((d) => trackedIds.includes(d)).length;
 
-  // Intensity banner colors
-  const intensityBg =
-    info.colorClass === "green"  ? "#f0fdf4" :
-    info.colorClass === "blue"   ? "#eff6ff" :
-    info.colorClass === "amber"  ? "#fffbeb" :
-    "#fff7ed";
-  const intensityBorder =
-    info.colorClass === "green"  ? "#bbf7d0" :
-    info.colorClass === "blue"   ? "#bfdbfe" :
-    info.colorClass === "amber"  ? "#fde68a" :
-    "#fed7aa";
-  const intensityText =
-    info.colorClass === "green"  ? "#15803d" :
-    info.colorClass === "blue"   ? "#1d4ed8" :
-    info.colorClass === "amber"  ? "#92400e" :
-    "#c2410c";
+  // Intensity bar width
+  const intensityBarColor =
+    info.colorClass === "green"  ? "#CDFF00" :
+    info.colorClass === "blue"   ? "#CDFF00" :
+    info.colorClass === "amber"  ? "#FFB4AB" :
+    "#FFB4AB";
 
   return (
-    <div className="max-w-lg mx-auto px-4 py-8 space-y-6">
+    <div className="max-w-3xl mx-auto px-4 py-6 space-y-5">
 
-      {/* ── Intensity banner ── */}
-      <div style={{
-        padding: "12px 16px",
-        borderRadius: 10,
-        background: intensityBg,
-        border: `1px solid ${intensityBorder}`,
-        display: "flex",
-        alignItems: "flex-start",
-        gap: 10,
-      }}>
-        <div>
-          <p style={{ fontSize: 13, fontWeight: 700, color: intensityText, margin: 0 }}>
-            Training at {intensityPct}% intensity today — {info.label}
-          </p>
-          <p style={{ fontSize: 12, color: intensityText, margin: "3px 0 0", opacity: 0.85 }}>
+      {/* ── Hero Card (dark) ── */}
+      <div className="bg-obsidian rounded-[14px] p-6 space-y-5">
+        {/* Header row */}
+        <div className="sm:flex sm:items-start sm:justify-between sm:gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-white">
+              {protocol.emoji} {protocol.displayName}
+            </h1>
+            <p className="text-white/50 mt-1 text-sm max-w-sm">
+              {protocol.glp1Note}
+            </p>
+          </div>
+          <div className="flex items-center gap-2 mt-3 sm:mt-0 shrink-0">
+            <div className="flex items-center gap-1 bg-white/10 px-2.5 py-1.5 rounded-full">
+              <span className="text-sm">{streak >= 7 ? "🔥🔥" : streak >= 1 ? "🔥" : "💤"}</span>
+              <span className={`text-xs font-semibold ${streak >= 1 ? "text-white" : "text-white/40"}`}>
+                {streak} workout{streak !== 1 ? "s" : ""}
+              </span>
+            </div>
+            {proteinStreakDays >= 1 && (
+              <div className="flex items-center gap-1 bg-white/10 px-2.5 py-1.5 rounded-full">
+                <span className="text-xs">🥩</span>
+                <span className="text-xs font-semibold text-white">
+                  {proteinStreakDays}d protein
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Intensity bar */}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <p className="text-sm font-medium text-white">
+              Training at {intensityPct}% intensity
+            </p>
+            <span className="text-xs text-white/50">{info.label}</span>
+          </div>
+          <div className="h-2 rounded-full bg-white/10 overflow-hidden">
+            <div
+              className="h-full rounded-full transition-all duration-500"
+              style={{ width: `${intensityPct}%`, backgroundColor: intensityBarColor }}
+            />
+          </div>
+          <p className="text-xs text-white/50">
             {getIntensityAdvice(intensityPct, commStyle as CommStyle)}
           </p>
         </div>
-      </div>
 
-      {/* ── Header + streak badges ── */}
-      <div className="flex items-start justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-obsidian">
-            {protocol.emoji} {protocol.displayName}
-          </h1>
-          <p className="text-mgray mt-1 text-sm max-w-xs">
-            {protocol.glp1Note}
-          </p>
-        </div>
-        <div className="flex flex-col items-end gap-1.5">
-          {/* Workout streak */}
-          <div className={`flex items-center gap-1 px-2.5 py-1.5 rounded-full border flex-shrink-0 ${
-            streak >= 1 ? "bg-surface border-black/5" : "bg-surface border-black/5"
-          }`}>
-            <span className="text-sm">{streak >= 7 ? "🔥🔥" : streak >= 1 ? "🔥" : "💤"}</span>
-            <span className={`text-xs font-semibold ${streak >= 1 ? "text-obsidian" : "text-muted"}`}>
-              {streak} workout{streak !== 1 ? "s" : ""}
-            </span>
-          </div>
-          {/* Protein streak (cross-context) */}
-          {proteinStreakDays >= 1 && (
-            <div className="flex items-center gap-1 bg-surface border border-black/5 px-2.5 py-1.5 rounded-full">
-              <span className="text-xs">🥩</span>
-              <span className="text-xs font-semibold text-obsidian">
-                {proteinStreakDays}d protein
-              </span>
-            </div>
+        {/* Weekly progress */}
+        <div className="flex gap-2 items-center pt-2 border-t border-white/5">
+          <span className="text-sm text-white/40 mr-1">This week</span>
+          {trackedSessions.map((session) => (
+            <div
+              key={session.id}
+              className={`h-2.5 flex-1 rounded-full transition-colors ${done.includes(session.id) ? "bg-[#CDFF00]" : "bg-white/10"}`}
+            />
+          ))}
+          <span className="text-sm font-semibold text-white ml-1">
+            {trackedDoneCount}/{trackedSessions.length}
+          </span>
+          {trackedDoneCount === trackedSessions.length && trackedSessions.length > 0 && (
+            <span className="text-sm">🏆</span>
           )}
+        </div>
+
+        {/* Points */}
+        <div className="flex items-center gap-1.5 justify-center">
+          <Flame className="h-3.5 w-3.5 text-white/40" />
+          <span className="text-xs text-white/40 font-medium">{points} total points · +5 per workout</span>
         </div>
       </div>
 
       {/* Milestone */}
       {milestoneLabel && (
-        <div className="flex items-center gap-2 px-3 py-2 bg-[#CDFF00]/10 border border-[#CDFF00]/20 rounded-lg">
-          <Trophy className="h-4 w-4 text-obsidian flex-shrink-0" />
-          <span className="text-sm font-medium text-obsidian">{milestoneLabel}</span>
+        <div className="flex items-center gap-2 px-3 py-2 bg-obsidian rounded-lg">
+          <Trophy className="h-4 w-4 text-[#CDFF00] flex-shrink-0" />
+          <span className="text-sm font-medium text-white">{milestoneLabel}</span>
         </div>
       )}
-
-      {/* Weekly progress */}
-      <div className="flex gap-2 items-center bg-white border border-black/5 rounded-xl px-4 py-3">
-        <span className="text-sm text-mgray mr-1">This week</span>
-        {trackedSessions.map((session) => (
-          <div
-            key={session.id}
-            className={`h-2.5 flex-1 rounded-full transition-colors ${done.includes(session.id) ? "bg-obsidian" : "bg-muted/30"}`}
-          />
-        ))}
-        <span className="text-sm font-semibold text-obsidian ml-1">
-          {trackedDoneCount}/{trackedSessions.length}
-        </span>
-        {trackedDoneCount === trackedSessions.length && trackedSessions.length > 0 && (
-          <span className="text-sm">🏆</span>
-        )}
-      </div>
-
-      {/* Points */}
-      <div className="flex items-center gap-1.5 justify-center">
-        <Flame className="h-3.5 w-3.5 text-obsidian" />
-        <span className="text-xs text-muted font-medium">{points} total points · +5 per workout</span>
-      </div>
 
       {/* ── Primary activity sessions ── */}
       {protocol.needsComplementaryStrength && (
@@ -188,23 +172,25 @@ export function TrainingClient({
             </h2>
             <p className="text-xs text-mgray">Mark each session when you complete it.</p>
           </div>
-          {protocol.primarySessions.map((session) => (
-            <StrengthCard
-              key={session.id}
-              session={session}
-              isDone={done.includes(session.id)}
-              toggling={toggling === session.id}
-              onToggle={() => toggleDay(session.id)}
-            />
-          ))}
+          <div className="grid sm:grid-cols-2 gap-4">
+            {protocol.primarySessions.map((session) => (
+              <SessionCard
+                key={session.id}
+                session={session}
+                isDone={done.includes(session.id)}
+                toggling={toggling === session.id}
+                onToggle={() => toggleDay(session.id)}
+              />
+            ))}
+          </div>
         </div>
       )}
 
       {/* ── Strength protocol (for primary=strength) ── */}
       {!protocol.needsComplementaryStrength && primaryActivity === "strength" && (
-        <div className="space-y-4">
+        <div className="grid sm:grid-cols-2 gap-4">
           {protocol.primarySessions.map((session) => (
-            <StrengthCard
+            <SessionCard
               key={session.id}
               session={session}
               isDone={done.includes(session.id)}
@@ -217,9 +203,9 @@ export function TrainingClient({
 
       {/* ── HIIT sessions (no complementary needed) ── */}
       {!protocol.needsComplementaryStrength && primaryActivity !== "strength" && (
-        <div className="space-y-4">
+        <div className="grid sm:grid-cols-2 gap-4">
           {protocol.primarySessions.map((session) => (
-            <StrengthCard
+            <SessionCard
               key={session.id}
               session={session}
               isDone={done.includes(session.id)}
@@ -237,8 +223,8 @@ export function TrainingClient({
           <div className="flex items-start gap-3 p-4 bg-obsidian rounded-[10px]">
             <AlertTriangle className="h-5 w-5 text-[#FFB4AB] mt-0.5 flex-shrink-0" />
             <div>
-              <p className="font-semibold text-[#FFB4AB] text-sm">
-                Muscle Preservation — Required on GLP-1
+              <p className="font-medium text-[#FFB4AB] text-sm">
+                Muscle Preservation Required on GLP-1
               </p>
               <p className="text-xs text-white mt-1">{protocol.glp1Note}</p>
             </div>
@@ -253,73 +239,85 @@ export function TrainingClient({
             </p>
           </div>
 
-          {COMPLEMENTARY_STRENGTH_SESSIONS.map((session) => (
-            <StrengthCard
-              key={session.id}
-              session={session}
-              isDone={done.includes(session.id)}
-              toggling={toggling === session.id}
-              onToggle={() => toggleDay(session.id)}
-            />
-          ))}
+          <div className="grid sm:grid-cols-2 gap-4">
+            {COMPLEMENTARY_STRENGTH_SESSIONS.map((session) => (
+              <SessionCard
+                key={session.id}
+                session={session}
+                isDone={done.includes(session.id)}
+                toggling={toggling === session.id}
+                onToggle={() => toggleDay(session.id)}
+              />
+            ))}
+          </div>
         </div>
       )}
     </div>
   );
 }
 
-// ── Workout cards ─────────────────────────────────────────────────────────────
+// ── Session Card ──────────────────────────────────────────────────────────────
 
-interface StrengthCardProps {
+interface SessionCardProps {
   session: WorkoutSession;
   isDone: boolean;
   toggling: boolean;
   onToggle: () => void;
 }
 
-function StrengthCard({ session, isDone, toggling, onToggle }: StrengthCardProps) {
+function SessionCard({ session, isDone, toggling, onToggle }: SessionCardProps) {
   return (
-    <Card className={`border-black/5 rounded-[10px] ${isDone ? "opacity-75" : ""}`}>
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-base font-medium text-obsidian">{session.label}</CardTitle>
-          <Badge variant={isDone ? "secondary" : "outline"}>~{session.duration}</Badge>
+    <div className={`bg-white border border-black/5 rounded-[10px] flex flex-col ${isDone ? "opacity-70" : ""}`}>
+      {/* Header */}
+      <div className="px-5 pt-5 pb-3">
+        <div className="flex items-center justify-between gap-2">
+          <h3 className="text-sm font-medium text-obsidian">{session.label}</h3>
+          <span className="text-xs text-muted shrink-0 px-2 py-0.5 bg-surface rounded">
+            ~{session.duration}
+          </span>
         </div>
-        <p className="text-sm text-mgray">{session.description}</p>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        {session.exercises && session.exercises.length > 0 && (
+        <p className="text-xs text-mgray mt-1">{session.description}</p>
+      </div>
+
+      {/* Exercises */}
+      {session.exercises && session.exercises.length > 0 && (
+        <div className="px-5 pb-3 flex-1">
           <div className="divide-y divide-black/5">
             {session.exercises.map((ex) => (
-              <div key={ex.name} className="py-2.5 flex justify-between items-start gap-2">
+              <div key={ex.name} className="py-2 flex justify-between items-start gap-2">
                 <div>
                   <p className="text-sm font-medium text-obsidian">{ex.name}</p>
-                  <p className="text-xs text-muted">{ex.why}</p>
+                  <p className="text-[11px] text-muted">{ex.why}</p>
                 </div>
-                <span className="text-sm text-mgray shrink-0">
-                  {ex.sets} × {ex.reps}
+                <span className="text-xs text-mgray shrink-0 font-medium bg-surface px-1.5 py-0.5 rounded">
+                  {ex.sets}×{ex.reps}
                 </span>
               </div>
             ))}
           </div>
-        )}
+        </div>
+      )}
 
-        <Button
-          variant={isDone ? "secondary" : "default"}
-          className={`w-full ${isDone ? "bg-surface text-mgray" : "bg-obsidian text-white hover:bg-obsidian-light"}`}
+      {/* Action button */}
+      <div className="px-5 pb-5 mt-auto">
+        <button
           onClick={onToggle}
           disabled={toggling}
+          className={`w-full py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-50 ${
+            isDone
+              ? "bg-surface text-mgray"
+              : "bg-obsidian text-white hover:bg-obsidian-light"
+          }`}
         >
           {toggling ? (
             "Saving…"
           ) : isDone ? (
-            <><CheckCircle2 className="h-4 w-4 mr-2" /> Done this week</>
+            <><CheckCircle2 className="h-4 w-4" /> Done this week</>
           ) : (
-            <><Circle className="h-4 w-4 mr-2" /> Mark as done (+5 pts)</>
+            <><Circle className="h-4 w-4" /> Mark as done (+5 pts)</>
           )}
-        </Button>
-      </CardContent>
-    </Card>
+        </button>
+      </div>
+    </div>
   );
 }
-
