@@ -150,8 +150,8 @@ export function TrainingClient({
 
         {/* Points */}
         <div className="flex items-center gap-1.5 justify-center">
-          <Flame className="h-3.5 w-3.5 text-white/40" />
-          <span className="text-xs text-white/40 font-medium">{points} total points · +5 per workout</span>
+          <Flame className="h-3.5 w-3.5 text-white" />
+          <span className="text-xs text-white font-medium">{points} total points · +5 per workout</span>
         </div>
       </div>
 
