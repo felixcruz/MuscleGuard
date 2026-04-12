@@ -5,13 +5,15 @@ import { createClient } from "@/lib/supabase/client";
 import { ProteinRing } from "@/components/dashboard/ProteinRing";
 import { QuickLogForm } from "@/components/dashboard/QuickLogForm";
 import { TodayFoodLog } from "@/components/dashboard/TodayFoodLog";
-import { Flame, Trophy, Zap, X, ChevronDown, ChevronRight, AlertTriangle, Search, Plus } from "lucide-react";
+import { Flame, Trophy, Zap, X, ChevronDown, ChevronRight, AlertTriangle, Search, Plus, Sunrise, Sun, Moon, Cookie } from "lucide-react";
 import { getDynamicMsg, getSevereAppetiteAlert, type CommStyle } from "@/lib/comm-style";
 
 // ── Meal presets ──
+const MEAL_ICONS = { breakfast: Sunrise, lunch: Sun, dinner: Moon, snack: Cookie } as const;
+
 const MEAL_PRESETS = {
   breakfast: {
-    emoji: "🌅", label: "Breakfast",
+    label: "Breakfast",
     items: [
       { name: "Greek yogurt (150g)", protein_g: 18, calories: 120, portion_g: 150 },
       { name: "Scrambled eggs (2)", protein_g: 13, calories: 180, portion_g: 120 },
@@ -20,7 +22,7 @@ const MEAL_PRESETS = {
     ],
   },
   lunch: {
-    emoji: "☀️", label: "Lunch",
+    label: "Lunch",
     items: [
       { name: "Chicken breast (150g)", protein_g: 45, calories: 248, portion_g: 150 },
       { name: "Canned tuna (140g)", protein_g: 30, calories: 110, portion_g: 140 },
@@ -29,7 +31,7 @@ const MEAL_PRESETS = {
     ],
   },
   dinner: {
-    emoji: "🌙", label: "Dinner",
+    label: "Dinner",
     items: [
       { name: "Chicken breast (200g)", protein_g: 60, calories: 330, portion_g: 200 },
       { name: "Lean beef (150g)", protein_g: 38, calories: 270, portion_g: 150 },
@@ -38,7 +40,7 @@ const MEAL_PRESETS = {
     ],
   },
   snack: {
-    emoji: "⚡", label: "Snack",
+    label: "Snack",
     items: [
       { name: "Protein bar", protein_g: 20, calories: 200, portion_g: 60 },
       { name: "Greek yogurt (100g)", protein_g: 10, calories: 80, portion_g: 100 },
@@ -350,19 +352,20 @@ export function DashboardClient({
           <div className="flex-1 grid grid-cols-4 gap-2">
             {(Object.keys(MEAL_PRESETS) as MealType[]).map((key) => {
               const preset = MEAL_PRESETS[key];
+              const Icon = MEAL_ICONS[key];
               const isActive = activePreset === key;
               return (
                 <button
                   key={key}
                   type="button"
                   onClick={() => setActivePreset(isActive ? null : key)}
-                  className={`flex flex-col items-center gap-0.5 py-2.5 px-1 rounded-[10px] border text-xs font-medium transition-colors ${
+                  className={`flex flex-col items-center gap-1 py-2.5 px-1 rounded-[10px] border text-xs font-medium transition-colors ${
                     isActive
                       ? "border-obsidian bg-obsidian text-white"
                       : "border-black/5 bg-white text-mgray hover:border-black/10"
                   }`}
                 >
-                  <span className="text-lg">{preset.emoji}</span>
+                  <Icon className="h-5 w-5" />
                   {preset.label}
                 </button>
               );
@@ -374,8 +377,9 @@ export function DashboardClient({
         {activePreset && (
           <div className="border border-black/5 rounded-[10px] bg-white overflow-hidden shadow-sm">
             <div className="flex items-center justify-between px-4 py-2.5 border-b border-black/5 bg-surface">
-              <span className="text-sm font-semibold text-obsidian">
-                {MEAL_PRESETS[activePreset].emoji} {MEAL_PRESETS[activePreset].label}
+              <span className="text-sm font-semibold text-obsidian flex items-center gap-1.5">
+                {(() => { const Icon = MEAL_ICONS[activePreset]; return <Icon className="h-4 w-4" />; })()}
+                {MEAL_PRESETS[activePreset].label}
               </span>
               <button onClick={() => setActivePreset(null)} className="text-muted hover:text-obsidian transition-colors">
                 <X className="h-4 w-4" />

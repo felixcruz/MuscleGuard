@@ -1,16 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { Sparkles } from "lucide-react";
+import { Sparkles, Sunrise, Sun, Moon, Cookie } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
 import { MealCard, type Meal } from "./MealCard";
 
 const MEAL_TIMES = [
-  { value: "breakfast", label: "🌅 Breakfast" },
-  { value: "lunch", label: "☀️ Lunch" },
-  { value: "dinner", label: "🌙 Dinner" },
-  { value: "snack", label: "⚡ Snack" },
+  { value: "breakfast", label: "Breakfast", icon: Sunrise },
+  { value: "lunch", label: "Lunch", icon: Sun },
+  { value: "dinner", label: "Dinner", icon: Moon },
+  { value: "snack", label: "Snack", icon: Cookie },
 ];
 
 const HUNGER_LEVELS = [
@@ -174,12 +174,13 @@ export function MealWizard({ userId, proteinRemainingG, dietaryPrefs, onMealLogg
         <UserBubble>{MEAL_TIMES.find((m) => m.value === mealTime)?.label}</UserBubble>
       ) : (
         <div className="flex flex-wrap gap-2 pl-9">
-          {MEAL_TIMES.map(({ value, label }) => (
+          {MEAL_TIMES.map(({ value, label, icon: Icon }) => (
             <button
               key={value}
               onClick={() => { setMealTime(value); setStep(1); }}
-              className="px-4 py-2 rounded-full border border-black/5 bg-white text-sm text-mgray hover:border-black/10 hover:bg-surface transition-colors"
+              className="px-4 py-2 rounded-full border border-black/5 bg-white text-sm text-mgray hover:border-black/10 hover:bg-surface transition-colors flex items-center gap-1.5"
             >
+              <Icon className="h-4 w-4" />
               {label}
             </button>
           ))}
