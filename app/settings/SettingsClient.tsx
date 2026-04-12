@@ -19,6 +19,7 @@ interface Props {
     comm_style?: string;
     dietary_prefs?: string[];
     favorite_proteins?: string[];
+    gender?: string;
   };
 }
 
@@ -74,6 +75,7 @@ export function SettingsClient({ userId, email, profile }: Props) {
   const [portal, setPortal] = useState(false);
 
   const [fullName, setFullName] = useState(profile.full_name ?? "");
+  const [gender, setGender] = useState(profile.gender ?? "");
   const [commStyle, setCommStyle] = useState(profile.comm_style ?? "balanced");
   const [dietaryPref, setDietaryPref] = useState(profile.dietary_prefs?.[0] ?? "none");
   const [favProteins, setFavProteins] = useState<string[]>(profile.favorite_proteins ?? []);
@@ -95,6 +97,7 @@ export function SettingsClient({ userId, email, profile }: Props) {
       .from("profiles")
       .update({
         full_name: fullName || null,
+        gender: gender || null,
         comm_style: commStyle,
         dietary_prefs: prefs,
         favorite_proteins: favProteins.length > 0 ? favProteins : null,
@@ -186,6 +189,31 @@ export function SettingsClient({ userId, email, profile }: Props) {
                 onChange={(e) => setFullName(e.target.value)}
                 className="w-full px-3 py-2 border border-black/10 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-obsidian/20 bg-white"
               />
+            </div>
+
+            <div>
+              <label className="text-xs font-medium text-mgray block mb-2">Gender</label>
+              <div className="flex gap-2">
+                {[
+                  { value: "male", label: "Male" },
+                  { value: "female", label: "Female" },
+                  { value: "other", label: "Other" },
+                  { value: "prefer_not", label: "Prefer not to say" },
+                ].map((opt) => (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => setGender(opt.value)}
+                    className={`px-3 py-1.5 rounded-lg text-xs border transition-colors ${
+                      gender === opt.value
+                        ? "border-obsidian bg-obsidian text-white font-medium"
+                        : "border-black/5 bg-white text-mgray hover:border-black/10"
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
             </div>
 
             <div className="space-y-1.5">
