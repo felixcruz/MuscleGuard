@@ -507,90 +507,99 @@ export default function OnboardingPage() {
                 Tell us about your exercise habits so we can build your training protocol.
               </p>
 
-              <label className="text-xs font-medium text-obsidian block mb-2">
-                What types of exercise do you do?{" "}
-                <span className="text-mgray font-normal">(select all that apply)</span>
-              </label>
-              <div className="flex flex-wrap gap-2 mb-5">
-                {ACTIVITY_OPTIONS.map((opt) => {
-                  const selected = form.activity_types.includes(opt.value);
-                  return (
+              {/* Section: Exercise types */}
+              <div className="bg-surface rounded-[10px] p-4 mb-4">
+                <label className="text-xs font-medium text-obsidian block mb-2">
+                  What types of exercise do you do?{" "}
+                  <span className="text-mgray font-normal">(select all that apply)</span>
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  {ACTIVITY_OPTIONS.map((opt) => {
+                    const selected = form.activity_types.includes(opt.value);
+                    return (
+                      <button
+                        key={opt.value}
+                        type="button"
+                        onClick={() => toggleActivity(opt.value)}
+                        className={`px-3.5 py-2 rounded-full text-xs flex items-center gap-1.5 border transition-colors ${
+                          selected
+                            ? "border-obsidian bg-obsidian text-white font-medium"
+                            : "border-black/5 bg-white text-mgray hover:border-black/10"
+                        }`}
+                      >
+                        <span>{opt.emoji}</span>
+                        {opt.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Section: Primary activity */}
+              {form.activity_types.length >= 2 && (
+                <div className="bg-surface rounded-[10px] p-4 mb-4">
+                  <label className="text-xs font-medium text-obsidian block mb-2">Which is your primary activity?</label>
+                  <select
+                    value={form.primary_activity}
+                    onChange={(e) => set("primary_activity", e.target.value)}
+                    className="px-3 py-2.5 border border-black/10 rounded-lg text-base bg-white min-w-[200px] focus:outline-none focus:ring-2 focus:ring-obsidian/20"
+                  >
+                    <option value="">Select primary activity…</option>
+                    {form.activity_types.map((act) => {
+                      const opt = ACTIVITY_OPTIONS.find((o) => o.value === act);
+                      return opt ? (
+                        <option key={act} value={act}>{opt.emoji} {opt.label}</option>
+                      ) : null;
+                    })}
+                  </select>
+                </div>
+              )}
+
+              {/* Section: Frequency */}
+              <div className="bg-surface rounded-[10px] p-4 mb-4">
+                <label className="text-xs font-medium text-obsidian block mb-2">How often do you exercise?</label>
+                <div className="flex flex-wrap gap-2">
+                  {[
+                    { value: "1_2x", label: "1-2x/week" },
+                    { value: "3_4x", label: "3-4x/week" },
+                    { value: "5x_plus", label: "5+x/week" },
+                  ].map((opt) => (
                     <button
                       key={opt.value}
                       type="button"
-                      onClick={() => toggleActivity(opt.value)}
-                      className={`px-3.5 py-2 rounded-full text-xs flex items-center gap-1.5 border transition-colors ${
-                        selected
-                          ? "border-obsidian bg-obsidian text-white font-medium"
-                          : "border-black/5 bg-white text-mgray hover:border-black/10"
-                      }`}
+                      onClick={() => set("activity_frequency", opt.value)}
+                      className={pillClass(form.activity_frequency === opt.value)}
                     >
-                      <span>{opt.emoji}</span>
                       {opt.label}
                     </button>
-                  );
-                })}
+                  ))}
+                </div>
               </div>
 
-              {form.activity_types.length >= 2 && (
-                <>
-                  <label className="text-xs font-medium text-obsidian block mb-2">Which is your primary activity?</label>
-                  <div className="mb-5">
-                    <select
-                      value={form.primary_activity}
-                      onChange={(e) => set("primary_activity", e.target.value)}
-                      className="px-3 py-2.5 border border-black/10 rounded-lg text-sm bg-white min-w-[200px] focus:outline-none focus:ring-2 focus:ring-obsidian/20"
+              {/* Section: Experience */}
+              <div className="bg-surface rounded-[10px] p-4 mb-4">
+                <label className="text-xs font-medium text-obsidian block mb-2">Experience level</label>
+                <div className="flex flex-wrap gap-2">
+                  {[
+                    { value: "beginner", label: "Beginner" },
+                    { value: "intermediate", label: "Intermediate" },
+                    { value: "advanced", label: "Advanced" },
+                  ].map((opt) => (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      onClick={() => set("experience_level", opt.value)}
+                      className={pillClass(form.experience_level === opt.value)}
                     >
-                      <option value="">Select primary activity…</option>
-                      {form.activity_types.map((act) => {
-                        const opt = ACTIVITY_OPTIONS.find((o) => o.value === act);
-                        return opt ? (
-                          <option key={act} value={act}>{opt.emoji} {opt.label}</option>
-                        ) : null;
-                      })}
-                    </select>
-                  </div>
-                </>
-              )}
-
-              <label className="text-xs font-medium text-obsidian block mb-2">How often do you exercise?</label>
-              <div className="flex flex-wrap gap-2 mb-5">
-                {[
-                  { value: "1_2x", label: "1-2x/week" },
-                  { value: "3_4x", label: "3-4x/week" },
-                  { value: "5x_plus", label: "5+x/week" },
-                ].map((opt) => (
-                  <button
-                    key={opt.value}
-                    type="button"
-                    onClick={() => set("activity_frequency", opt.value)}
-                    className={pillClass(form.activity_frequency === opt.value)}
-                  >
-                    {opt.label}
-                  </button>
-                ))}
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
               </div>
 
-              <label className="text-xs font-medium text-obsidian block mb-2">Experience level</label>
-              <div className="flex flex-wrap gap-2 mb-5">
-                {[
-                  { value: "beginner", label: "Beginner" },
-                  { value: "intermediate", label: "Intermediate" },
-                  { value: "advanced", label: "Advanced" },
-                ].map((opt) => (
-                  <button
-                    key={opt.value}
-                    type="button"
-                    onClick={() => set("experience_level", opt.value)}
-                    className={pillClass(form.experience_level === opt.value)}
-                  >
-                    {opt.label}
-                  </button>
-                ))}
-              </div>
-
+              {/* Section: Equipment */}
               {form.activity_types.includes("strength") && (
-                <>
+                <div className="bg-surface rounded-[10px] p-4">
                   <label className="text-xs font-medium text-obsidian block mb-2">Equipment available</label>
                   <div className="space-y-2">
                     {[
@@ -616,7 +625,7 @@ export default function OnboardingPage() {
                       );
                     })}
                   </div>
-                </>
+                </div>
               )}
             </div>
           )}
