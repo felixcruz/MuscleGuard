@@ -8,49 +8,150 @@ import { TodayFoodLog } from "@/components/dashboard/TodayFoodLog";
 import { Flame, Trophy, Zap, X, ChevronDown, ChevronRight, AlertTriangle, Search, Plus, Sunrise, Sun, Moon, Cookie } from "lucide-react";
 import { getDynamicMsg, getSevereAppetiteAlert, type CommStyle } from "@/lib/comm-style";
 
-// ── Meal presets ──
+// ── Meal slot logic ──
 const MEAL_ICONS = { breakfast: Sunrise, lunch: Sun, dinner: Moon, snack: Cookie } as const;
+const MEAL_LABELS = { breakfast: "Breakfast", lunch: "Lunch", dinner: "Dinner", snack: "Snack" } as const;
+type MealType = "breakfast" | "lunch" | "dinner" | "snack";
 
-const MEAL_PRESETS = {
-  breakfast: {
-    label: "Breakfast",
-    items: [
-      { name: "Greek yogurt (150g)", protein_g: 18, calories: 120, portion_g: 150 },
-      { name: "Scrambled eggs (2)", protein_g: 13, calories: 180, portion_g: 120 },
-      { name: "Cottage cheese (200g)", protein_g: 22, calories: 180, portion_g: 200 },
-      { name: "Protein shake", protein_g: 30, calories: 180, portion_g: 350 },
-    ],
-  },
-  lunch: {
-    label: "Lunch",
-    items: [
-      { name: "Chicken breast (150g)", protein_g: 45, calories: 248, portion_g: 150 },
-      { name: "Canned tuna (140g)", protein_g: 30, calories: 110, portion_g: 140 },
-      { name: "Ground turkey (150g)", protein_g: 35, calories: 200, portion_g: 150 },
-      { name: "Salmon fillet (150g)", protein_g: 39, calories: 312, portion_g: 150 },
-    ],
-  },
-  dinner: {
-    label: "Dinner",
-    items: [
-      { name: "Chicken breast (200g)", protein_g: 60, calories: 330, portion_g: 200 },
-      { name: "Lean beef (150g)", protein_g: 38, calories: 270, portion_g: 150 },
-      { name: "Salmon (180g)", protein_g: 47, calories: 374, portion_g: 180 },
-      { name: "Shrimp (200g)", protein_g: 38, calories: 200, portion_g: 200 },
-    ],
-  },
-  snack: {
-    label: "Snack",
-    items: [
-      { name: "Protein bar", protein_g: 20, calories: 200, portion_g: 60 },
-      { name: "Greek yogurt (100g)", protein_g: 10, calories: 80, portion_g: 100 },
-      { name: "Hard-boiled eggs (2)", protein_g: 13, calories: 140, portion_g: 100 },
-      { name: "Edamame (150g)", protein_g: 18, calories: 190, portion_g: 150 },
-    ],
-  },
-} as const;
+interface QuickFood {
+  name: string;
+  protein_g: number;
+  calories: number;
+  portion_g: number;
+}
 
-type MealType = keyof typeof MEAL_PRESETS;
+// Default foods for new users (filtered by dietary prefs at runtime)
+const DEFAULT_FOODS: Record<MealType, QuickFood[]> = {
+  breakfast: [
+    { name: "Greek yogurt (150g)", protein_g: 18, calories: 120, portion_g: 150 },
+    { name: "Scrambled eggs (2)", protein_g: 13, calories: 180, portion_g: 120 },
+    { name: "Cottage cheese (200g)", protein_g: 22, calories: 180, portion_g: 200 },
+    { name: "Protein shake", protein_g: 30, calories: 180, portion_g: 350 },
+  ],
+  lunch: [
+    { name: "Chicken breast (150g)", protein_g: 45, calories: 248, portion_g: 150 },
+    { name: "Canned tuna (140g)", protein_g: 30, calories: 110, portion_g: 140 },
+    { name: "Ground turkey (150g)", protein_g: 35, calories: 200, portion_g: 150 },
+    { name: "Salmon fillet (150g)", protein_g: 39, calories: 312, portion_g: 150 },
+  ],
+  dinner: [
+    { name: "Chicken breast (200g)", protein_g: 60, calories: 330, portion_g: 200 },
+    { name: "Lean beef (150g)", protein_g: 38, calories: 270, portion_g: 150 },
+    { name: "Salmon (180g)", protein_g: 47, calories: 374, portion_g: 180 },
+    { name: "Shrimp (200g)", protein_g: 38, calories: 200, portion_g: 200 },
+  ],
+  snack: [
+    { name: "Protein bar", protein_g: 20, calories: 200, portion_g: 60 },
+    { name: "Greek yogurt (100g)", protein_g: 10, calories: 80, portion_g: 100 },
+    { name: "Hard-boiled eggs (2)", protein_g: 13, calories: 140, portion_g: 100 },
+    { name: "Edamame (150g)", protein_g: 18, calories: 190, portion_g: 150 },
+  ],
+};
+
+// Non-vegetarian keywords for filtering
+const MEAT_KEYWORDS = ["chicken", "beef", "turkey", "tuna", "salmon", "shrimp", "pork", "steak", "lamb"];
+
+function getMealSlot(loggedAt: string): MealType {
+  const hour = new Date(loggedAt).getHours();
+  if (hour < 11) return "breakfast";
+  if (hour < 15) return "lunch";
+  if (hour < 17) return "snack";
+  return "dinner";
+}
+
+interface RecentFoodLog {
+  food_name: string;
+  protein_g: number;
+  calories: number | null;
+  portion_g: number | null;
+  logged_at: string | null;
+}
+
+function buildSmartPresets(
+  recentFoods: RecentFoodLog[],
+  dietaryPrefs: string[],
+): Record<MealType, QuickFood[]> {
+  const isVegetarian = dietaryPrefs.some(p =>
+    p.toLowerCase().includes("vegetarian") || p.toLowerCase().includes("vegan")
+  );
+
+  // Count frequency per food per slot
+  const slotCounts: Record<MealType, Record<string, { count: number; food: QuickFood }>> = {
+    breakfast: {}, lunch: {}, dinner: {}, snack: {},
+  };
+
+  for (const log of recentFoods) {
+    if (!log.logged_at) continue;
+    const slot = getMealSlot(log.logged_at);
+    const key = log.food_name.toLowerCase();
+    if (!slotCounts[slot][key]) {
+      slotCounts[slot][key] = {
+        count: 0,
+        food: {
+          name: log.food_name,
+          protein_g: Math.round(Number(log.protein_g)),
+          calories: Math.round(Number(log.calories ?? 0)),
+          portion_g: Math.round(Number(log.portion_g ?? 100)),
+        },
+      };
+    }
+    slotCounts[slot][key].count++;
+  }
+
+  const result: Record<MealType, QuickFood[]> = { breakfast: [], lunch: [], dinner: [], snack: [] };
+
+  for (const slot of ["breakfast", "lunch", "dinner", "snack"] as MealType[]) {
+    // Sort by frequency
+    const sorted = Object.values(slotCounts[slot])
+      .sort((a, b) => b.count - a.count)
+      .map(s => s.food);
+
+    if (sorted.length >= 2) {
+      // User has enough history for this slot
+      result[slot] = sorted.slice(0, 4);
+    } else {
+      // Fill with defaults (filtered by dietary prefs)
+      let defaults = [...DEFAULT_FOODS[slot]];
+      if (isVegetarian) {
+        defaults = defaults.filter(f =>
+          !MEAT_KEYWORDS.some(k => f.name.toLowerCase().includes(k))
+        );
+      }
+      // Prepend any recents the user has
+      const combined = [...sorted, ...defaults.filter(d => !sorted.some(s => s.name === d.name))];
+      result[slot] = combined.slice(0, 4);
+    }
+  }
+
+  return result;
+}
+
+function getQuickAddFood(recentFoods: RecentFoodLog[]): QuickFood {
+  // Find the user's #1 most logged food overall
+  const counts: Record<string, { count: number; food: QuickFood }> = {};
+  for (const log of recentFoods) {
+    const key = log.food_name.toLowerCase();
+    if (!counts[key]) {
+      counts[key] = {
+        count: 0,
+        food: {
+          name: log.food_name,
+          protein_g: Math.round(Number(log.protein_g)),
+          calories: Math.round(Number(log.calories ?? 0)),
+          portion_g: Math.round(Number(log.portion_g ?? 100)),
+        },
+      };
+    }
+    counts[key].count++;
+  }
+
+  const sorted = Object.values(counts).sort((a, b) => b.count - a.count);
+  if (sorted.length > 0 && sorted[0].count >= 3) {
+    return sorted[0].food;
+  }
+  // Default for new users
+  return { name: "Protein shake", protein_g: 30, calories: 120, portion_g: 40 };
+}
 
 // ── Confetti ──
 const CONFETTI_COLORS = ["#CDFF00","#131413","#BFC1C0","#FFB4AB","#CDFF00","#585A59","#CDFF00"];
@@ -124,6 +225,8 @@ interface Props {
   trainingIntensityPct: number;
   appetiteLevel: string;
   commStyle: string;
+  recentFoods: RecentFoodLog[];
+  dietaryPrefs: string[];
 }
 
 function formatTime(ts: string) {
@@ -147,6 +250,7 @@ export function DashboardClient({
   proteinStreakDays, workoutStreakDays, totalPoints,
   goalAlreadyHitToday, proteinGoalExplanation, proteinBreakdown,
   trainingIntensityPct, appetiteLevel, commStyle,
+  recentFoods, dietaryPrefs,
 }: Props) {
   const supabase = createClient();
 
@@ -156,6 +260,9 @@ export function DashboardClient({
   const [showConfetti, setShowConfetti] = useState(false);
   const goalHitRef = useRef(goalAlreadyHitToday);
   const confettiTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const smartPresets = buildSmartPresets(recentFoods, dietaryPrefs);
+  const quickAddFood = getQuickAddFood(recentFoods);
 
   const [activePreset, setActivePreset] = useState<MealType | null>(null);
   const [loggingPreset, setLoggingPreset] = useState<string | null>(null);
@@ -217,14 +324,14 @@ export function DashboardClient({
     setActivePreset(null);
   }
 
-  async function quickAdd30g() {
+  async function handleQuickAdd() {
     setQuickAdding(true);
     await supabase.from("food_logs").insert({
       user_id: userId,
-      food_name: "Protein supplement (30g)",
-      protein_g: 30,
-      calories: 120,
-      portion_g: 40,
+      food_name: quickAddFood.name,
+      protein_g: quickAddFood.protein_g,
+      calories: quickAddFood.calories,
+      portion_g: quickAddFood.portion_g,
     });
     await refreshLogs();
     setQuickAdding(false);
@@ -350,23 +457,26 @@ export function DashboardClient({
         <div className="flex items-center gap-2">
           {/* Meal preset buttons */}
           <div className="flex-1 grid grid-cols-4 gap-2">
-            {(Object.keys(MEAL_PRESETS) as MealType[]).map((key) => {
-              const preset = MEAL_PRESETS[key];
+            {(["breakfast", "lunch", "dinner", "snack"] as MealType[]).map((key) => {
               const Icon = MEAL_ICONS[key];
               const isActive = activePreset === key;
+              const hasRecents = recentFoods.length > 0 && smartPresets[key].some(f => !DEFAULT_FOODS[key].some(d => d.name === f.name));
               return (
                 <button
                   key={key}
                   type="button"
                   onClick={() => setActivePreset(isActive ? null : key)}
-                  className={`flex flex-col items-center gap-1 py-2.5 px-1 rounded-[10px] border text-xs font-medium transition-colors ${
+                  className={`flex flex-col items-center gap-1 py-2.5 px-1 rounded-[10px] border text-xs font-medium transition-colors relative ${
                     isActive
                       ? "border-obsidian bg-obsidian text-white"
                       : "border-black/5 bg-white text-mgray hover:border-black/10"
                   }`}
                 >
                   <Icon className="h-5 w-5" />
-                  {preset.label}
+                  {MEAL_LABELS[key]}
+                  {hasRecents && (
+                    <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-[#CDFF00]" />
+                  )}
                 </button>
               );
             })}
@@ -379,14 +489,14 @@ export function DashboardClient({
             <div className="flex items-center justify-between px-4 py-2.5 border-b border-black/5 bg-surface">
               <span className="text-sm font-semibold text-obsidian flex items-center gap-1.5">
                 {(() => { const Icon = MEAL_ICONS[activePreset]; return <Icon className="h-4 w-4" />; })()}
-                {MEAL_PRESETS[activePreset].label}
+                {MEAL_LABELS[activePreset]}
               </span>
               <button onClick={() => setActivePreset(null)} className="text-muted hover:text-obsidian transition-colors">
                 <X className="h-4 w-4" />
               </button>
             </div>
             <div className="divide-y divide-black/5">
-              {MEAL_PRESETS[activePreset].items.map((item) => (
+              {smartPresets[activePreset].map((item) => (
                 <button
                   key={item.name}
                   type="button"
@@ -396,7 +506,7 @@ export function DashboardClient({
                 >
                   <div>
                     <p className="text-sm font-medium text-obsidian">{item.name}</p>
-                    <p className="text-xs text-muted">{item.calories} kcal</p>
+                    <p className="text-xs text-mgray">{item.calories} kcal · {item.portion_g}g</p>
                   </div>
                   <span className={`text-sm font-semibold ml-3 flex-shrink-0 ${
                     loggingPreset === item.name ? "text-muted" : "text-green-600"
@@ -409,15 +519,15 @@ export function DashboardClient({
           </div>
         )}
 
-        {/* Quick add 30g */}
+        {/* Quick add (personalized) */}
         <button
           type="button"
-          onClick={quickAdd30g}
+          onClick={handleQuickAdd}
           disabled={quickAdding}
           className="w-full flex items-center justify-center gap-2 py-2.5 rounded-[10px] bg-obsidian text-white text-sm font-medium transition-colors hover:bg-obsidian-light disabled:opacity-60"
         >
           <Zap className="h-4 w-4" />
-          {quickAdding ? "Adding…" : "Quick add 30g protein"}
+          {quickAdding ? "Adding…" : `Quick add ${quickAddFood.name} (+${quickAddFood.protein_g}g)`}
         </button>
       </div>
 

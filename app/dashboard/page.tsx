@@ -29,11 +29,16 @@ export default async function DashboardPage() {
   monday.setDate(todayDate.getDate() + toMonday);
   const weekStart = monday.toISOString().split("T")[0];
 
-  const [profileResult, logsResult, weekLogsResult] = await Promise.all([
+  // 30 days ago for recent foods
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+  const thirtyDaysAgoStr = thirtyDaysAgo.toISOString().split("T")[0];
+
+  const [profileResult, logsResult, weekLogsResult, recentFoodsResult] = await Promise.all([
     supabase
       .from("profiles")
       .select(
-        "protein_goal_g, weight_kg, protein_streak_days, protein_streak_last_date, workout_streak_days, total_points, primary_goal, glp1_dose_mg, glp1_medication, appetite_level, best_appetite_time, activity_types, primary_activity, comm_style"
+        "protein_goal_g, weight_kg, protein_streak_days, protein_streak_last_date, workout_streak_days, total_points, primary_goal, glp1_dose_mg, glp1_medication, appetite_level, best_appetite_time, activity_types, primary_activity, comm_style, dietary_prefs"
       )
       .eq("id", user.id)
       .single(),
@@ -50,6 +55,13 @@ export default async function DashboardPage() {
       .gte("log_date", weekStart)
       .lte("log_date", today)
       .order("logged_at", { ascending: true }),
+    supabase
+      .from("food_logs")
+      .select("food_name, protein_g, calories, portion_g, logged_at")
+      .eq("user_id", user.id)
+      .gte("log_date", thirtyDaysAgoStr)
+      .order("logged_at", { ascending: false })
+      .limit(200),
   ]);
 
   const profile = profileResult.data;
@@ -83,6 +95,8 @@ export default async function DashboardPage() {
       trainingIntensityPct={trainingIntensityPct}
       appetiteLevel={appetiteLevel}
       commStyle={profile?.comm_style ?? "balanced"}
+      recentFoods={recentFoodsResult.data ?? []}
+      dietaryPrefs={profile?.dietary_prefs ?? []}
     />
   );
 }
