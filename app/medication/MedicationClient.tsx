@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Pill, Check, ChevronDown, ChevronRight } from "lucide-react";
 import { SEMAGLUTIDE_DOSES, TIRZEPATIDE_DOSES } from "@/lib/personalization";
 
 interface MedLog {
@@ -47,15 +48,6 @@ const CHANGE_TYPES = [
   { value: "pause", label: "Pause medication" },
 ];
 
-const CHANGE_TYPE_COLORS: Record<string, string> = {
-  start: "#2196f3",
-  increase: "#4caf50",
-  decrease: "#ff9800",
-  switch: "#9c27b0",
-  pause: "#f44336",
-  dose_taken: "#9e9e9e",
-};
-
 function formatDate(dateStr: string) {
   return new Date(dateStr + "T12:00:00Z").toLocaleDateString("en-US", {
     month: "short",
@@ -93,37 +85,13 @@ export function MedicationClient({
     proteinGoal: number;
     intensityPct: number;
   } | null>(null);
+  const [historyExpanded, setHistoryExpanded] = useState(true);
 
-  // Dose change form state
   const [newDose, setNewDose] = useState("");
   const [changeType, setChangeType] = useState("increase");
   const [formAppetite, setFormAppetite] = useState("moderate");
   const [energyLevel, setEnergyLevel] = useState("moderate");
   const [notes, setNotes] = useState("");
-
-  const statusBadgeStyle = {
-    display: "inline-block",
-    padding: "3px 10px",
-    borderRadius: 99,
-    fontSize: 12,
-    fontWeight: 700,
-    background:
-      statusColorClass === "green"  ? "#f1f8f1" :
-      statusColorClass === "amber"  ? "#fffbeb" :
-      statusColorClass === "orange" ? "#fff7ed" :
-      "#fff0f0",
-    color:
-      statusColorClass === "green"  ? "#2e7d32" :
-      statusColorClass === "amber"  ? "#92400e" :
-      statusColorClass === "orange" ? "#c2410c" :
-      "#b91c1c",
-    border: `1px solid ${
-      statusColorClass === "green"  ? "#bbf7d0" :
-      statusColorClass === "amber"  ? "#fde68a" :
-      statusColorClass === "orange" ? "#fed7aa" :
-      "#fecaca"
-    }`,
-  };
 
   function getDosesForMed() {
     if (medication === "semaglutide") return SEMAGLUTIDE_DOSES;
@@ -138,7 +106,6 @@ export function MedicationClient({
       const data = await res.json();
       if (data.ok) {
         setLogTakenSuccess(true);
-        // Add a new log entry at the top
         setLogs((prev) => [
           {
             id: String(Date.now()),
@@ -211,196 +178,105 @@ export function MedicationClient({
     }
   }
 
-  return (
-    <div
-      style={{
-        maxWidth: 540,
-        margin: "0 auto",
-        padding: "32px 16px 48px",
-        fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-      }}
-    >
-      {/* Header */}
-      <h1
-        style={{
-          fontSize: 24,
-          fontWeight: 700,
-          color: "#1a1a1a",
-          marginBottom: 20,
-        }}
-      >
-        Medication
-      </h1>
+  const frequencyLabel =
+    frequency === "weekly"
+      ? `Every week${injectionDay ? `, ${injectionDay}` : ""}`
+      : frequency === "biweekly"
+      ? "Every 2 weeks"
+      : "Monthly";
 
-      {/* ── Status Card ── */}
-      <div
-        style={{
-          background: "#fff",
-          border: "1px solid rgba(0,0,0,0.05)",
-          borderRadius: 10,
-          padding: "20px 20px",
-          marginBottom: 16,
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            alignItems: "flex-start",
-            justifyContent: "space-between",
-            marginBottom: 12,
-          }}
-        >
-          <div>
-            <p
-              style={{ fontSize: 20, fontWeight: 700, color: "#1a1a1a", margin: 0 }}
-            >
+  const statusBg =
+    statusColorClass === "green" ? "bg-[#CDFF00]" :
+    statusColorClass === "amber" ? "bg-[#FFB4AB]" :
+    "bg-[#FFB4AB]";
+  const statusTextColor = "text-obsidian";
+
+  return (
+    <div className="max-w-3xl mx-auto px-4 py-6 space-y-5">
+
+      {/* ── Hero Card (dark) ── */}
+      <div className="bg-obsidian rounded-[14px] p-6">
+        <div className="sm:flex sm:items-start sm:justify-between sm:gap-6">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <Pill className="h-5 w-5 text-[#CDFF00]" />
+              <h1 className="text-2xl font-bold text-white">Medication</h1>
+            </div>
+            <p className="text-xl font-medium text-white mt-2">
               {doseMg}mg {getMedLabel(medication)}
             </p>
-            <p style={{ fontSize: 13, color: "#666", margin: "4px 0 0" }}>
-              {frequency === "weekly"
-                ? `Every week${injectionDay ? ` on ${injectionDay}` : ""}`
-                : frequency === "biweekly"
-                ? "Every 2 weeks"
-                : "Monthly"}
-            </p>
+            <p className="text-sm text-white/50">{frequencyLabel}</p>
           </div>
-          <span style={statusBadgeStyle}>{status === "on_schedule" ? "On schedule" : statusLabel}</span>
+
+          <div className="mt-4 sm:mt-0 flex flex-col items-start sm:items-end gap-2">
+            <span className={`px-3 py-1 rounded-full text-xs font-semibold ${statusBg} ${statusTextColor}`}>
+              {status === "on_schedule" ? "On schedule" : statusLabel}
+            </span>
+            {nextDueDate && (
+              <p className="text-xs text-white/50">
+                Next dose: {formatDate(nextDueDate)}
+              </p>
+            )}
+          </div>
         </div>
 
-        {nextDueDate && (
-          <p style={{ fontSize: 13, color: "#444", marginBottom: 16 }}>
-            <span style={{ fontWeight: 600 }}>Next dose:</span>{" "}
-            {formatDate(nextDueDate)} —{" "}
-            <span
-              style={{
-                color:
-                  statusColorClass === "green"
-                    ? "#2e7d32"
-                    : statusColorClass === "amber"
-                    ? "#92400e"
-                    : "#c2410c",
-                fontWeight: 600,
-              }}
-            >
-              {statusLabel}
-            </span>
-          </p>
-        )}
-
         {/* Action buttons */}
-        <div style={{ display: "flex", gap: 10 }}>
+        <div className="flex gap-3 mt-5 pt-4 border-t border-white/5">
           <button
             type="button"
             onClick={handleLogTaken}
             disabled={logTakenLoading || logTakenSuccess}
-            style={{
-              flex: 1,
-              padding: "10px 12px",
-              borderRadius: 8,
-              fontSize: 13,
-              fontWeight: 600,
-              border: "none",
-              background: logTakenSuccess ? "#4caf50" : "#131413",
-              color: "#fff",
-              cursor: logTakenLoading || logTakenSuccess ? "default" : "pointer",
-            }}
+            className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+              logTakenSuccess
+                ? "bg-[#CDFF00] text-obsidian"
+                : "bg-white text-obsidian hover:bg-white/90"
+            } disabled:opacity-70`}
           >
             {logTakenSuccess ? "✓ Logged!" : logTakenLoading ? "Logging…" : "✓ Log dose taken today"}
           </button>
           <button
             type="button"
             onClick={() => setShowDoseForm(!showDoseForm)}
-            style={{
-              flex: 1,
-              padding: "10px 12px",
-              borderRadius: 8,
-              fontSize: 13,
-              fontWeight: 600,
-              border: "1px solid rgba(0,0,0,0.05)",
-              background: "#fff",
-              color: "#131413",
-              cursor: "pointer",
-            }}
+            className="flex-1 py-2.5 rounded-lg text-sm font-medium border border-white/20 text-white hover:bg-white/10 transition-colors"
           >
-            ↑ Log dose change
+            Log dose change
           </button>
         </div>
       </div>
 
-      {/* ── Dose change form (inline) ── */}
+      {/* ── Dose change form ── */}
       {showDoseForm && (
-        <div
-          style={{
-            background: "#fff",
-            border: "1px solid rgba(0,0,0,0.05)",
-            borderRadius: 10,
-            padding: "20px",
-            marginBottom: 16,
-          }}
-        >
-          <h3
-            style={{
-              fontSize: 15,
-              fontWeight: 700,
-              color: "#1a1a1a",
-              marginBottom: 16,
-            }}
-          >
-            Log dose change
-          </h3>
+        <div className="bg-white border border-black/5 rounded-[10px] p-5">
+          <h3 className="text-sm font-medium text-obsidian mb-4">Log dose change</h3>
 
           {doseFormSuccess ? (
-            <div
-              style={{
-                background: "#f1f8f1",
-                border: "1px solid #c8e6c9",
-                borderRadius: 8,
-                padding: "12px 16px",
-              }}
-            >
-              <p style={{ fontSize: 14, fontWeight: 600, color: "#2e7d32", margin: 0 }}>
-                ✓ Plan updated!
-              </p>
-              <p style={{ fontSize: 13, color: "#444", margin: "6px 0 0" }}>
-                New protein target: <strong>{doseFormSuccess.proteinGoal}g/day</strong>
-                {" · "}Training intensity: <strong>{doseFormSuccess.intensityPct}%</strong>
+            <div className="bg-obsidian rounded-lg p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-5 h-5 rounded-full bg-[#CDFF00] flex items-center justify-center">
+                  <Check className="h-3 w-3 text-obsidian" />
+                </div>
+                <span className="text-sm font-medium text-white">Plan updated!</span>
+              </div>
+              <p className="text-xs text-white/60">
+                New protein target: <span className="text-white font-medium">{doseFormSuccess.proteinGoal}g/day</span>
+                {" · "}Training intensity: <span className="text-white font-medium">{doseFormSuccess.intensityPct}%</span>
               </p>
             </div>
           ) : (
-            <form onSubmit={handleDoseChange} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+            <form onSubmit={handleDoseChange} className="space-y-4">
               {/* New dose */}
               <div>
-                <label
-                  style={{
-                    fontSize: 12,
-                    fontWeight: 600,
-                    color: "#666",
-                    display: "block",
-                    marginBottom: 6,
-                  }}
-                >
-                  New dose
-                </label>
+                <label className="text-xs font-medium text-mgray block mb-1.5">New dose</label>
                 {getDosesForMed().length > 0 ? (
                   <select
                     value={newDose}
                     onChange={(e) => setNewDose(e.target.value)}
                     required
-                    style={{
-                      padding: "9px 12px",
-                      borderRadius: 8,
-                      border: "1px solid rgba(0,0,0,0.1)",
-                      fontSize: 14,
-                      color: newDose ? "#1a1a1a" : "#999",
-                      background: "#fff",
-                      minWidth: 140,
-                    }}
+                    className="px-3 py-2 border border-black/10 rounded-lg text-sm bg-white min-w-[140px] focus:outline-none focus:ring-2 focus:ring-obsidian/20"
                   >
                     <option value="">Select dose…</option>
                     {getDosesForMed().map((d) => (
-                      <option key={d} value={String(d)}>
-                        {d} mg
-                      </option>
+                      <option key={d} value={String(d)}>{d} mg</option>
                     ))}
                   </select>
                 ) : (
@@ -410,50 +286,25 @@ export function MedicationClient({
                     value={newDose}
                     onChange={(e) => setNewDose(e.target.value)}
                     required
-                    style={{
-                      padding: "9px 12px",
-                      borderRadius: 8,
-                      border: "1px solid rgba(0,0,0,0.1)",
-                      fontSize: 14,
-                      width: 100,
-                    }}
+                    className="w-24 px-3 py-2 border border-black/10 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-obsidian/20"
                   />
                 )}
               </div>
 
               {/* Change type */}
               <div>
-                <label
-                  style={{
-                    fontSize: 12,
-                    fontWeight: 600,
-                    color: "#666",
-                    display: "block",
-                    marginBottom: 6,
-                  }}
-                >
-                  Type of change
-                </label>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                <label className="text-xs font-medium text-mgray block mb-1.5">Type of change</label>
+                <div className="flex flex-wrap gap-2">
                   {CHANGE_TYPES.map((ct) => (
                     <button
                       key={ct.value}
                       type="button"
                       onClick={() => setChangeType(ct.value)}
-                      style={{
-                        padding: "7px 12px",
-                        borderRadius: 8,
-                        fontSize: 13,
-                        border:
-                          changeType === ct.value
-                            ? "2px solid #131413"
-                            : "1px solid rgba(0,0,0,0.1)",
-                        background:
-                          changeType === ct.value ? "#f7f7f7" : "#fff",
-                        color: "#1a1a1a",
-                        cursor: "pointer",
-                        fontWeight: changeType === ct.value ? 600 : 400,
-                      }}
+                      className={`px-3 py-1.5 rounded-lg text-xs border transition-colors ${
+                        changeType === ct.value
+                          ? "border-obsidian bg-surface text-obsidian font-medium"
+                          : "border-black/5 bg-white text-mgray hover:border-black/10"
+                      }`}
                     >
                       {ct.label}
                     </button>
@@ -463,37 +314,18 @@ export function MedicationClient({
 
               {/* Appetite */}
               <div>
-                <label
-                  style={{
-                    fontSize: 12,
-                    fontWeight: 600,
-                    color: "#666",
-                    display: "block",
-                    marginBottom: 6,
-                  }}
-                >
-                  Current appetite
-                </label>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                <label className="text-xs font-medium text-mgray block mb-1.5">Current appetite</label>
+                <div className="flex flex-wrap gap-2">
                   {APPETITE_OPTIONS.map((ao) => (
                     <button
                       key={ao.value}
                       type="button"
                       onClick={() => setFormAppetite(ao.value)}
-                      style={{
-                        padding: "7px 12px",
-                        borderRadius: 8,
-                        fontSize: 12,
-                        border:
-                          formAppetite === ao.value
-                            ? "2px solid #131413"
-                            : "1px solid rgba(0,0,0,0.1)",
-                        background:
-                          formAppetite === ao.value ? "#f7f7f7" : "#fff",
-                        color: "#1a1a1a",
-                        cursor: "pointer",
-                        fontWeight: formAppetite === ao.value ? 600 : 400,
-                      }}
+                      className={`px-3 py-1.5 rounded-lg text-xs border transition-colors ${
+                        formAppetite === ao.value
+                          ? "border-obsidian bg-surface text-obsidian font-medium"
+                          : "border-black/5 bg-white text-mgray hover:border-black/10"
+                      }`}
                     >
                       {ao.label}
                     </button>
@@ -503,37 +335,18 @@ export function MedicationClient({
 
               {/* Energy */}
               <div>
-                <label
-                  style={{
-                    fontSize: 12,
-                    fontWeight: 600,
-                    color: "#666",
-                    display: "block",
-                    marginBottom: 6,
-                  }}
-                >
-                  Current energy level
-                </label>
-                <div style={{ display: "flex", gap: 6 }}>
+                <label className="text-xs font-medium text-mgray block mb-1.5">Current energy level</label>
+                <div className="flex gap-2">
                   {["low", "moderate", "high"].map((e) => (
                     <button
                       key={e}
                       type="button"
                       onClick={() => setEnergyLevel(e)}
-                      style={{
-                        padding: "7px 12px",
-                        borderRadius: 8,
-                        fontSize: 12,
-                        border:
-                          energyLevel === e
-                            ? "2px solid #131413"
-                            : "1px solid rgba(0,0,0,0.1)",
-                        background: energyLevel === e ? "#f7f7f7" : "#fff",
-                        color: "#1a1a1a",
-                        cursor: "pointer",
-                        fontWeight: energyLevel === e ? 600 : 400,
-                        textTransform: "capitalize",
-                      }}
+                      className={`px-3 py-1.5 rounded-lg text-xs border capitalize transition-colors ${
+                        energyLevel === e
+                          ? "border-obsidian bg-surface text-obsidian font-medium"
+                          : "border-black/5 bg-white text-mgray hover:border-black/10"
+                      }`}
                     >
                       {e}
                     </button>
@@ -543,49 +356,20 @@ export function MedicationClient({
 
               {/* Notes */}
               <div>
-                <label
-                  style={{
-                    fontSize: 12,
-                    fontWeight: 600,
-                    color: "#666",
-                    display: "block",
-                    marginBottom: 6,
-                  }}
-                >
-                  Notes (optional)
-                </label>
+                <label className="text-xs font-medium text-mgray block mb-1.5">Notes (optional)</label>
                 <textarea
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   placeholder="Any relevant notes…"
                   rows={2}
-                  style={{
-                    width: "100%",
-                    padding: "9px 12px",
-                    borderRadius: 8,
-                    border: "1px solid rgba(0,0,0,0.1)",
-                    fontSize: 13,
-                    resize: "vertical",
-                    boxSizing: "border-box",
-                  }}
+                  className="w-full px-3 py-2 border border-black/10 rounded-lg text-sm resize-vertical focus:outline-none focus:ring-2 focus:ring-obsidian/20"
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={doseFormLoading || !newDose}
-                style={{
-                  padding: "11px",
-                  borderRadius: 8,
-                  fontSize: 14,
-                  fontWeight: 600,
-                  border: "none",
-                  background:
-                    doseFormLoading || !newDose ? "#ccc" : "#131413",
-                  color: "#fff",
-                  cursor:
-                    doseFormLoading || !newDose ? "not-allowed" : "pointer",
-                }}
+                className="w-full py-2.5 bg-obsidian text-white text-sm font-medium rounded-lg hover:bg-obsidian-light transition-colors disabled:opacity-50"
               >
                 {doseFormLoading ? "Saving…" : "Save dose change"}
               </button>
@@ -595,173 +379,93 @@ export function MedicationClient({
       )}
 
       {/* ── Your Plan ── */}
-      <div
-        style={{
-          background: "#fff",
-          border: "1px solid rgba(0,0,0,0.1)",
-          borderRadius: 12,
-          padding: "16px 20px",
-          marginBottom: 16,
-        }}
-      >
-        <h3
-          style={{
-            fontSize: 14,
-            fontWeight: 700,
-            color: "#1a1a1a",
-            marginBottom: 12,
-          }}
-        >
-          Your current plan
-        </h3>
-        <div style={{ display: "flex", gap: 16 }}>
-          <div
-            style={{
-              flex: 1,
-              background: "#f9fafb",
-              borderRadius: 8,
-              padding: "12px",
-            }}
-          >
-            <p style={{ fontSize: 11, color: "#666", margin: 0, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em" }}>
-              Protein goal
-            </p>
-            <p style={{ fontSize: 22, fontWeight: 700, color: "#2e7d32", margin: "4px 0 2px" }}>
-              {currentProteinGoal}g
-            </p>
-            <p style={{ fontSize: 11, color: "#999", margin: 0 }}>per day</p>
-          </div>
-          <div
-            style={{
-              flex: 1,
-              background: "#f9fafb",
-              borderRadius: 8,
-              padding: "12px",
-            }}
-          >
-            <p style={{ fontSize: 11, color: "#666", margin: 0, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em" }}>
-              Training intensity
-            </p>
-            <p
-              style={{
-                fontSize: 22,
-                fontWeight: 700,
-                color:
-                  currentIntensityPct >= 95
-                    ? "#2e7d32"
-                    : currentIntensityPct >= 85
-                    ? "#1d4ed8"
-                    : currentIntensityPct >= 75
-                    ? "#92400e"
-                    : "#c2410c",
-                margin: "4px 0 2px",
-              }}
-            >
-              {currentIntensityPct}%
-            </p>
-            <p style={{ fontSize: 11, color: "#999", margin: 0 }}>
-              {currentIntensityPct >= 95
-                ? "Full intensity"
-                : currentIntensityPct >= 85
-                ? "Moderate"
-                : currentIntensityPct >= 75
-                ? "Reduced"
-                : "Light"}
-            </p>
-          </div>
+      <div className="grid grid-cols-2 gap-4">
+        <div className="bg-white border border-black/5 rounded-[10px] p-5 text-center">
+          <p className="text-[10px] font-medium text-muted uppercase tracking-widest mb-2">Protein goal</p>
+          <p className="text-3xl font-bold text-[#CDFF00]" style={{ textShadow: "0 0 20px rgba(205,255,0,0.15)" }}>
+            {currentProteinGoal}g
+          </p>
+          <p className="text-xs text-muted mt-1">per day</p>
+        </div>
+        <div className="bg-white border border-black/5 rounded-[10px] p-5 text-center">
+          <p className="text-[10px] font-medium text-muted uppercase tracking-widest mb-2">Training intensity</p>
+          <p className="text-3xl font-bold text-obsidian">
+            {currentIntensityPct}%
+          </p>
+          <p className="text-xs text-muted mt-1">
+            {currentIntensityPct >= 95
+              ? "Full intensity"
+              : currentIntensityPct >= 85
+              ? "Moderate"
+              : currentIntensityPct >= 75
+              ? "Reduced"
+              : "Light"}
+          </p>
         </div>
       </div>
 
       {/* ── Dose History ── */}
-      <div
-        style={{
-          background: "#fff",
-          border: "1px solid rgba(0,0,0,0.1)",
-          borderRadius: 12,
-          padding: "16px 20px",
-        }}
-      >
-        <h3
-          style={{
-            fontSize: 14,
-            fontWeight: 700,
-            color: "#1a1a1a",
-            marginBottom: 14,
-          }}
+      <div className="bg-white border border-black/5 rounded-[10px] overflow-hidden">
+        <button
+          type="button"
+          onClick={() => setHistoryExpanded(!historyExpanded)}
+          className="w-full flex items-center justify-between px-5 py-4 hover:bg-surface transition-colors"
         >
-          Dose history
-        </h3>
+          <span className="text-sm font-medium text-obsidian">Dose history</span>
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-muted">{logs.length} entries</span>
+            {historyExpanded
+              ? <ChevronDown className="h-4 w-4 text-muted" />
+              : <ChevronRight className="h-4 w-4 text-muted" />
+            }
+          </div>
+        </button>
 
-        {logs.length === 0 ? (
-          <p style={{ fontSize: 13, color: "#999", textAlign: "center", padding: "16px 0" }}>
-            No medication logs yet.
-          </p>
-        ) : (
-          <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
-            {logs.map((log, i) => (
-              <div
-                key={log.id}
-                style={{
-                  paddingTop: i > 0 ? 12 : 0,
-                  paddingBottom: i < logs.length - 1 ? 12 : 0,
-                  borderBottom: i < logs.length - 1 ? "1px solid rgba(0,0,0,0.05)" : "none",
-                  display: "flex",
-                  alignItems: "flex-start",
-                  gap: 12,
-                }}
-              >
-                {/* Timeline dot */}
-                <div
-                  style={{
-                    width: 10,
-                    height: 10,
-                    borderRadius: "50%",
-                    background: CHANGE_TYPE_COLORS[log.change_type] ?? "#9e9e9e",
-                    flexShrink: 0,
-                    marginTop: 4,
-                  }}
-                />
-                <div style={{ flex: 1 }}>
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 8,
-                      flexWrap: "wrap",
-                    }}
-                  >
-                    <span
-                      style={{
-                        fontSize: 12,
-                        fontWeight: 700,
-                        padding: "2px 8px",
-                        borderRadius: 99,
-                        background: `${CHANGE_TYPE_COLORS[log.change_type]}22`,
-                        color: CHANGE_TYPE_COLORS[log.change_type] ?? "#666",
-                      }}
-                    >
-                      {log.change_type.replace("_", " ")}
-                    </span>
-                    <span style={{ fontSize: 13, fontWeight: 600, color: "#1a1a1a" }}>
-                      {log.dose_mg}mg
-                    </span>
-                    <span style={{ fontSize: 12, color: "#999" }}>
-                      {formatDate(log.change_date)}
-                    </span>
+        {historyExpanded && (
+          <div className="border-t border-black/5">
+            {logs.length === 0 ? (
+              <p className="text-sm text-muted text-center py-8">
+                No medication logs yet.
+              </p>
+            ) : (
+              <div className="divide-y divide-black/5">
+                {logs.map((log) => (
+                  <div key={log.id} className="flex items-start gap-3 px-5 py-3">
+                    {/* Timeline dot */}
+                    <div className={`w-2.5 h-2.5 rounded-full mt-1.5 shrink-0 ${
+                      log.change_type === "dose_taken" ? "bg-muted" :
+                      log.change_type === "increase" ? "bg-[#CDFF00]" :
+                      log.change_type === "decrease" ? "bg-[#FFB4AB]" :
+                      log.change_type === "start" ? "bg-obsidian" :
+                      log.change_type === "switch" ? "bg-obsidian" :
+                      "bg-[#FFB4AB]"
+                    }`} />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className={`text-xs font-medium px-2 py-0.5 rounded capitalize ${
+                          log.change_type === "dose_taken" ? "bg-surface text-mgray" :
+                          log.change_type === "increase" ? "bg-[#CDFF00]/10 text-obsidian" :
+                          log.change_type === "decrease" ? "bg-[#FFB4AB]/10 text-obsidian" :
+                          "bg-surface text-obsidian"
+                        }`}>
+                          {log.change_type.replace("_", " ")}
+                        </span>
+                        <span className="text-sm font-medium text-obsidian">{log.dose_mg}mg</span>
+                        <span className="text-xs text-muted">{formatDate(log.change_date)}</span>
+                      </div>
+                      {log.appetite_level && (
+                        <p className="text-xs text-mgray mt-1">
+                          Appetite: {log.appetite_level.replace("_", " ")}
+                        </p>
+                      )}
+                      {log.notes && (
+                        <p className="text-xs text-muted mt-0.5 italic">{log.notes}</p>
+                      )}
+                    </div>
                   </div>
-                  {log.appetite_level && (
-                    <p style={{ fontSize: 12, color: "#666", margin: "3px 0 0" }}>
-                      Appetite: {log.appetite_level.replace("_", " ")}
-                    </p>
-                  )}
-                  {log.notes && (
-                    <p style={{ fontSize: 12, color: "#888", margin: "3px 0 0", fontStyle: "italic" }}>
-                      {log.notes}
-                    </p>
-                  )}
-                </div>
+                ))}
               </div>
-            ))}
+            )}
           </div>
         )}
       </div>
