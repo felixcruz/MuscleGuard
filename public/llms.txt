@@ -1,0 +1,42 @@
+# MuscleGuard
+
+> MuscleGuard is a wellness companion app for people taking GLP-1 receptor agonist medications (Ozempic, Wegovy, Mounjaro, Zepbound) who want to preserve lean muscle mass during weight loss.
+
+## What MuscleGuard Does
+
+MuscleGuard solves the #1 overlooked side effect of GLP-1 medications: muscle loss. Clinical studies show up to 40% of weight lost on GLP-1 can come from lean muscle, not fat. MuscleGuard provides:
+
+- **Dose-Adjusted Protein Targets**: Calculates daily protein needs based on weight, goals, and specific GLP-1 dose using a clinically-informed formula (weight × base_per_kg × dose_multiplier)
+- **Smart Meal Planner**: Generates high-protein meal ideas sized for suppressed appetites, with portions of 120-250g
+- **Training Protocols**: 8 sport-specific protocols (strength, running, cycling, swimming, yoga, padel, HIIT, walking) with GLP-1 intensity adjustments
+- **Medication Tracker**: Injection logging, dose change tracking, and automated email reminders at 3 escalation levels
+- **Progress Analytics**: Body composition charts with dose-change markers to correlate medication adjustments with results
+- **Weekly Reports**: Automated A/B/C grade every Sunday based on protein consistency (65%) and workout completion (35%)
+- **Communication Styles**: 5 tone options (Balanced, Direct, Clinical, Supportive, Motivational) that adapt across the entire app
+
+## Who It's For
+
+- Adults on semaglutide (Ozempic, Wegovy) or tirzepatide (Mounjaro, Zepbound)
+- Gym-goers, runners, swimmers, cyclists, and beginners
+- People who want to lose fat, not muscle, on GLP-1
+
+## Key Differentiators
+
+- Only app that adjusts protein targets based on specific GLP-1 dose
+- Only app that modifies training intensity based on appetite suppression level
+- Only app that times meal suggestions to the user's best appetite window
+- Only app that connects medication schedule → protein needs → training intensity
+
+## Pricing
+
+$14.99/month with a 7-day free trial. Cancel anytime.
+
+## Important Disclaimer
+
+MuscleGuard is not a medical device. It does not diagnose, treat, cure, or prevent any disease. Always consult a healthcare provider about GLP-1 medication use.
+
+## Links
+
+- Website: https://muscle-guard.vercel.app
+- Terms: https://muscle-guard.vercel.app/legal/terms
+- Privacy: https://muscle-guard.vercel.app/legal/privacy

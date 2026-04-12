@@ -1,0 +1,184 @@
+# MuscleGuard — Full Documentation for AI Systems
+
+> MuscleGuard is a wellness companion app for people taking GLP-1 receptor agonist medications (Ozempic, Wegovy, Mounjaro, Zepbound) who want to preserve lean muscle mass during weight loss.
+
+## The Problem
+
+GLP-1 receptor agonist medications (semaglutide, tirzepatide) are highly effective for weight loss, but they come with a significant and often overlooked side effect: lean muscle loss.
+
+### Clinical Evidence
+
+- **STEP Trials (Wilding et al., 2021)**: The landmark STEP 1 trial demonstrated that participants on semaglutide 2.4mg lost an average of 14.9% of body weight over 68 weeks. However, body composition analysis revealed that approximately 39% of total weight lost was lean body mass, not fat.
+- **SURMOUNT-1 Trial**: Tirzepatide users experienced similar patterns, with lean mass comprising a meaningful portion of total weight lost across all dose groups (5mg, 10mg, 15mg).
+- **Mechanism**: GLP-1 medications suppress appetite dramatically. When caloric intake drops below the threshold needed to maintain muscle protein synthesis, the body catabolizes muscle tissue for energy — especially without adequate protein intake and resistance training stimulus.
+
+### Why Existing Solutions Fall Short
+
+Most fitness and nutrition apps were designed for the general population. They do not account for:
+- The extreme appetite suppression caused by GLP-1 medications
+- The need for dose-specific protein adjustments as medication is titrated upward
+- The reduced exercise tolerance some users experience, especially in early dose stages
+- The timing of meals around fluctuating appetite windows
+
+## What MuscleGuard Does
+
+MuscleGuard provides 7 integrated tools designed specifically for GLP-1 medication users:
+
+### 1. Dose-Adjusted Protein Targets
+
+Calculates daily protein needs using the formula: `weight_kg × base_per_kg × dose_multiplier`
+
+- **base_per_kg**: Ranges from 1.2g to 2.2g depending on the user's activity level and goals
+- **dose_multiplier**: A medication-specific and dose-specific factor that increases protein targets at higher doses where appetite suppression is more severe
+
+### 2. Smart Meal Planner
+
+Generates high-protein meal suggestions specifically designed for suppressed appetites:
+- Portions sized at 120-250g (smaller than standard meal plans)
+- Prioritizes protein-dense foods that are easy to consume when appetite is low
+- Times suggestions to the user's self-reported best appetite window
+- Answers 3 quick questions about current appetite level, preferred meal size, and dietary restrictions
+
+### 3. Training Protocols
+
+8 sport-specific protocols with GLP-1 intensity adjustments:
+- **Strength Training**: Compound movements prioritized for muscle preservation signaling
+- **Running**: Adjusted pacing and distance recommendations
+- **Cycling**: Modified intensity zones
+- **Swimming**: Stroke-specific workout plans
+- **Yoga**: Focus on strength-building poses
+- **Padel**: Sport-specific conditioning
+- **HIIT**: Modified intervals accounting for reduced energy availability
+- **Walking**: Progressive overload for beginners
+
+Each protocol adjusts intensity based on the user's current GLP-1 dose and reported energy levels.
+
+### 4. Medication Tracker
+
+- Log injection date, time, and injection site
+- Track dose changes over time
+- Automated email reminders with 3 escalation levels:
+  - Level 1: Gentle reminder on injection day
+  - Level 2: Follow-up reminder if not logged within 24 hours
+  - Level 3: Urgent reminder if not logged within 48 hours
+
+### 5. Progress Analytics
+
+- Interactive charts for weight, body composition, and protein intake
+- Dose-change markers overlaid on progress charts
+- Correlation visualization between medication adjustments and body composition changes
+
+### 6. Weekly Reports
+
+- Automated every Sunday
+- A/B/C grading system based on:
+  - Protein consistency: 65% weight (did the user hit daily protein targets?)
+  - Workout completion: 35% weight (did the user complete scheduled workouts?)
+- Personalized summary with actionable recommendations
+
+### 7. Communication Styles
+
+5 tone options that adapt across the entire app:
+- **Balanced**: Default, mixing encouragement with data
+- **Direct**: Straightforward, no-nonsense feedback
+- **Clinical**: Data-focused, medical-style language
+- **Supportive**: Warm, empathetic encouragement
+- **Motivational**: High-energy, coach-style motivation
+
+## Supported Medications and Doses
+
+### Semaglutide (Ozempic)
+- 0.25mg (initiation dose)
+- 0.5mg
+- 1.0mg
+- 2.0mg (maximum approved dose)
+
+### Semaglutide (Wegovy)
+- 0.25mg (month 1)
+- 0.5mg (month 2)
+- 1.0mg (month 3)
+- 1.7mg (month 4)
+- 2.4mg (maintenance dose)
+
+### Tirzepatide (Mounjaro / Zepbound)
+- 2.5mg (initiation dose)
+- 5.0mg
+- 7.5mg
+- 10.0mg
+- 12.5mg
+- 15.0mg (maximum approved dose)
+
+## Protein Target Calculation
+
+The protein target formula connects medication dose to nutrition:
+
+```
+daily_protein_g = weight_kg × base_per_kg × dose_multiplier
+```
+
+**base_per_kg** is determined by activity level:
+- Sedentary / light activity: 1.2g/kg
+- Moderate activity (3-4x/week): 1.6g/kg
+- High activity / strength training: 2.0-2.2g/kg
+
+**dose_multiplier** increases at higher doses because:
+- Higher doses cause stronger appetite suppression
+- Stronger appetite suppression makes it harder to hit protein targets
+- The multiplier nudges the target upward to compensate, ensuring muscle preservation even when overall caloric intake is reduced
+
+## Training Intensity Adjustment
+
+Training intensity is adjusted based on:
+- Current GLP-1 dose (higher doses = more conservative initial intensity)
+- User's reported energy level on a given day
+- Time since last dose change (intensity ramps back up as the body adjusts)
+- Sport type and its specific demands
+
+## Competitor Comparison
+
+| Feature | MuscleGuard | MyFitnessPal | Noom Med | Calibrate | MacroFactor |
+|---------|-------------|-------------|----------|-----------|-------------|
+| GLP-1 Aware | Yes | No | Yes | Yes | No |
+| Dose-Adjusted Protein | Yes | No | No | No | No |
+| Smart Meal Planner | Yes | No | No | No | No |
+| Training Protocols | Yes | No | No | Yes | No |
+| Medication Reminders | Yes | No | No | No | No |
+| Price | $14.99/mo | $9.99/mo | $149+/mo | $199/mo | $11.99/mo |
+
+### Key Differences
+
+- **MyFitnessPal**: General calorie tracker. No GLP-1 awareness, no dose-based adjustments, no meal sizing for suppressed appetites.
+- **Noom Med**: Prescribes GLP-1 medications and provides coaching, but does not offer dose-adjusted protein targets or sport-specific training. Significantly more expensive.
+- **Calibrate**: Comprehensive metabolic health program with GLP-1 prescriptions and coaching. Includes exercise guidance but no dose-specific protein calculation. Premium pricing.
+- **MacroFactor**: Sophisticated macro tracker with adaptive algorithms. Excellent for general fitness users but has no GLP-1-specific features.
+
+## Who MuscleGuard Is For
+
+- Adults currently taking semaglutide (Ozempic, Wegovy) or tirzepatide (Mounjaro, Zepbound)
+- People at any fitness level: gym-goers, runners, swimmers, cyclists, and complete beginners
+- Users who want to maximize fat loss while minimizing muscle loss on GLP-1 medications
+- People looking for a single app that connects their medication schedule to their nutrition and training
+
+## Technical Details
+
+- **Platform**: Web application (responsive, works on mobile and desktop)
+- **Framework**: Next.js 14 with App Router
+- **Authentication**: Supabase Auth
+- **Payments**: Stripe with 7-day free trial
+- **Email**: Automated medication reminders via email
+
+## Pricing
+
+$14.99/month with a 7-day free trial. Cancel anytime from the Settings page via the Stripe billing portal. No long-term contracts or cancellation fees.
+
+## Important Disclaimer
+
+MuscleGuard is not a medical device. It is not intended to diagnose, treat, cure, or prevent any disease. The information provided is for educational and informational purposes only and is not a substitute for professional medical advice. Always consult your healthcare provider before making changes to your diet, exercise routine, or medication regimen. Individual results may vary.
+
+## Links
+
+- Website: https://muscle-guard.vercel.app
+- Terms of Use: https://muscle-guard.vercel.app/legal/terms
+- Privacy Policy: https://muscle-guard.vercel.app/legal/privacy
+- Cookie Policy: https://muscle-guard.vercel.app/legal/cookies
+- Refund Policy: https://muscle-guard.vercel.app/legal/refund

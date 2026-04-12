@@ -144,6 +144,27 @@ const faqs = [
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-[#f7f7f7]">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "SoftwareApplication",
+            name: "MuscleGuard",
+            applicationCategory: "HealthApplication",
+            operatingSystem: "Web",
+            description:
+              "Preserve lean muscle during GLP-1 weight loss with dose-adjusted protein targets, smart meal planning, and training protocols.",
+            url: "https://muscle-guard.vercel.app",
+            offers: {
+              "@type": "Offer",
+              price: "14.99",
+              priceCurrency: "USD",
+              priceValidUntil: "2027-12-31",
+            },
+          }),
+        }}
+      />
       {/* Nav */}
       <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-black/5">
         <div className="flex items-center justify-between px-6 py-4 max-w-6xl mx-auto">

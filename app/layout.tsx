@@ -5,9 +5,67 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "MuscleGuard — GLP-1 Muscle Protection Coach",
+  title: {
+    default: "MuscleGuard — GLP-1 Muscle Protection Coach",
+    template: "%s | MuscleGuard",
+  },
   description:
-    "Prevent muscle loss on Ozempic, Wegovy & Mounjaro. Smart protein tracking and meal planning designed for GLP-1 users.",
+    "Preserve lean muscle during GLP-1 weight loss. Dose-adjusted protein targets, personalized meal planning, smart training protocols, and medication tracking for Ozempic, Wegovy, and Mounjaro users.",
+  keywords: [
+    "GLP-1",
+    "muscle preservation",
+    "Ozempic",
+    "Wegovy",
+    "Mounjaro",
+    "protein tracking",
+    "muscle loss prevention",
+    "semaglutide",
+    "tirzepatide",
+    "GLP-1 companion app",
+    "muscle protection",
+  ],
+  authors: [{ name: "MuscleGuard" }],
+  creator: "MuscleGuard",
+  publisher: "MuscleGuard",
+  metadataBase: new URL("https://muscle-guard.vercel.app"),
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "https://muscle-guard.vercel.app",
+    siteName: "MuscleGuard",
+    title: "MuscleGuard — Preserve Muscle on GLP-1 Medications",
+    description:
+      "Up to 40% of GLP-1 weight loss can be muscle. MuscleGuard helps you hit dose-adjusted protein targets, follow smart training protocols, and track your medication — all in one app.",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "MuscleGuard — GLP-1 Muscle Protection Coach",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "MuscleGuard — Preserve Muscle on GLP-1 Medications",
+    description:
+      "Dose-adjusted protein targets, smart meal planning, and training protocols for Ozempic, Wegovy, and Mounjaro users.",
+    images: ["/og-image.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
 };
 
 export default function RootLayout({
