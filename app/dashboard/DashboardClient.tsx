@@ -316,7 +316,7 @@ export function DashboardClient({
                     </div>
                     <div className="text-center">
                       <p className="text-xs font-medium text-white">{val}g</p>
-                      <p className="text-[10px] text-white/30 capitalize">{meal}</p>
+                      <p className="text-[10px] text-white capitalize">{meal}</p>
                     </div>
                   </div>
                 );
