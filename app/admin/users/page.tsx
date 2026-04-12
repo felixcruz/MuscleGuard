@@ -12,36 +12,37 @@ export default async function AdminUsersPage() {
 
   const supabase = createAdminClient();
 
-  const { data: profiles } = await supabase
-    .from("profiles")
-    .select(
-      "id, full_name, role, subscription_status, protein_goal_g, workout_streak_days, created_at"
-    )
-    .order("created_at", { ascending: false });
-
-  // Get emails
+  // Auth users are source of truth
   const { data: authData } = await supabase.auth.admin.listUsers({
     perPage: 1000,
     page: 1,
   });
 
-  const emailMap = new Map<string, string>();
-  if (authData?.users) {
-    for (const u of authData.users) {
-      emailMap.set(u.id, u.email ?? "");
-    }
+  const { data: profiles } = await supabase
+    .from("profiles")
+    .select(
+      "id, full_name, role, subscription_status, protein_goal_g, workout_streak_days, onboarding_done, glp1_medication, glp1_dose_mg"
+    );
+
+  const profileMap = new Map<string, Record<string, unknown>>();
+  for (const p of profiles ?? []) {
+    profileMap.set(p.id as string, p);
   }
 
-  const users = (profiles ?? []).map((p) => ({
-    id: p.id,
-    email: emailMap.get(p.id) ?? "",
-    name: p.full_name ?? "",
-    role: p.role ?? "user",
-    subscription_status: p.subscription_status ?? "none",
-    protein_goal_g: p.protein_goal_g ?? 0,
-    workout_streak_days: p.workout_streak_days ?? 0,
-    created_at: p.created_at,
-  }));
+  const users = (authData?.users ?? []).map((u) => {
+    const p = profileMap.get(u.id);
+    return {
+      id: u.id,
+      email: u.email ?? "",
+      name: (p?.full_name as string) ?? "",
+      role: (p?.role as string) ?? "user",
+      subscription_status: (p?.subscription_status as string) ?? "none",
+      protein_goal_g: (p?.protein_goal_g as number) ?? 0,
+      workout_streak_days: (p?.workout_streak_days as number) ?? 0,
+      onboarding_done: (p?.onboarding_done as boolean) ?? false,
+      created_at: u.created_at,
+    };
+  }).sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
   return (
     <div className="min-h-screen bg-surface">
