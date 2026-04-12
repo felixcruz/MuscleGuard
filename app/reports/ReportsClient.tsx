@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Sparkles, TrendingUp } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Sparkles, ChevronDown, ChevronRight, BarChart2 } from "lucide-react";
 import type { WeeklyReportData } from "@/lib/weekly-report";
 
 interface CurrentWeek {
@@ -25,12 +24,6 @@ interface Props {
   isSunday: boolean;
 }
 
-const GRADE_STYLES = {
-  A: { bg: "bg-[#CDFF00]", text: "text-obsidian", light: "bg-[#CDFF00]/10 border-[#CDFF00]/20" },
-  B: { bg: "bg-surface", text: "text-obsidian", light: "bg-surface border-black/5" },
-  C: { bg: "bg-alert", text: "text-obsidian", light: "bg-alert/10 border-alert/20" },
-};
-
 function formatWeek(weekStart: string, weekEnd: string) {
   const opts: Intl.DateTimeFormatOptions = { month: "short", day: "numeric" };
   const s = new Date(weekStart + "T12:00:00Z").toLocaleDateString("en-US", opts);
@@ -41,66 +34,95 @@ function formatWeek(weekStart: string, weekEnd: string) {
   return `${s} – ${e}`;
 }
 
-function GradeBadge({ grade }: { grade: "A" | "B" | "C" }) {
-  const style = GRADE_STYLES[grade];
-  return (
-    <div
-      className={`w-14 h-14 rounded-full ${style.bg} flex items-center justify-center flex-shrink-0`}
-    >
-      <span className="text-2xl font-bold text-obsidian">{grade}</span>
-    </div>
-  );
+function gradeConfig(grade: string) {
+  if (grade === "A") return { bg: "bg-[#CDFF00]", ring: "ring-[#CDFF00]/30", emoji: "🏆" };
+  if (grade === "B") return { bg: "bg-obsidian", ring: "ring-obsidian/10", emoji: "⭐" };
+  return { bg: "bg-[#FFB4AB]", ring: "ring-[#FFB4AB]/30", emoji: "📈" };
 }
 
 function ReportCard({ report }: { report: WeeklyReportData }) {
   const [expanded, setExpanded] = useState(false);
-  const style = GRADE_STYLES[report.grade as "A" | "B" | "C"];
+  const g = gradeConfig(report.grade);
+  const proteinPct = Math.round((report.protein_days_hit / 7) * 100);
+  const workoutPct = Math.min(100, Math.round((report.workouts_count / 3) * 100));
 
   return (
-    <div className={`border rounded-[10px] p-4 space-y-3 ${style.light}`}>
-      <div className="flex items-start gap-4">
-        <GradeBadge grade={report.grade as "A" | "B" | "C"} />
+    <div className="bg-white border border-black/5 rounded-[10px] overflow-hidden">
+      {/* Header row */}
+      <div className="p-5 flex items-center gap-4">
+        {/* Grade circle */}
+        <div className={`w-14 h-14 rounded-full ${g.bg} ring-4 ${g.ring} flex items-center justify-center shrink-0`}>
+          <span className={`text-2xl font-bold ${report.grade === "B" ? "text-white" : "text-obsidian"}`}>
+            {report.grade}
+          </span>
+        </div>
+
         <div className="flex-1 min-w-0">
-          <p className="text-xs text-mgray font-medium">
-            {formatWeek(report.week_start, report.week_end)}
-          </p>
-          <div className="flex gap-4 mt-1.5 text-sm text-obsidian">
-            <span>
-              🥩 <strong>{report.protein_days_hit}</strong>/7 protein days
-            </span>
-            <span>
-              🏋️ <strong>{report.workouts_count}</strong> workout{report.workouts_count !== 1 ? "s" : ""}
+          <div className="flex items-center justify-between">
+            <p className="text-sm font-medium text-obsidian">
+              {formatWeek(report.week_start, report.week_end)}
+            </p>
+            <span className="text-xs text-mgray font-medium">
+              {Math.round(report.score)}/100
             </span>
           </div>
+
           {/* Score bar */}
-          <div className="mt-2">
-            <div className="h-1.5 bg-muted/20 rounded-full overflow-hidden">
-              <div
-                className="h-full rounded-full bg-obsidian"
-                style={{ width: `${Math.min(100, report.score)}%` }}
-              />
-            </div>
-            <p className="text-xs text-muted mt-0.5">Score: {Math.round(report.score)}/100</p>
+          <div className="h-2 bg-surface rounded-full overflow-hidden mt-2">
+            <div
+              className="h-full rounded-full bg-obsidian transition-all duration-500"
+              style={{ width: `${Math.min(100, report.score)}%` }}
+            />
+          </div>
+
+          {/* Stats row */}
+          <div className="flex gap-4 mt-2 text-xs text-mgray">
+            <span>🥩 <span className="font-medium text-obsidian">{report.protein_days_hit}</span>/7 protein days</span>
+            <span>🏋️ <span className="font-medium text-obsidian">{report.workouts_count}</span> workout{report.workouts_count !== 1 ? "s" : ""}</span>
           </div>
         </div>
       </div>
 
-      {/* AI Summary */}
-      <div>
-        <p
-          className={`text-sm text-obsidian leading-relaxed ${
-            !expanded ? "line-clamp-2" : ""
-          }`}
+      {/* Summary (expandable) */}
+      <div className="border-t border-black/5">
+        <button
+          onClick={() => setExpanded(e => !e)}
+          className="w-full flex items-center justify-between px-5 py-3 hover:bg-surface transition-colors"
         >
-          {report.summary_text}
-        </p>
-        {report.summary_text.length > 120 && (
-          <button
-            onClick={() => setExpanded((e) => !e)}
-            className="text-xs text-muted hover:text-obsidian mt-0.5"
-          >
-            {expanded ? "Show less" : "Read more"}
-          </button>
+          <span className="text-xs text-mgray font-medium">Weekly summary</span>
+          {expanded
+            ? <ChevronDown className="h-4 w-4 text-muted" />
+            : <ChevronRight className="h-4 w-4 text-muted" />
+          }
+        </button>
+        {expanded && (
+          <div className="px-5 pb-4">
+            <p className="text-sm text-mgray leading-relaxed">{report.summary_text}</p>
+
+            {/* Detailed breakdown */}
+            <div className="grid grid-cols-2 gap-3 mt-4">
+              <div className="bg-surface rounded-lg p-3">
+                <p className="text-[10px] text-mgray uppercase tracking-widest">Protein consistency</p>
+                <div className="flex items-end gap-1.5 mt-1">
+                  <span className="text-xl font-bold text-obsidian">{proteinPct}%</span>
+                  <span className="text-xs text-mgray mb-0.5">{report.protein_days_hit} of 7 days</span>
+                </div>
+                <div className="h-1.5 bg-muted/20 rounded-full overflow-hidden mt-2">
+                  <div className="h-full rounded-full bg-obsidian" style={{ width: `${proteinPct}%` }} />
+                </div>
+              </div>
+              <div className="bg-surface rounded-lg p-3">
+                <p className="text-[10px] text-mgray uppercase tracking-widest">Workout completion</p>
+                <div className="flex items-end gap-1.5 mt-1">
+                  <span className="text-xl font-bold text-obsidian">{workoutPct}%</span>
+                  <span className="text-xs text-mgray mb-0.5">{report.workouts_count} of 3 target</span>
+                </div>
+                <div className="h-1.5 bg-muted/20 rounded-full overflow-hidden mt-2">
+                  <div className="h-full rounded-full bg-obsidian" style={{ width: `${workoutPct}%` }} />
+                </div>
+              </div>
+            </div>
+          </div>
         )}
       </div>
     </div>
@@ -148,101 +170,111 @@ export function ReportsClient({
     !lastWeekReportExists &&
     !liveReports.some((r) => r.week_start === lastWeekStart);
 
+  // Current week projected grade
+  const projectedProtein = Math.round((currentWeek.proteinDaysHit / currentWeek.daysElapsed) * 7);
+  const projectedScore = Math.round(
+    ((currentWeek.proteinDaysHit / Math.max(1, currentWeek.daysElapsed)) * 65) +
+    (Math.min(currentWeek.workoutsCount / 3, 1) * 35)
+  );
+  const projectedGrade = projectedScore >= 85 ? "A" : projectedScore >= 65 ? "B" : "C";
+  const pg = gradeConfig(projectedGrade);
+
   return (
-    <div className="max-w-lg mx-auto px-4 py-8 space-y-8">
+    <div className="max-w-3xl mx-auto px-4 py-6 space-y-5">
 
-      {/* Header */}
-      <div className="flex items-start justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-obsidian">Weekly Reports</h1>
-          <p className="text-mgray text-sm mt-1">
-            Auto-generated every Sunday · A / B / C grade
-          </p>
-        </div>
-        <TrendingUp className="h-6 w-6 text-muted mt-1" />
-      </div>
-
-      {/* Current week preview */}
-      <div className="border border-black/5 rounded-[10px] p-4 space-y-3 bg-white">
-        <div className="flex items-center justify-between">
-          <p className="text-sm font-semibold text-obsidian">This week so far</p>
-          <span className="text-xs text-muted">
-            Day {currentWeek.daysElapsed}/7
-          </span>
-        </div>
-
-        <div className="space-y-2">
-          {/* Protein days */}
+      {/* ── Hero Card (dark) ── */}
+      <div className="bg-obsidian rounded-[14px] p-6">
+        <div className="sm:flex sm:items-center sm:justify-between sm:gap-6">
           <div>
-            <div className="flex justify-between text-xs text-mgray mb-1">
-              <span>Protein days</span>
-              <span>
-                {currentWeek.proteinDaysHit}/{currentWeek.daysElapsed} days
+            <div className="flex items-center gap-2">
+              <BarChart2 className="h-5 w-5 text-[#CDFF00]" />
+              <h1 className="text-2xl font-bold text-white">Reports</h1>
+            </div>
+            <p className="text-white/50 mt-1 text-sm">
+              Auto-generated every Sunday with your A/B/C grade.
+            </p>
+          </div>
+
+          {/* Projected grade */}
+          <div className="mt-4 sm:mt-0 flex items-center gap-3">
+            <div className={`w-12 h-12 rounded-full ${pg.bg} flex items-center justify-center`}>
+              <span className={`text-lg font-bold ${projectedGrade === "B" ? "text-white" : "text-obsidian"}`}>
+                {projectedGrade}
               </span>
             </div>
-            <div className="h-2 bg-muted/20 rounded-full overflow-hidden">
-              <div
-                className="h-full rounded-full bg-green-500 transition-all"
-                style={{
-                  width: `${(currentWeek.proteinDaysHit / 7) * 100}%`,
-                }}
-              />
-            </div>
-          </div>
-
-          {/* Workouts */}
-          <div>
-            <div className="flex justify-between text-xs text-mgray mb-1">
-              <span>Workouts</span>
-              <span>{currentWeek.workoutsCount}/3 target</span>
-            </div>
-            <div className="h-2 bg-muted/20 rounded-full overflow-hidden">
-              <div
-                className="h-full rounded-full bg-blue-500 transition-all"
-                style={{
-                  width: `${Math.min(1, currentWeek.workoutsCount / 3) * 100}%`,
-                }}
-              />
+            <div>
+              <p className="text-xs text-white/40">Projected</p>
+              <p className="text-sm font-medium text-white">Day {currentWeek.daysElapsed}/7</p>
             </div>
           </div>
         </div>
 
-        <p className="text-xs text-muted">
-          Report will be generated automatically this Sunday.
-        </p>
+        {/* Current week progress bars */}
+        <div className="grid grid-cols-2 gap-4 mt-5 pt-4 border-t border-white/5">
+          <div>
+            <div className="flex justify-between text-xs mb-1.5">
+              <span className="text-white">Protein days</span>
+              <span className="text-white font-medium">{currentWeek.proteinDaysHit}/{currentWeek.daysElapsed}</span>
+            </div>
+            <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+              <div
+                className="h-full rounded-full bg-[#CDFF00] transition-all"
+                style={{ width: `${(currentWeek.proteinDaysHit / 7) * 100}%` }}
+              />
+            </div>
+          </div>
+          <div>
+            <div className="flex justify-between text-xs mb-1.5">
+              <span className="text-white">Workouts</span>
+              <span className="text-white font-medium">{currentWeek.workoutsCount}/3</span>
+            </div>
+            <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+              <div
+                className="h-full rounded-full bg-[#CDFF00] transition-all"
+                style={{ width: `${Math.min(1, currentWeek.workoutsCount / 3) * 100}%` }}
+              />
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Generate last week's report if missing */}
       {showGenerateButton && (
-        <div className="border border-dashed border-black/10 rounded-[10px] p-4 text-center space-y-2">
+        <div className="bg-white border border-dashed border-black/10 rounded-[10px] p-5 text-center space-y-3">
+          <Sparkles className="h-6 w-6 text-obsidian mx-auto" />
           <p className="text-sm text-mgray">
             {isSunday
               ? "Today's report is ready to generate!"
-              : `Last week's report (${formatWeek(lastWeekStart, lastWeekEnd)}) hasn't been generated yet.`}
+              : `Last week's report (${formatWeek(lastWeekStart, lastWeekEnd)}) is available.`}
           </p>
-          <Button onClick={generateReport} disabled={generating} size="sm" className="bg-obsidian text-white hover:bg-obsidian-light">
-            <Sparkles className="h-4 w-4 mr-1.5" />
+          <button
+            onClick={generateReport}
+            disabled={generating}
+            className="px-6 py-2.5 bg-obsidian text-white text-sm font-medium rounded-lg hover:bg-obsidian-light transition-colors disabled:opacity-50 inline-flex items-center gap-1.5"
+          >
+            <Sparkles className="h-4 w-4" />
             {generating ? "Generating…" : "Generate report"}
-          </Button>
-          {error && <p className="text-xs text-red-500">{error}</p>}
+          </button>
+          {error && <p className="text-xs text-[#FFB4AB]">{error}</p>}
         </div>
       )}
 
       {/* Past reports */}
       {liveReports.length > 0 ? (
         <div className="space-y-4">
-          <h2 className="text-sm font-semibold text-obsidian uppercase tracking-wide">
+          <p className="text-[10px] font-medium text-mgray uppercase tracking-widest">
             Past reports
-          </h2>
+          </p>
           {liveReports.map((report) => (
             <ReportCard key={report.id} report={report} />
           ))}
         </div>
       ) : (
         !showGenerateButton && (
-          <div className="text-center py-10 text-muted">
-            <p className="text-sm">No reports yet.</p>
-            <p className="text-xs mt-1">
+          <div className="text-center py-16">
+            <BarChart2 className="h-10 w-10 text-muted mx-auto mb-3" />
+            <p className="text-mgray text-sm">No reports yet.</p>
+            <p className="text-xs text-muted mt-1">
               Your first report will appear after the first Sunday.
             </p>
           </div>
