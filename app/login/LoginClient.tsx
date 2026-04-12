@@ -111,7 +111,7 @@ export default function LoginPage() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    className="rounded-lg"
+                    className="rounded-lg text-base"
                   />
                 </div>
                 <Button type="submit" className="w-full bg-obsidian text-white hover:bg-obsidian-light rounded-lg" disabled={loading}>
