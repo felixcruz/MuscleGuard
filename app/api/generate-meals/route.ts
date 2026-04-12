@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const { proteinRemainingG, dietaryPrefs, ingredients, mealTime, hungerLevel } = validation.data!;
+  const { proteinRemainingG, dietaryPrefs, ingredients, mealTime, hungerLevel, customRequest } = validation.data!;
 
   const { data: profile } = await supabase
     .from("profiles")
@@ -91,7 +91,7 @@ Always return valid JSON only — no markdown, no extra text.`,
       {
         role: "user",
         content: `Generate 3 high-protein meal ideas for someone who needs ${proteinRemainingG}g more protein today.
-${prefsText} ${mealTimeText} ${hungerText} ${ingredientsText}
+${prefsText} ${mealTimeText} ${hungerText} ${ingredientsText}${customRequest ? `\nThe user specifically requested: "${customRequest}". Prioritize this request.` : ""}
 Each meal must have at least 25g protein.
 Return a JSON array with exactly 3 items using this exact structure:
 [

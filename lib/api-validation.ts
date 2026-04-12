@@ -16,6 +16,7 @@ export function validateMealGenerationRequest(data: unknown): {
     ingredients?: string[];
     mealTime?: string;
     hungerLevel?: string;
+    customRequest?: string;
   };
   errors?: ValidationError[];
 } {
@@ -97,6 +98,18 @@ export function validateMealGenerationRequest(data: unknown): {
     }
   }
 
+  // Validate optional customRequest
+  let customRequest: string | undefined;
+  if (obj.customRequest !== undefined) {
+    if (typeof obj.customRequest !== "string") {
+      errors.push({ field: "customRequest", message: "Must be a string" });
+    } else if (obj.customRequest.length > 300) {
+      errors.push({ field: "customRequest", message: "Maximum 300 characters" });
+    } else {
+      customRequest = obj.customRequest;
+    }
+  }
+
   if (errors.length > 0) {
     return { valid: false, errors };
   }
@@ -109,6 +122,7 @@ export function validateMealGenerationRequest(data: unknown): {
       ingredients,
       mealTime,
       hungerLevel,
+      customRequest,
     },
   };
 }

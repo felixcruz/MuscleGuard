@@ -38,9 +38,9 @@ function AiBubble({ children }: { children: React.ReactNode }) {
     <div className="flex gap-2 items-start">
       <div
         className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
-        style={{ backgroundColor: "#f7f7f7" }}
+        style={{ backgroundColor: "#131413" }}
       >
-        <Sparkles className="h-3.5 w-3.5" style={{ color: "#131413" }} />
+        <Sparkles className="h-3.5 w-3.5" style={{ color: "#CDFF00" }} />
       </div>
       <div className="bg-surface rounded-2xl rounded-tl-sm px-4 py-3 text-sm text-obsidian max-w-xs leading-relaxed">
         {children}
@@ -68,6 +68,7 @@ export function MealWizard({ userId, proteinRemainingG, dietaryPrefs, onMealLogg
   const [mealTime, setMealTime] = useState<string | null>(null);
   const [hungerLevel, setHungerLevel] = useState<string | null>(null);
   const [ingredients, setIngredients] = useState<string[]>([]);
+  const [customRequest, setCustomRequest] = useState("");
   const [generating, setGenerating] = useState(false);
   const [meals, setMeals] = useState<Meal[]>([]);
   const [loggedMeals, setLoggedMeals] = useState<Set<string>>(new Set());
@@ -93,6 +94,7 @@ export function MealWizard({ userId, proteinRemainingG, dietaryPrefs, onMealLogg
           mealTime,
           hungerLevel,
           ingredients: selectedIngredients.length > 0 ? selectedIngredients : undefined,
+          customRequest: customRequest.trim() || undefined,
         }),
       });
       const data = await res.json();
@@ -254,6 +256,15 @@ export function MealWizard({ userId, proteinRemainingG, dietaryPrefs, onMealLogg
                 })}
               </div>
 
+              {/* Custom request */}
+              <input
+                type="text"
+                value={customRequest}
+                onChange={(e) => setCustomRequest(e.target.value)}
+                placeholder="e.g. something easy with eggs, under 10 minutes"
+                className="w-full px-3 py-2.5 border border-black/10 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-obsidian/20 bg-white text-obsidian placeholder:text-muted"
+              />
+
               <div className="flex items-center gap-2">
                 <Button
                   onClick={() => generate(ingredients)}
@@ -262,13 +273,13 @@ export function MealWizard({ userId, proteinRemainingG, dietaryPrefs, onMealLogg
                   size="sm"
                 >
                   <Sparkles className="h-4 w-4 mr-1.5" />
-                  {ingredients.length > 0
-                    ? `Generate with ${ingredients.length} ingredient${ingredients.length !== 1 ? "s" : ""}`
+                  {ingredients.length > 0 || customRequest.trim()
+                    ? "Generate meals"
                     : "Generate meals"}
                 </Button>
-                {ingredients.length > 0 && (
+                {(ingredients.length > 0 || customRequest.trim()) && (
                   <button
-                    onClick={() => setIngredients([])}
+                    onClick={() => { setIngredients([]); setCustomRequest(""); }}
                     className="text-xs text-muted hover:text-obsidian px-2 py-1"
                   >
                     Clear
