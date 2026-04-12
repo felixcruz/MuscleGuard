@@ -2,9 +2,6 @@
 
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 
 interface Props {
   userId: string;
@@ -40,8 +37,8 @@ export function MeasurementForm({ userId, onSaved }: Props) {
     <form onSubmit={handleSubmit} className="space-y-3">
       <div className="grid grid-cols-3 gap-3">
         <div className="space-y-1">
-          <Label htmlFor="wt">Weight (kg) *</Label>
-          <Input
+          <label htmlFor="wt" className="text-xs font-medium text-mgray">Weight (kg) *</label>
+          <input
             id="wt"
             type="number"
             step="0.1"
@@ -49,37 +46,44 @@ export function MeasurementForm({ userId, onSaved }: Props) {
             value={weightKg}
             onChange={(e) => setWeightKg(e.target.value)}
             required
+            className="w-full px-3 py-2 border border-black/10 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-obsidian/20 bg-white"
           />
         </div>
         <div className="space-y-1">
-          <Label htmlFor="mm">Muscle (kg)</Label>
-          <Input
+          <label htmlFor="mm" className="text-xs font-medium text-mgray">Muscle (kg)</label>
+          <input
             id="mm"
             type="number"
             step="0.1"
             placeholder="optional"
             value={muscleMassKg}
             onChange={(e) => setMuscleMassKg(e.target.value)}
+            className="w-full px-3 py-2 border border-black/10 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-obsidian/20 bg-white"
           />
         </div>
         <div className="space-y-1">
-          <Label htmlFor="bf">Body fat %</Label>
-          <Input
+          <label htmlFor="bf" className="text-xs font-medium text-mgray">Body fat %</label>
+          <input
             id="bf"
             type="number"
             step="0.1"
             placeholder="optional"
             value={bodyFatPct}
             onChange={(e) => setBodyFatPct(e.target.value)}
+            className="w-full px-3 py-2 border border-black/10 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-obsidian/20 bg-white"
           />
         </div>
       </div>
-      <p className="text-xs text-gray-400">
+      <p className="text-xs text-muted">
         Muscle mass from smart scale (Withings, Renpho, etc.) or DEXA scan.
       </p>
-      <Button type="submit" disabled={saving || !weightKg} className="w-full">
+      <button
+        type="submit"
+        disabled={saving || !weightKg}
+        className="w-full py-2.5 bg-obsidian text-white text-sm font-medium rounded-lg hover:bg-obsidian-light transition-colors disabled:opacity-50"
+      >
         {saving ? "Saving…" : "Log today's measurement"}
-      </Button>
+      </button>
     </form>
   );
 }

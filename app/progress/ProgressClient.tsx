@@ -3,8 +3,7 @@
 import { useState, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { MeasurementForm } from "@/components/progress/MeasurementForm";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, TrendingDown, TrendingUp, Scale } from "lucide-react";
 import {
   LineChart,
   Line,
@@ -79,9 +78,9 @@ export function ProgressClient({
     dateIso: m.measured_at.split("T")[0],
     weight: m.weight_kg,
     muscle: m.muscle_mass_kg,
+    fat: m.body_fat_pct,
   }));
 
-  // Build a lookup: date string → dose for reference lines
   const doseDates = medicationLogs.map((log) => ({
     date: new Date(log.change_date).toLocaleDateString("en-US", {
       month: "short",
@@ -91,27 +90,98 @@ export function ProgressClient({
     type: log.change_type,
   }));
 
+  // Summary stats
+  const latest = measurements.length > 0 ? measurements[measurements.length - 1] : null;
+  const first = measurements.length > 1 ? measurements[0] : null;
+  const weightChange = latest?.weight_kg && first?.weight_kg
+    ? (latest.weight_kg - first.weight_kg).toFixed(1)
+    : null;
+  const muscleChange = latest?.muscle_mass_kg && first?.muscle_mass_kg
+    ? (latest.muscle_mass_kg - first.muscle_mass_kg).toFixed(1)
+    : null;
+
+  const hasCharts = chartData.length >= 2;
+  const hasMuscleData = chartData.some((d) => d.muscle !== null);
+  const hasFatData = chartData.some((d) => d.fat !== null);
+
   return (
-    <div className="max-w-lg mx-auto px-4 py-8 space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-obsidian">Progress</h1>
-        <p className="text-mgray mt-1">
-          Track your weight and muscle mass weekly.
-        </p>
+    <div className="max-w-3xl mx-auto px-4 py-6 space-y-5">
+
+      {/* ── Hero Card (dark) ── */}
+      <div className="bg-obsidian rounded-[14px] p-6">
+        <div className="sm:flex sm:items-center sm:justify-between sm:gap-6">
+          <div>
+            <h1 className="text-2xl font-bold text-white">Progress</h1>
+            <p className="text-white/50 mt-1 text-sm">
+              Track your weight and muscle mass weekly.
+            </p>
+          </div>
+
+          {/* Summary stats */}
+          {latest && (
+            <div className="flex items-center gap-4 mt-4 sm:mt-0">
+              {latest.weight_kg && (
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-white">{latest.weight_kg}</p>
+                  <p className="text-[10px] text-white uppercase">kg</p>
+                </div>
+              )}
+              {latest.muscle_mass_kg && (
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-[#CDFF00]">{latest.muscle_mass_kg}</p>
+                  <p className="text-[10px] text-white uppercase">muscle kg</p>
+                </div>
+              )}
+              {latest.body_fat_pct && (
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-white">{latest.body_fat_pct}%</p>
+                  <p className="text-[10px] text-white uppercase">body fat</p>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Change indicators */}
+        {(weightChange || muscleChange) && (
+          <div className="flex items-center gap-4 mt-4 pt-4 border-t border-white/5">
+            {weightChange && (
+              <div className="flex items-center gap-1.5 text-sm">
+                {parseFloat(weightChange) <= 0
+                  ? <TrendingDown className="h-4 w-4 text-[#CDFF00]" />
+                  : <TrendingUp className="h-4 w-4 text-[#FFB4AB]" />
+                }
+                <span className="text-white font-medium">{weightChange} kg</span>
+                <span className="text-white/40">weight</span>
+              </div>
+            )}
+            {muscleChange && (
+              <div className="flex items-center gap-1.5 text-sm">
+                {parseFloat(muscleChange) >= 0
+                  ? <TrendingUp className="h-4 w-4 text-[#CDFF00]" />
+                  : <TrendingDown className="h-4 w-4 text-[#FFB4AB]" />
+                }
+                <span className="text-white font-medium">{muscleChange} kg</span>
+                <span className="text-white/40">muscle</span>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
+      {/* Muscle loss alert */}
       {muscleLossAlert && (
-        <div className="flex items-start gap-3 p-4 bg-red-50 border border-red-200 rounded-lg">
-          <AlertTriangle className="h-5 w-5 text-red-600 mt-0.5 shrink-0" />
+        <div className="flex items-start gap-3 p-4 bg-obsidian rounded-[10px]">
+          <AlertTriangle className="h-5 w-5 text-[#FFB4AB] mt-0.5 shrink-0" />
           <div>
-            <p className="font-semibold text-red-800">Muscle loss detected</p>
-            <p className="text-sm text-red-700 mt-0.5">
+            <p className="font-medium text-[#FFB4AB] text-sm">Muscle loss detected</p>
+            <p className="text-xs text-white mt-0.5">
               You lost more than 1kg of muscle this week. Check your{" "}
-              <a href="/meals" className="underline font-medium">
+              <a href="/meals" className="underline text-[#CDFF00]">
                 meal plan
               </a>{" "}
               and{" "}
-              <a href="/training" className="underline font-medium">
+              <a href="/training" className="underline text-[#CDFF00]">
                 strength training
               </a>
               .
@@ -120,46 +190,47 @@ export function ProgressClient({
         </div>
       )}
 
-      <Card className="border-black/5 rounded-[10px]">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base">
-            Log today&apos;s measurement
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <MeasurementForm userId={userId} onSaved={refresh} />
-        </CardContent>
-      </Card>
+      {/* ── Log Measurement ── */}
+      <div className="bg-white border border-black/5 rounded-[10px] p-5 space-y-1">
+        <h3 className="text-sm font-medium text-obsidian mb-3">Log today&apos;s measurement</h3>
+        <MeasurementForm userId={userId} onSaved={refresh} />
+      </div>
 
-      {chartData.length >= 2 && (
-        <Card className="border-black/5 rounded-[10px]">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base">Weight trend</CardTitle>
+      {/* ── Charts ── */}
+      {hasCharts && (
+        <div className={`grid gap-4 ${hasMuscleData || hasFatData ? "sm:grid-cols-2" : ""}`}>
+          {/* Weight chart */}
+          <div className="bg-white border border-black/5 rounded-[10px] p-5">
+            <div className="flex items-center justify-between mb-1">
+              <h3 className="text-sm font-medium text-obsidian">Weight trend</h3>
+              <Scale className="h-4 w-4 text-muted" />
+            </div>
             {doseDates.length > 0 && (
-              <p className="text-xs text-muted">
-                Dashed lines indicate dose changes
+              <p className="text-[10px] text-muted uppercase tracking-widest mb-3">
+                Dashed lines = dose changes
               </p>
             )}
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={200}>
+            <ResponsiveContainer width="100%" height={180}>
               <LineChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                <XAxis dataKey="date" tick={{ fontSize: 11 }} />
-                <YAxis tick={{ fontSize: 11 }} domain={["auto", "auto"]} />
-                <Tooltip />
-                {/* Medication dose change reference lines */}
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.04)" />
+                <XAxis dataKey="date" tick={{ fontSize: 10, fill: "#BFC1C0" }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 10, fill: "#BFC1C0" }} domain={["auto", "auto"]} axisLine={false} tickLine={false} width={35} />
+                <Tooltip
+                  contentStyle={{ backgroundColor: "#131413", border: "none", borderRadius: 8, fontSize: 12, color: "#fff" }}
+                  labelStyle={{ color: "#BFC1C0" }}
+                />
                 {doseDates.map((dd, i) => (
                   <ReferenceLine
                     key={i}
                     x={dd.date}
-                    stroke="#2e7d32"
+                    stroke="#CDFF00"
                     strokeDasharray="3 3"
+                    strokeOpacity={0.6}
                     label={{
                       value: `${dd.dose}mg`,
                       position: "top",
-                      fontSize: 10,
-                      fill: "#2e7d32",
+                      fontSize: 9,
+                      fill: "#CDFF00",
                     }}
                   />
                 ))}
@@ -167,60 +238,102 @@ export function ProgressClient({
                   type="monotone"
                   dataKey="weight"
                   name="Weight (kg)"
-                  stroke="#16a34a"
+                  stroke="#131413"
                   strokeWidth={2}
-                  dot={{ r: 3 }}
+                  dot={{ r: 3, fill: "#131413" }}
+                  activeDot={{ r: 5, fill: "#CDFF00" }}
                 />
               </LineChart>
             </ResponsiveContainer>
-          </CardContent>
-        </Card>
-      )}
+          </div>
 
-      {chartData.some((d) => d.muscle !== null) && (
-        <Card className="border-black/5 rounded-[10px]">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base">Muscle mass trend</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={200}>
-              <LineChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                <XAxis dataKey="date" tick={{ fontSize: 11 }} />
-                <YAxis tick={{ fontSize: 11 }} domain={["auto", "auto"]} />
-                <Tooltip />
-                {doseDates.map((dd, i) => (
-                  <ReferenceLine
-                    key={i}
-                    x={dd.date}
-                    stroke="#2e7d32"
-                    strokeDasharray="3 3"
-                    label={{
-                      value: `${dd.dose}mg`,
-                      position: "top",
-                      fontSize: 10,
-                      fill: "#2e7d32",
-                    }}
+          {/* Muscle chart */}
+          {hasMuscleData && (
+            <div className="bg-white border border-black/5 rounded-[10px] p-5">
+              <div className="flex items-center justify-between mb-1">
+                <h3 className="text-sm font-medium text-obsidian">Muscle mass trend</h3>
+                <TrendingUp className="h-4 w-4 text-muted" />
+              </div>
+              {doseDates.length > 0 && (
+                <p className="text-[10px] text-muted uppercase tracking-widest mb-3">
+                  Dashed lines = dose changes
+                </p>
+              )}
+              <ResponsiveContainer width="100%" height={180}>
+                <LineChart data={chartData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.04)" />
+                  <XAxis dataKey="date" tick={{ fontSize: 10, fill: "#BFC1C0" }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: 10, fill: "#BFC1C0" }} domain={["auto", "auto"]} axisLine={false} tickLine={false} width={35} />
+                  <Tooltip
+                    contentStyle={{ backgroundColor: "#131413", border: "none", borderRadius: 8, fontSize: 12, color: "#fff" }}
+                    labelStyle={{ color: "#BFC1C0" }}
                   />
-                ))}
-                <Line
-                  type="monotone"
-                  dataKey="muscle"
-                  name="Muscle mass (kg)"
-                  stroke="#7c3aed"
-                  strokeWidth={2}
-                  dot={{ r: 3 }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
+                  {doseDates.map((dd, i) => (
+                    <ReferenceLine
+                      key={i}
+                      x={dd.date}
+                      stroke="#CDFF00"
+                      strokeDasharray="3 3"
+                      strokeOpacity={0.6}
+                      label={{
+                        value: `${dd.dose}mg`,
+                        position: "top",
+                        fontSize: 9,
+                        fill: "#CDFF00",
+                      }}
+                    />
+                  ))}
+                  <Line
+                    type="monotone"
+                    dataKey="muscle"
+                    name="Muscle mass (kg)"
+                    stroke="#CDFF00"
+                    strokeWidth={2}
+                    dot={{ r: 3, fill: "#CDFF00" }}
+                    activeDot={{ r: 5, fill: "#CDFF00" }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          )}
+
+          {/* Body fat chart */}
+          {hasFatData && (
+            <div className={`bg-white border border-black/5 rounded-[10px] p-5 ${hasMuscleData ? "sm:col-span-2" : ""}`}>
+              <div className="flex items-center justify-between mb-1">
+                <h3 className="text-sm font-medium text-obsidian">Body fat trend</h3>
+                <TrendingDown className="h-4 w-4 text-muted" />
+              </div>
+              <ResponsiveContainer width="100%" height={180}>
+                <LineChart data={chartData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.04)" />
+                  <XAxis dataKey="date" tick={{ fontSize: 10, fill: "#BFC1C0" }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: 10, fill: "#BFC1C0" }} domain={["auto", "auto"]} axisLine={false} tickLine={false} width={35} unit="%" />
+                  <Tooltip
+                    contentStyle={{ backgroundColor: "#131413", border: "none", borderRadius: 8, fontSize: 12, color: "#fff" }}
+                    labelStyle={{ color: "#BFC1C0" }}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="fat"
+                    name="Body fat (%)"
+                    stroke="#585A59"
+                    strokeWidth={2}
+                    dot={{ r: 3, fill: "#585A59" }}
+                    activeDot={{ r: 5, fill: "#CDFF00" }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          )}
+        </div>
       )}
 
       {measurements.length === 0 && (
-        <p className="text-center text-muted text-sm py-8">
-          Log your first measurement to start tracking your progress.
-        </p>
+        <div className="text-center py-12">
+          <Scale className="h-10 w-10 text-muted mx-auto mb-3" />
+          <p className="text-mgray text-sm">Log your first measurement to start tracking your progress.</p>
+        </div>
       )}
     </div>
   );
