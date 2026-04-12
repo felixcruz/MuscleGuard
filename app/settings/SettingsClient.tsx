@@ -106,16 +106,16 @@ export function SettingsClient({ userId, email, profile }: Props) {
 
   return (
     <div className="max-w-lg mx-auto px-4 py-8 space-y-6">
-      <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
+      <h1 className="text-2xl font-bold text-obsidian">Settings</h1>
 
       {/* Tab switcher */}
-      <div className="flex gap-1 p-1 bg-gray-100 rounded-xl">
+      <div className="flex gap-1 p-1 bg-surface rounded-xl">
         <button
           onClick={() => setTab("general")}
           className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-sm font-medium transition-colors ${
             tab === "general"
-              ? "bg-white text-gray-900 shadow-sm"
-              : "text-gray-500 hover:text-gray-700"
+              ? "bg-white text-obsidian shadow-sm"
+              : "text-mgray hover:text-obsidian"
           }`}
         >
           <User className="h-4 w-4" />
@@ -125,8 +125,8 @@ export function SettingsClient({ userId, email, profile }: Props) {
           onClick={() => setTab("billing")}
           className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-sm font-medium transition-colors ${
             tab === "billing"
-              ? "bg-white text-gray-900 shadow-sm"
-              : "text-gray-500 hover:text-gray-700"
+              ? "bg-white text-obsidian shadow-sm"
+              : "text-mgray hover:text-obsidian"
           }`}
         >
           <Receipt className="h-4 w-4" />
@@ -137,14 +137,14 @@ export function SettingsClient({ userId, email, profile }: Props) {
       {/* ── GENERAL TAB ── */}
       {tab === "general" && (
         <div className="space-y-6">
-          <Card>
+          <Card className="border-black/5 rounded-[10px]">
             <CardHeader className="pb-3">
               <CardTitle className="text-base">Profile</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               {/* Name */}
               <div className="space-y-1.5">
-                <label className="text-sm text-gray-500">Name</label>
+                <label className="text-sm text-mgray">Name</label>
                 <Input
                   placeholder="Your name"
                   value={fullName}
@@ -153,27 +153,27 @@ export function SettingsClient({ userId, email, profile }: Props) {
               </div>
               {/* Email — read only */}
               <div className="space-y-1.5">
-                <label className="text-sm text-gray-500">Email</label>
-                <div className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-md text-sm text-gray-500">
+                <label className="text-sm text-mgray">Email</label>
+                <div className="px-3 py-2 bg-surface border border-black/5 rounded-md text-sm text-mgray">
                   {email}
                 </div>
               </div>
               {profile.weight_kg && (
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">Current weight</span>
+                  <span className="text-mgray">Current weight</span>
                   <span className="font-medium">{profile.weight_kg} kg</span>
                 </div>
               )}
               {profile.protein_goal_g && (
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">Daily protein goal</span>
-                  <span className="font-medium text-brand-700">{profile.protein_goal_g}g</span>
+                  <span className="text-mgray">Daily protein goal</span>
+                  <span className="font-medium text-obsidian">{profile.protein_goal_g}g</span>
                 </div>
               )}
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="border-black/5 rounded-[10px]">
             <CardHeader className="pb-3">
               <CardTitle className="text-base">Communication style</CardTitle>
               <CardDescription>How the app talks to you across all sections.</CardDescription>
@@ -185,22 +185,22 @@ export function SettingsClient({ userId, email, profile }: Props) {
                   onClick={() => setCommStyle(s.value)}
                   className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg border text-sm transition-colors ${
                     commStyle === s.value
-                      ? "bg-brand-50 border-brand-400 text-brand-800"
-                      : "bg-white border-gray-200 text-gray-700 hover:border-gray-300"
+                      ? "bg-[#CDFF00]/10 border-[#CDFF00]/30 text-obsidian"
+                      : "bg-white border-black/5 text-mgray hover:border-black/10"
                   }`}
                 >
                   <span className="font-medium">{s.label}</span>
-                  <span className="text-xs text-gray-400">{s.desc}</span>
+                  <span className="text-xs text-muted">{s.desc}</span>
                 </button>
               ))}
             </CardContent>
           </Card>
 
-          <Button onClick={handleSave} disabled={saving} className="w-full">
+          <Button onClick={handleSave} disabled={saving} className="w-full bg-obsidian text-white hover:bg-obsidian-light">
             {saving ? "Saving…" : saved ? "Saved!" : "Save changes"}
           </Button>
 
-          <Button variant="ghost" className="w-full text-gray-500" onClick={handleSignOut}>
+          <Button variant="ghost" className="w-full text-mgray" onClick={handleSignOut}>
             <LogOut className="h-4 w-4 mr-2" />
             Sign out
           </Button>
@@ -211,7 +211,7 @@ export function SettingsClient({ userId, email, profile }: Props) {
       {tab === "billing" && (
         <div className="space-y-6">
           {/* Status card */}
-          <Card>
+          <Card className="border-black/5 rounded-[10px]">
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-base">Plan</CardTitle>
@@ -227,13 +227,13 @@ export function SettingsClient({ userId, email, profile }: Props) {
 
               {/* Upgrade CTA (non-active users) */}
               {!isActive && (
-                <div className="p-4 bg-brand-50 rounded-lg border border-brand-200 space-y-3">
+                <div className="p-4 bg-obsidian rounded-[10px] space-y-3">
                   <div className="flex items-start gap-3">
-                    <Shield className="h-5 w-5 text-brand-600 mt-0.5 shrink-0" />
+                    <Shield className="h-5 w-5 text-[#CDFF00] mt-0.5 shrink-0" />
                     <div>
-                      <p className="font-semibold text-brand-900">MuscleGuard Pro</p>
-                      <p className="text-sm text-brand-700">$14.99/month · Cancel anytime</p>
-                      <ul className="text-sm text-brand-700 mt-2 space-y-1">
+                      <p className="font-semibold text-white">MuscleGuard Pro</p>
+                      <p className="text-sm text-white/70">$14.99/month · Cancel anytime</p>
+                      <ul className="text-sm text-white/70 mt-2 space-y-1">
                         <li>✓ Unlimited protein tracking</li>
                         <li>✓ AI meal generation</li>
                         <li>✓ Muscle loss alerts</li>
@@ -241,7 +241,7 @@ export function SettingsClient({ userId, email, profile }: Props) {
                       </ul>
                     </div>
                   </div>
-                  <Button onClick={handleUpgrade} disabled={upgrading} className="w-full">
+                  <Button onClick={handleUpgrade} disabled={upgrading} className="w-full bg-[#CDFF00] text-obsidian hover:bg-[#b8e600]">
                     <CreditCard className="h-4 w-4 mr-2" />
                     {upgrading ? "Redirecting…" : "Upgrade to Pro"}
                   </Button>
@@ -259,11 +259,11 @@ export function SettingsClient({ userId, email, profile }: Props) {
                     variant="ghost"
                     onClick={handlePortal}
                     disabled={portal}
-                    className="w-full text-red-500 hover:text-red-600 hover:bg-red-50"
+                    className="w-full text-[#FFB4AB] hover:text-[#FFB4AB] hover:bg-alert/10"
                   >
                     {portal ? "Opening…" : "Cancel plan"}
                   </Button>
-                  <p className="text-xs text-center text-gray-400">
+                  <p className="text-xs text-center text-muted">
                     Cancellation is handled securely via Stripe. Your access continues until the end of the billing period.
                   </p>
                 </div>

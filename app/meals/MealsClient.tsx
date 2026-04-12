@@ -132,11 +132,11 @@ export function MealsClient({
       {/* ── Header + protein bar ── */}
       <div className="space-y-3">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Meals</h1>
-          <p className="text-gray-500 mt-1 text-sm">
+          <h1 className="text-2xl font-bold text-obsidian">Meals</h1>
+          <p className="text-mgray mt-1 text-sm">
             {proteinRemaining > 0 ? (
               <>
-                <span className="text-brand-700 font-semibold">
+                <span className="text-obsidian font-semibold">
                   {proteinRemaining}g protein
                 </span>{" "}
                 remaining today
@@ -149,11 +149,11 @@ export function MealsClient({
           </p>
         </div>
         <div>
-          <div className="flex justify-between text-xs text-gray-500 mb-1">
+          <div className="flex justify-between text-xs text-mgray mb-1">
             <span>{proteinLogged}g logged</span>
             <span>{proteinGoalG}g goal</span>
           </div>
-          <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
+          <div className="h-2.5 bg-surface-alt rounded-full overflow-hidden">
             <div
               className="h-full rounded-full transition-all duration-500"
               style={{
@@ -162,15 +162,15 @@ export function MealsClient({
               }}
             />
           </div>
-          <p className="text-xs text-gray-400 mt-1 text-right">
+          <p className="text-xs text-muted mt-1 text-right">
             {pct}% complete
           </p>
         </div>
 
         {/* Meal distribution breakdown */}
         {proteinBreakdown && (
-          <p className="text-xs text-gray-400">
-            <span className="font-medium text-gray-500">Targets:</span>{" "}
+          <p className="text-xs text-muted">
+            <span className="font-medium text-mgray">Targets:</span>{" "}
             Breakfast: {proteinBreakdown.breakfast}g · Lunch: {proteinBreakdown.lunch}g · Dinner: {proteinBreakdown.dinner}g · Snack: {proteinBreakdown.snack}g
           </p>
         )}
@@ -178,9 +178,9 @@ export function MealsClient({
 
       {/* ── Food Search ── */}
       <div className="space-y-3">
-        <h2 className="text-base font-semibold text-gray-800">Log a food</h2>
+        <h2 className="text-base font-medium text-obsidian">Log a food</h2>
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted pointer-events-none" />
           <input
             type="text"
             placeholder="Search USDA database (e.g. chicken breast)"
@@ -190,28 +190,28 @@ export function MealsClient({
               setSelected(null);
               setLoggedFdcId(null);
             }}
-            className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white"
+            className="w-full pl-9 pr-4 py-2.5 border border-black/10 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-obsidian/20 bg-white"
           />
           {searching && (
-            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400">
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted">
               Searching…
             </span>
           )}
         </div>
 
         {results.length > 0 && (
-          <div className="border border-gray-200 rounded-lg overflow-hidden divide-y divide-gray-100 bg-white shadow-sm">
+          <div className="border border-black/5 rounded-[10px] overflow-hidden divide-y divide-black/5 bg-white shadow-sm">
             {results.map((food) => (
               <button
                 key={food.fdcId}
                 type="button"
                 onClick={() => handleSelect(food)}
-                className="w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors"
+                className="w-full text-left px-4 py-3 hover:bg-surface transition-colors"
               >
-                <p className="text-sm font-medium text-gray-900 leading-snug">
+                <p className="text-sm font-medium text-obsidian leading-snug">
                   {food.description}
                 </p>
-                <p className="text-xs text-gray-500 mt-0.5">
+                <p className="text-xs text-mgray mt-0.5">
                   {food.proteinPer100g}g protein · {food.caloriesPer100g} kcal
                   per 100g
                 </p>
@@ -221,17 +221,17 @@ export function MealsClient({
         )}
 
         {selected && (
-          <div className="border border-gray-200 rounded-lg p-4 bg-gray-50 space-y-3">
-            <p className="text-sm font-semibold text-gray-900 leading-snug">
+          <div className="border border-black/5 rounded-[10px] p-4 bg-surface space-y-3">
+            <p className="text-sm font-semibold text-obsidian leading-snug">
               {selected.description}
             </p>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-mgray">
               {selected.proteinPer100g}g protein · {selected.caloriesPer100g}{" "}
               kcal per 100g
             </p>
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-2 flex-1">
-                <label className="text-sm text-gray-600 whitespace-nowrap">
+                <label className="text-sm text-mgray whitespace-nowrap">
                   Portion
                 </label>
                 <input
@@ -240,12 +240,12 @@ export function MealsClient({
                   max="2000"
                   value={portionG}
                   onChange={(e) => setPortionG(e.target.value)}
-                  className="w-20 px-2 py-1.5 border border-gray-200 rounded-md text-sm text-center focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white"
+                  className="w-20 px-2 py-1.5 border border-black/10 rounded-lg text-sm text-center focus:outline-none focus:ring-2 focus:ring-obsidian/20 bg-white"
                 />
-                <span className="text-sm text-gray-500">g</span>
+                <span className="text-sm text-mgray">g</span>
               </div>
-              <div className="text-right text-sm text-gray-700">
-                <span className="font-semibold text-brand-700">
+              <div className="text-right text-sm text-obsidian">
+                <span className="font-semibold text-green-600">
                   {nutrients.protein}g
                 </span>{" "}
                 protein
@@ -257,7 +257,7 @@ export function MealsClient({
               size="sm"
               onClick={handleLogFood}
               disabled={logging || !portionG || parseFloat(portionG) <= 0}
-              className="w-full"
+              className="w-full bg-obsidian text-white hover:bg-obsidian-light"
             >
               <Plus className="h-4 w-4 mr-1" />
               {logging ? "Logging…" : "Log food"}
@@ -281,11 +281,11 @@ export function MealsClient({
 
       {/* ── Divider ── */}
       <div className="flex items-center gap-3">
-        <div className="h-px flex-1 bg-gray-200" />
-        <span className="text-xs text-gray-400 uppercase tracking-wide">
+        <div className="h-px flex-1 bg-black/5" />
+        <span className="text-xs text-muted uppercase tracking-wide">
           or get AI meal ideas
         </span>
-        <div className="h-px flex-1 bg-gray-200" />
+        <div className="h-px flex-1 bg-black/5" />
       </div>
 
       {/* ── AI Meal Wizard ── */}

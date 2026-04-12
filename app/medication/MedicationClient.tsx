@@ -236,8 +236,8 @@ export function MedicationClient({
       <div
         style={{
           background: "#fff",
-          border: "1px solid #ddd",
-          borderRadius: 12,
+          border: "1px solid rgba(0,0,0,0.05)",
+          borderRadius: 10,
           padding: "20px 20px",
           marginBottom: 16,
         }}
@@ -300,7 +300,7 @@ export function MedicationClient({
               fontSize: 13,
               fontWeight: 600,
               border: "none",
-              background: logTakenSuccess ? "#4caf50" : "#2e7d32",
+              background: logTakenSuccess ? "#4caf50" : "#131413",
               color: "#fff",
               cursor: logTakenLoading || logTakenSuccess ? "default" : "pointer",
             }}
@@ -316,9 +316,9 @@ export function MedicationClient({
               borderRadius: 8,
               fontSize: 13,
               fontWeight: 600,
-              border: "1px solid #ddd",
+              border: "1px solid rgba(0,0,0,0.05)",
               background: "#fff",
-              color: "#1a1a1a",
+              color: "#131413",
               cursor: "pointer",
             }}
           >
@@ -332,8 +332,8 @@ export function MedicationClient({
         <div
           style={{
             background: "#fff",
-            border: "1px solid #ddd",
-            borderRadius: 12,
+            border: "1px solid rgba(0,0,0,0.05)",
+            borderRadius: 10,
             padding: "20px",
             marginBottom: 16,
           }}
@@ -389,7 +389,7 @@ export function MedicationClient({
                     style={{
                       padding: "9px 12px",
                       borderRadius: 8,
-                      border: "1px solid #ddd",
+                      border: "1px solid rgba(0,0,0,0.1)",
                       fontSize: 14,
                       color: newDose ? "#1a1a1a" : "#999",
                       background: "#fff",
@@ -413,7 +413,7 @@ export function MedicationClient({
                     style={{
                       padding: "9px 12px",
                       borderRadius: 8,
-                      border: "1px solid #ddd",
+                      border: "1px solid rgba(0,0,0,0.1)",
                       fontSize: 14,
                       width: 100,
                     }}
@@ -446,10 +446,10 @@ export function MedicationClient({
                         fontSize: 13,
                         border:
                           changeType === ct.value
-                            ? "2px solid #2e7d32"
-                            : "1px solid #ddd",
+                            ? "2px solid #131413"
+                            : "1px solid rgba(0,0,0,0.1)",
                         background:
-                          changeType === ct.value ? "#f1f8f1" : "#fff",
+                          changeType === ct.value ? "#f7f7f7" : "#fff",
                         color: "#1a1a1a",
                         cursor: "pointer",
                         fontWeight: changeType === ct.value ? 600 : 400,
@@ -486,10 +486,10 @@ export function MedicationClient({
                         fontSize: 12,
                         border:
                           formAppetite === ao.value
-                            ? "2px solid #2e7d32"
-                            : "1px solid #ddd",
+                            ? "2px solid #131413"
+                            : "1px solid rgba(0,0,0,0.1)",
                         background:
-                          formAppetite === ao.value ? "#f1f8f1" : "#fff",
+                          formAppetite === ao.value ? "#f7f7f7" : "#fff",
                         color: "#1a1a1a",
                         cursor: "pointer",
                         fontWeight: formAppetite === ao.value ? 600 : 400,
@@ -526,9 +526,9 @@ export function MedicationClient({
                         fontSize: 12,
                         border:
                           energyLevel === e
-                            ? "2px solid #2e7d32"
-                            : "1px solid #ddd",
-                        background: energyLevel === e ? "#f1f8f1" : "#fff",
+                            ? "2px solid #131413"
+                            : "1px solid rgba(0,0,0,0.1)",
+                        background: energyLevel === e ? "#f7f7f7" : "#fff",
                         color: "#1a1a1a",
                         cursor: "pointer",
                         fontWeight: energyLevel === e ? 600 : 400,
@@ -563,7 +563,7 @@ export function MedicationClient({
                     width: "100%",
                     padding: "9px 12px",
                     borderRadius: 8,
-                    border: "1px solid #ddd",
+                    border: "1px solid rgba(0,0,0,0.1)",
                     fontSize: 13,
                     resize: "vertical",
                     boxSizing: "border-box",
@@ -581,7 +581,7 @@ export function MedicationClient({
                   fontWeight: 600,
                   border: "none",
                   background:
-                    doseFormLoading || !newDose ? "#ccc" : "#2e7d32",
+                    doseFormLoading || !newDose ? "#ccc" : "#131413",
                   color: "#fff",
                   cursor:
                     doseFormLoading || !newDose ? "not-allowed" : "pointer",
@@ -598,7 +598,7 @@ export function MedicationClient({
       <div
         style={{
           background: "#fff",
-          border: "1px solid #ddd",
+          border: "1px solid rgba(0,0,0,0.1)",
           borderRadius: 12,
           padding: "16px 20px",
           marginBottom: 16,
@@ -676,7 +676,7 @@ export function MedicationClient({
       <div
         style={{
           background: "#fff",
-          border: "1px solid #ddd",
+          border: "1px solid rgba(0,0,0,0.1)",
           borderRadius: 12,
           padding: "16px 20px",
         }}
@@ -704,7 +704,7 @@ export function MedicationClient({
                 style={{
                   paddingTop: i > 0 ? 12 : 0,
                   paddingBottom: i < logs.length - 1 ? 12 : 0,
-                  borderBottom: i < logs.length - 1 ? "1px solid #f0f0f0" : "none",
+                  borderBottom: i < logs.length - 1 ? "1px solid rgba(0,0,0,0.05)" : "none",
                   display: "flex",
                   alignItems: "flex-start",
                   gap: 12,

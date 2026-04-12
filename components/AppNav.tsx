@@ -25,10 +25,10 @@ export function AppNav() {
   return (
     <>
       {/* Top bar (desktop) */}
-      <header className="hidden sm:flex items-center justify-between px-6 py-3 border-b bg-white sticky top-0 z-10">
+      <header className="hidden sm:flex items-center justify-between px-6 py-3 border-b border-black/5 bg-white/90 backdrop-blur-md sticky top-0 z-10">
         <Link href="/dashboard" className="flex items-center gap-2">
-          <Shield className="h-5 w-5 text-brand-600" />
-          <span className="font-semibold text-gray-800">MuscleGuard</span>
+          <Shield className="h-5 w-5 text-obsidian" />
+          <span className="font-semibold tracking-tight text-obsidian">MuscleGuard</span>
         </Link>
         <nav className="flex gap-1">
           {DESKTOP_NAV.map((item) => {
@@ -40,8 +40,8 @@ export function AppNav() {
                 className={cn(
                   "flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm transition-colors",
                   active
-                    ? "bg-brand-50 text-brand-700 font-medium"
-                    : "text-gray-500 hover:text-gray-800 hover:bg-gray-50"
+                    ? "bg-surface text-obsidian font-medium"
+                    : "text-mgray hover:text-obsidian hover:bg-surface"
                 )}
               >
                 <item.icon className="h-4 w-4" />
@@ -53,7 +53,7 @@ export function AppNav() {
       </header>
 
       {/* Bottom tab bar (mobile) — 5 tabs */}
-      <nav className="sm:hidden fixed bottom-0 inset-x-0 bg-white border-t z-10">
+      <nav className="sm:hidden fixed bottom-0 inset-x-0 bg-white border-t border-black/5 z-10">
         <div className="flex">
           {MOBILE_NAV.map((item) => {
             const active = pathname.startsWith(item.href);
@@ -63,7 +63,7 @@ export function AppNav() {
                 href={item.href}
                 className={cn(
                   "flex-1 flex flex-col items-center gap-0.5 py-2 text-xs transition-colors",
-                  active ? "text-brand-600 font-medium" : "text-gray-400"
+                  active ? "text-obsidian font-medium" : "text-muted"
                 )}
               >
                 <item.icon className="h-5 w-5" />

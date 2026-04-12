@@ -261,23 +261,23 @@ export function DashboardClient({
       {/* ── Header: streak badges ── */}
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Today</h1>
-          {mounted && <p className="text-sm text-gray-500 mt-0.5 max-w-xs">{msg.title}</p>}
+          <h1 className="text-2xl font-bold text-obsidian">Today</h1>
+          {mounted && <p className="text-sm text-mgray mt-0.5 max-w-xs">{msg.title}</p>}
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
           {workoutStreakDays >= 1 && (
-            <div className="flex items-center gap-1 bg-blue-50 border border-blue-100 px-2.5 py-1.5 rounded-full">
-              <Flame className="h-3.5 w-3.5 text-blue-500" />
-              <span className="text-xs font-semibold text-blue-700">
+            <div className="flex items-center gap-1 bg-surface border border-black/5 px-2.5 py-1.5 rounded-full">
+              <Flame className="h-3.5 w-3.5 text-obsidian" />
+              <span className="text-xs font-semibold text-obsidian">
                 {workoutStreakDays} workout{workoutStreakDays !== 1 ? "s" : ""}
               </span>
             </div>
           )}
           <div className={`flex items-center gap-1 px-2.5 py-1.5 rounded-full border ${
-            streak >= 1 ? "bg-orange-50 border-orange-100" : "bg-gray-50 border-gray-200"
+            streak >= 1 ? "bg-surface border-black/5" : "bg-surface border-black/5"
           }`}>
             <span className="text-sm">{streak >= 7 ? "🔥🔥" : streak >= 1 ? "🔥" : "💤"}</span>
-            <span className={`text-xs font-semibold ${streak >= 1 ? "text-orange-700" : "text-gray-400"}`}>
+            <span className={`text-xs font-semibold ${streak >= 1 ? "text-obsidian" : "text-muted"}`}>
               {streak}d protein
             </span>
           </div>
@@ -286,27 +286,27 @@ export function DashboardClient({
 
       {/* Milestone badge */}
       {milestoneLabel && (
-        <div className="flex items-center gap-2 px-3 py-2 bg-yellow-50 border border-yellow-200 rounded-lg">
-          <Trophy className="h-4 w-4 text-yellow-600 flex-shrink-0" />
-          <span className="text-sm font-medium text-yellow-800">{milestoneLabel}</span>
+        <div className="flex items-center gap-2 px-3 py-2 bg-[#CDFF00]/10 border border-[#CDFF00]/20 rounded-lg">
+          <Trophy className="h-4 w-4 text-obsidian flex-shrink-0" />
+          <span className="text-sm font-medium text-obsidian">{milestoneLabel}</span>
         </div>
       )}
 
       {/* ── Protein ring ── */}
-      <Card>
+      <Card className="border-black/5">
         <CardContent className="pt-8 pb-4 flex justify-center">
           <ProteinRing goalG={proteinGoalG} loggedG={totalProtein} />
         </CardContent>
         {/* Protein personalization info */}
-        <div className="px-5 pb-5 space-y-2 border-t border-gray-100 pt-3">
-          <p className="text-xs text-gray-500 leading-relaxed">{proteinGoalExplanation}</p>
-          <p className="text-xs text-gray-400">
-            <span className="font-medium text-gray-600">Meal targets:</span>{" "}
+        <div className="px-5 pb-5 space-y-2 border-t border-black/5 pt-3">
+          <p className="text-xs text-mgray leading-relaxed">{proteinGoalExplanation}</p>
+          <p className="text-xs text-muted">
+            <span className="font-medium text-mgray">Meal targets:</span>{" "}
             Breakfast: {proteinBreakdown.breakfast}g · Lunch: {proteinBreakdown.lunch}g · Dinner: {proteinBreakdown.dinner}g · Snack: {proteinBreakdown.snack}g
           </p>
           {trainingIntensityPct < 95 && (
-            <p className="text-xs text-gray-400">
-              <span className="font-medium text-gray-600">Training today:</span>{" "}
+            <p className="text-xs text-muted">
+              <span className="font-medium text-mgray">Training today:</span>{" "}
               {trainingIntensityPct}% intensity
             </p>
           )}
@@ -315,15 +315,15 @@ export function DashboardClient({
 
       {/* Sub-message */}
       {mounted && msg.sub && (
-        <p className="text-sm text-gray-500 text-center -mt-2">{msg.sub}</p>
+        <p className="text-sm text-mgray text-center -mt-2">{msg.sub}</p>
       )}
 
       {/* Points */}
       <div className="flex items-center justify-center gap-1.5">
-        <Trophy className="h-3.5 w-3.5 text-yellow-500" />
-        <span className="text-xs text-gray-400 font-medium">{points} points</span>
-        <span className="text-gray-200">·</span>
-        <span className="text-xs text-gray-400">Protein goal = +10pts · Workout = +5pts</span>
+        <Trophy className="h-3.5 w-3.5 text-obsidian" />
+        <span className="text-xs text-muted font-medium">{points} points</span>
+        <span className="text-muted">·</span>
+        <span className="text-xs text-muted">Protein goal = +10pts · Workout = +5pts</span>
       </div>
 
       {/* ── Quick-add meal buttons ── */}
@@ -339,8 +339,8 @@ export function DashboardClient({
                 onClick={() => setActivePreset(isActive ? null : key)}
                 className="flex flex-col items-center gap-0.5 py-2.5 px-1 rounded-lg border text-xs font-medium transition-colors"
                 style={isActive
-                  ? { borderColor: "#2e7d32", background: "#f1f8f1", color: "#1b5e20" }
-                  : { borderColor: "#e5e7eb", background: "#fff", color: "#4b5563" }
+                  ? { borderColor: "#131413", background: "#f7f7f7", color: "#131413" }
+                  : { borderColor: "rgba(0,0,0,0.05)", background: "#fff", color: "#585A59" }
                 }
               >
                 <span className="text-lg">{preset.emoji}</span>
@@ -352,27 +352,27 @@ export function DashboardClient({
 
         {/* Preset panel */}
         {activePreset && (
-          <div className="border border-gray-200 rounded-xl bg-white overflow-hidden shadow-sm">
-            <div className="flex items-center justify-between px-4 py-2.5 border-b border-gray-100 bg-gray-50">
-              <span className="text-sm font-semibold text-gray-800">
+          <div className="border border-black/5 rounded-[10px] bg-white overflow-hidden shadow-sm">
+            <div className="flex items-center justify-between px-4 py-2.5 border-b border-black/5 bg-surface">
+              <span className="text-sm font-semibold text-obsidian">
                 {MEAL_PRESETS[activePreset].emoji} {MEAL_PRESETS[activePreset].label}
               </span>
-              <button onClick={() => setActivePreset(null)} className="text-gray-400 hover:text-gray-600">
+              <button onClick={() => setActivePreset(null)} className="text-muted hover:text-obsidian">
                 <X className="h-4 w-4" />
               </button>
             </div>
-            <div className="divide-y divide-gray-100">
+            <div className="divide-y divide-black/5">
               {MEAL_PRESETS[activePreset].items.map((item) => (
                 <button
                   key={item.name}
                   type="button"
                   onClick={() => logPreset(item)}
                   disabled={loggingPreset === item.name}
-                  className="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition-colors text-left"
+                  className="w-full flex items-center justify-between px-4 py-3 hover:bg-surface transition-colors text-left"
                 >
                   <div>
-                    <p className="text-sm font-medium text-gray-900">{item.name}</p>
-                    <p className="text-xs text-gray-400">{item.calories} kcal</p>
+                    <p className="text-sm font-medium text-obsidian">{item.name}</p>
+                    <p className="text-xs text-muted">{item.calories} kcal</p>
                   </div>
                   <span className="text-sm font-semibold ml-3 flex-shrink-0" style={{
                     color: loggingPreset === item.name ? "#9ca3af" : "#15803d"
@@ -391,7 +391,7 @@ export function DashboardClient({
           onClick={quickAdd30g}
           disabled={quickAdding}
           className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg border border-dashed text-sm font-medium transition-colors disabled:opacity-60"
-          style={{ borderColor: "#86efac", background: "#f0fdf4", color: "#15803d" }}
+          style={{ borderColor: "rgba(205,255,0,0.4)", background: "rgba(205,255,0,0.05)", color: "#131413" }}
         >
           <Zap className="h-4 w-4" />
           {quickAdding ? "Adding…" : "Quick add 30g protein"}
@@ -399,7 +399,7 @@ export function DashboardClient({
       </div>
 
       {/* ── Log food (USDA search) ── */}
-      <Card>
+      <Card className="border-black/5">
         <CardHeader className="pb-3">
           <CardTitle className="text-base">Log food</CardTitle>
         </CardHeader>
@@ -409,7 +409,7 @@ export function DashboardClient({
       </Card>
 
       {/* ── Today's log ── */}
-      <Card>
+      <Card className="border-black/5">
         <CardHeader className="pb-3">
           <CardTitle className="text-base">Today&apos;s food</CardTitle>
         </CardHeader>
@@ -467,24 +467,24 @@ function ThisWeek({ weekLogs, weekStart, expanded, onToggle, expandedDays, onTog
   const weekTotalProtein = weekLogs.reduce((s, l) => s + Number(l.protein_g), 0);
 
   return (
-    <div className="border border-gray-200 rounded-xl overflow-hidden bg-white">
+    <div className="border border-black/5 rounded-xl overflow-hidden bg-white">
       <button
         type="button"
         onClick={onToggle}
-        className="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition-colors"
+        className="w-full flex items-center justify-between px-4 py-3 hover:bg-surface transition-colors"
       >
         <div className="flex items-center gap-2">
           {expanded
-            ? <ChevronDown className="h-4 w-4 text-gray-400" />
-            : <ChevronRight className="h-4 w-4 text-gray-400" />
+            ? <ChevronDown className="h-4 w-4 text-muted" />
+            : <ChevronRight className="h-4 w-4 text-muted" />
           }
-          <span className="text-sm font-semibold text-gray-700">This Week</span>
+          <span className="text-sm font-semibold text-obsidian">This Week</span>
         </div>
-        <span className="text-xs text-gray-400">{weekTotalProtein}g protein total</span>
+        <span className="text-xs text-muted">{weekTotalProtein}g protein total</span>
       </button>
 
       {expanded && (
-        <div className="border-t border-gray-100 divide-y divide-gray-100">
+        <div className="border-t border-black/5 divide-y divide-black/5">
           {[...days].reverse().map((date) => {
             const entries = byDay[date] ?? [];
             const dayProtein = entries.reduce((s, l) => s + Number(l.protein_g), 0);
@@ -497,34 +497,34 @@ function ThisWeek({ weekLogs, weekStart, expanded, onToggle, expandedDays, onTog
                   type="button"
                   onClick={() => entries.length > 0 && onToggleDay(date)}
                   className={`w-full flex items-center justify-between px-4 py-2.5 text-left transition-colors ${
-                    entries.length > 0 ? "hover:bg-gray-50 cursor-pointer" : "cursor-default"
+                    entries.length > 0 ? "hover:bg-surface cursor-pointer" : "cursor-default"
                   }`}
                 >
                   <div className="flex items-center gap-2">
                     {entries.length > 0
                       ? isDayExpanded
-                        ? <ChevronDown className="h-3.5 w-3.5 text-gray-300" />
-                        : <ChevronRight className="h-3.5 w-3.5 text-gray-300" />
+                        ? <ChevronDown className="h-3.5 w-3.5 text-muted" />
+                        : <ChevronRight className="h-3.5 w-3.5 text-muted" />
                       : <span className="w-3.5" />
                     }
-                    <span className={`text-sm ${isToday ? "font-semibold text-gray-900" : "text-gray-600"}`}>
+                    <span className={`text-sm ${isToday ? "font-semibold text-obsidian" : "text-mgray"}`}>
                       {isToday ? "Today" : formatDayLabel(date)}
                     </span>
                   </div>
                   <span className={`text-xs font-medium ${
-                    dayProtein > 0 ? "text-green-600" : "text-gray-300"
+                    dayProtein > 0 ? "text-green-600" : "text-muted"
                   }`}>
                     {dayProtein > 0 ? `${dayProtein}g` : "—"}
                   </span>
                 </button>
 
                 {isDayExpanded && entries.length > 0 && (
-                  <div className="px-4 pb-2 space-y-1.5 bg-gray-50">
+                  <div className="px-4 pb-2 space-y-1.5 bg-surface">
                     {entries.map((entry) => (
                       <div key={entry.id} className="flex items-center justify-between pl-5">
                         <div className="min-w-0 flex-1">
-                          <p className="text-xs text-gray-700 line-clamp-1">{entry.food_name}</p>
-                          <p className="text-xs text-gray-400">{formatTime(entry.logged_at)}</p>
+                          <p className="text-xs text-obsidian line-clamp-1">{entry.food_name}</p>
+                          <p className="text-xs text-muted">{formatTime(entry.logged_at)}</p>
                         </div>
                         <span className="text-xs font-semibold text-green-600 ml-2 flex-shrink-0">
                           +{entry.protein_g}g

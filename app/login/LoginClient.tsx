@@ -65,25 +65,30 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-      <Card className="w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center bg-surface px-4">
+      <Card className="w-full max-w-md rounded-[10px] border-black/5">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-2">
-            <Shield className="h-10 w-10 text-brand-600" />
+            <Shield className="h-10 w-10 text-obsidian" />
           </div>
-          <CardTitle className="text-2xl">MuscleGuard</CardTitle>
-          <CardDescription>Your GLP-1 muscle protection coach</CardDescription>
+          <CardTitle className="text-2xl font-medium tracking-tight text-obsidian">MuscleGuard</CardTitle>
+          <CardDescription className="text-mgray">Your GLP-1 muscle protection coach</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {error && (
-            <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+            <div className="p-3 bg-alert/10 border border-alert/20 rounded-lg text-obsidian text-sm">
               {error}
             </div>
           )}
           {sent ? (
             <div className="text-center py-6">
-              <p className="text-brand-700 font-medium">Check your email!</p>
-              <p className="text-sm text-gray-500 mt-1">
+              <div className="flex justify-center mb-2">
+                <div className="w-10 h-10 rounded-full bg-[#CDFF00]/20 flex items-center justify-center">
+                  <span className="text-lg">✓</span>
+                </div>
+              </div>
+              <p className="text-obsidian font-medium">Check your email!</p>
+              <p className="text-sm text-mgray mt-1">
                 We sent a magic link to <strong>{email}</strong>
               </p>
             </div>
@@ -99,9 +104,10 @@ export default function LoginPage() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
+                    className="rounded-lg"
                   />
                 </div>
-                <Button type="submit" className="w-full" disabled={loading}>
+                <Button type="submit" className="w-full bg-obsidian text-white hover:bg-obsidian-light rounded-lg" disabled={loading}>
                   {loading ? "Sending…" : "Send magic link"}
                 </Button>
               </form>

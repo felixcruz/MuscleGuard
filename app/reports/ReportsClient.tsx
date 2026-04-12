@@ -26,9 +26,9 @@ interface Props {
 }
 
 const GRADE_STYLES = {
-  A: { bg: "bg-green-600", text: "text-green-600", light: "bg-green-50 border-green-200" },
-  B: { bg: "bg-amber-500", text: "text-amber-600", light: "bg-amber-50 border-amber-200" },
-  C: { bg: "bg-orange-500", text: "text-orange-600", light: "bg-orange-50 border-orange-200" },
+  A: { bg: "bg-[#CDFF00]", text: "text-obsidian", light: "bg-[#CDFF00]/10 border-[#CDFF00]/20" },
+  B: { bg: "bg-surface", text: "text-obsidian", light: "bg-surface border-black/5" },
+  C: { bg: "bg-alert", text: "text-obsidian", light: "bg-alert/10 border-alert/20" },
 };
 
 function formatWeek(weekStart: string, weekEnd: string) {
@@ -47,7 +47,7 @@ function GradeBadge({ grade }: { grade: "A" | "B" | "C" }) {
     <div
       className={`w-14 h-14 rounded-full ${style.bg} flex items-center justify-center flex-shrink-0`}
     >
-      <span className="text-2xl font-bold text-white">{grade}</span>
+      <span className="text-2xl font-bold text-obsidian">{grade}</span>
     </div>
   );
 }
@@ -57,14 +57,14 @@ function ReportCard({ report }: { report: WeeklyReportData }) {
   const style = GRADE_STYLES[report.grade as "A" | "B" | "C"];
 
   return (
-    <div className={`border rounded-xl p-4 space-y-3 ${style.light}`}>
+    <div className={`border rounded-[10px] p-4 space-y-3 ${style.light}`}>
       <div className="flex items-start gap-4">
         <GradeBadge grade={report.grade as "A" | "B" | "C"} />
         <div className="flex-1 min-w-0">
-          <p className="text-xs text-gray-500 font-medium">
+          <p className="text-xs text-mgray font-medium">
             {formatWeek(report.week_start, report.week_end)}
           </p>
-          <div className="flex gap-4 mt-1.5 text-sm text-gray-700">
+          <div className="flex gap-4 mt-1.5 text-sm text-obsidian">
             <span>
               🥩 <strong>{report.protein_days_hit}</strong>/7 protein days
             </span>
@@ -74,13 +74,13 @@ function ReportCard({ report }: { report: WeeklyReportData }) {
           </div>
           {/* Score bar */}
           <div className="mt-2">
-            <div className="h-1.5 bg-white/60 rounded-full overflow-hidden">
+            <div className="h-1.5 bg-muted/20 rounded-full overflow-hidden">
               <div
-                className={`h-full rounded-full ${style.bg}`}
+                className="h-full rounded-full bg-obsidian"
                 style={{ width: `${Math.min(100, report.score)}%` }}
               />
             </div>
-            <p className="text-xs text-gray-400 mt-0.5">Score: {Math.round(report.score)}/100</p>
+            <p className="text-xs text-muted mt-0.5">Score: {Math.round(report.score)}/100</p>
           </div>
         </div>
       </div>
@@ -88,7 +88,7 @@ function ReportCard({ report }: { report: WeeklyReportData }) {
       {/* AI Summary */}
       <div>
         <p
-          className={`text-sm text-gray-700 leading-relaxed ${
+          className={`text-sm text-obsidian leading-relaxed ${
             !expanded ? "line-clamp-2" : ""
           }`}
         >
@@ -97,7 +97,7 @@ function ReportCard({ report }: { report: WeeklyReportData }) {
         {report.summary_text.length > 120 && (
           <button
             onClick={() => setExpanded((e) => !e)}
-            className="text-xs text-gray-400 hover:text-gray-600 mt-0.5"
+            className="text-xs text-muted hover:text-obsidian mt-0.5"
           >
             {expanded ? "Show less" : "Read more"}
           </button>
@@ -154,19 +154,19 @@ export function ReportsClient({
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Weekly Reports</h1>
-          <p className="text-gray-500 text-sm mt-1">
+          <h1 className="text-2xl font-bold text-obsidian">Weekly Reports</h1>
+          <p className="text-mgray text-sm mt-1">
             Auto-generated every Sunday · A / B / C grade
           </p>
         </div>
-        <TrendingUp className="h-6 w-6 text-gray-400 mt-1" />
+        <TrendingUp className="h-6 w-6 text-muted mt-1" />
       </div>
 
       {/* Current week preview */}
-      <div className="border border-gray-200 rounded-xl p-4 space-y-3 bg-white">
+      <div className="border border-black/5 rounded-[10px] p-4 space-y-3 bg-white">
         <div className="flex items-center justify-between">
-          <p className="text-sm font-semibold text-gray-800">This week so far</p>
-          <span className="text-xs text-gray-400">
+          <p className="text-sm font-semibold text-obsidian">This week so far</p>
+          <span className="text-xs text-muted">
             Day {currentWeek.daysElapsed}/7
           </span>
         </div>
@@ -174,13 +174,13 @@ export function ReportsClient({
         <div className="space-y-2">
           {/* Protein days */}
           <div>
-            <div className="flex justify-between text-xs text-gray-500 mb-1">
+            <div className="flex justify-between text-xs text-mgray mb-1">
               <span>Protein days</span>
               <span>
                 {currentWeek.proteinDaysHit}/{currentWeek.daysElapsed} days
               </span>
             </div>
-            <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+            <div className="h-2 bg-muted/20 rounded-full overflow-hidden">
               <div
                 className="h-full rounded-full bg-green-500 transition-all"
                 style={{
@@ -192,11 +192,11 @@ export function ReportsClient({
 
           {/* Workouts */}
           <div>
-            <div className="flex justify-between text-xs text-gray-500 mb-1">
+            <div className="flex justify-between text-xs text-mgray mb-1">
               <span>Workouts</span>
               <span>{currentWeek.workoutsCount}/3 target</span>
             </div>
-            <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+            <div className="h-2 bg-muted/20 rounded-full overflow-hidden">
               <div
                 className="h-full rounded-full bg-blue-500 transition-all"
                 style={{
@@ -207,20 +207,20 @@ export function ReportsClient({
           </div>
         </div>
 
-        <p className="text-xs text-gray-400">
+        <p className="text-xs text-muted">
           Report will be generated automatically this Sunday.
         </p>
       </div>
 
       {/* Generate last week's report if missing */}
       {showGenerateButton && (
-        <div className="border border-dashed border-gray-300 rounded-xl p-4 text-center space-y-2">
-          <p className="text-sm text-gray-600">
+        <div className="border border-dashed border-black/10 rounded-[10px] p-4 text-center space-y-2">
+          <p className="text-sm text-mgray">
             {isSunday
               ? "Today's report is ready to generate!"
               : `Last week's report (${formatWeek(lastWeekStart, lastWeekEnd)}) hasn't been generated yet.`}
           </p>
-          <Button onClick={generateReport} disabled={generating} size="sm">
+          <Button onClick={generateReport} disabled={generating} size="sm" className="bg-obsidian text-white hover:bg-obsidian-light">
             <Sparkles className="h-4 w-4 mr-1.5" />
             {generating ? "Generating…" : "Generate report"}
           </Button>
@@ -231,7 +231,7 @@ export function ReportsClient({
       {/* Past reports */}
       {liveReports.length > 0 ? (
         <div className="space-y-4">
-          <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
+          <h2 className="text-sm font-semibold text-obsidian uppercase tracking-wide">
             Past reports
           </h2>
           {liveReports.map((report) => (
@@ -240,7 +240,7 @@ export function ReportsClient({
         </div>
       ) : (
         !showGenerateButton && (
-          <div className="text-center py-10 text-gray-400">
+          <div className="text-center py-10 text-muted">
             <p className="text-sm">No reports yet.</p>
             <p className="text-xs mt-1">
               Your first report will appear after the first Sunday.

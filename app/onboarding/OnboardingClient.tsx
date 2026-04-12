@@ -223,7 +223,7 @@ export default function OnboardingPage() {
     <div
       style={{
         minHeight: "100vh",
-        background: "linear-gradient(180deg, #f5f5f5 0%, #e8e8e8 100%)",
+        background: "#f7f7f7",
         fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
         display: "flex",
         flexDirection: "column",
@@ -240,7 +240,7 @@ export default function OnboardingPage() {
           height="22"
           viewBox="0 0 24 24"
           fill="none"
-          stroke="#2e7d32"
+          stroke="#131413"
           strokeWidth="2.5"
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -268,11 +268,11 @@ export default function OnboardingPage() {
               </span>
               <span style={{ fontSize: 13, color: "#666" }}>{progress}%</span>
             </div>
-            <div style={{ height: 6, background: "#ddd", borderRadius: 99 }}>
+            <div style={{ height: 6, background: "rgba(191,193,192,0.3)", borderRadius: 99 }}>
               <div
                 style={{
                   height: 6,
-                  background: "#2e7d32",
+                  background: "#131413",
                   borderRadius: 99,
                   width: `${progress}%`,
                   transition: "width 0.4s ease",
@@ -286,8 +286,8 @@ export default function OnboardingPage() {
         <div
           style={{
             background: "#fff",
-            border: "1px solid #ddd",
-            borderRadius: 12,
+            border: "1px solid rgba(0,0,0,0.05)",
+            borderRadius: 10,
             padding: "28px 24px",
           }}
         >
@@ -338,7 +338,7 @@ export default function OnboardingPage() {
                     }}
                   >
                     <span
-                      style={{ color: "#2e7d32", fontWeight: 700, marginTop: 1 }}
+                      style={{ color: "#131413", fontWeight: 700, marginTop: 1 }}
                     >
                       ✓
                     </span>
@@ -401,7 +401,7 @@ export default function OnboardingPage() {
                     width: "100%",
                     padding: "10px 40px 10px 12px",
                     borderRadius: 8,
-                    border: "1px solid #ddd",
+                    border: "1px solid rgba(0,0,0,0.1)",
                     fontSize: 15,
                     color: "#1a1a1a",
                     background: "#fff",
@@ -470,9 +470,9 @@ export default function OnboardingPage() {
                         padding: "14px 16px",
                         borderRadius: 10,
                         border: selected
-                          ? "2px solid #2e7d32"
-                          : "1px solid #ddd",
-                        background: selected ? "#f1f8f1" : "#fff",
+                          ? "2px solid #131413"
+                          : "1px solid rgba(0,0,0,0.1)",
+                        background: selected ? "#f7f7f7" : "#fff",
                         color: "#1a1a1a",
                         cursor: "pointer",
                       }}
@@ -481,7 +481,7 @@ export default function OnboardingPage() {
                         style={{
                           fontSize: 15,
                           fontWeight: selected ? 700 : 600,
-                          color: selected ? "#1b5e20" : "#1a1a1a",
+                          color: selected ? "#131413" : "#585A59",
                         }}
                       >
                         {opt.label}
@@ -564,10 +564,10 @@ export default function OnboardingPage() {
                       fontSize: 14,
                       border:
                         form.medication === med.value
-                          ? "2px solid #2e7d32"
-                          : "1px solid #ddd",
+                          ? "2px solid #131413"
+                          : "1px solid rgba(0,0,0,0.1)",
                       background:
-                        form.medication === med.value ? "#f1f8f1" : "#fff",
+                        form.medication === med.value ? "#f7f7f7" : "#fff",
                       color: "#1a1a1a",
                       cursor: "pointer",
                       fontWeight: form.medication === med.value ? 600 : 400,
@@ -609,7 +609,7 @@ export default function OnboardingPage() {
                           width: "100%",
                           padding: "10px 40px 10px 12px",
                           borderRadius: 8,
-                          border: "1px solid #ddd",
+                          border: "1px solid rgba(0,0,0,0.1)",
                           fontSize: 15,
                           color: "#1a1a1a",
                           background: "#fff",
@@ -638,7 +638,7 @@ export default function OnboardingPage() {
                         style={{
                           padding: "10px 12px",
                           borderRadius: 8,
-                          border: "1px solid #ddd",
+                          border: "1px solid rgba(0,0,0,0.1)",
                           fontSize: 14,
                           color: form.dose_mg ? "#1a1a1a" : "#999",
                           background: "#fff",
@@ -696,10 +696,10 @@ export default function OnboardingPage() {
                       fontSize: 13,
                       border:
                         form.frequency === opt.value
-                          ? "2px solid #2e7d32"
-                          : "1px solid #ddd",
+                          ? "2px solid #131413"
+                          : "1px solid rgba(0,0,0,0.1)",
                       background:
-                        form.frequency === opt.value ? "#f1f8f1" : "#fff",
+                        form.frequency === opt.value ? "#f7f7f7" : "#fff",
                       color: "#1a1a1a",
                       cursor: "pointer",
                       fontWeight: form.frequency === opt.value ? 600 : 400,
@@ -743,10 +743,10 @@ export default function OnboardingPage() {
                           fontSize: 12,
                           border:
                             form.injection_day === day
-                              ? "2px solid #2e7d32"
-                              : "1px solid #ddd",
+                              ? "2px solid #131413"
+                              : "1px solid rgba(0,0,0,0.1)",
                           background:
-                            form.injection_day === day ? "#f1f8f1" : "#fff",
+                            form.injection_day === day ? "#f7f7f7" : "#fff",
                           color:
                             form.injection_day === day ? "#1b5e20" : "#1a1a1a",
                           cursor: "pointer",
@@ -792,10 +792,10 @@ export default function OnboardingPage() {
                       fontSize: 14,
                       border:
                         form.appetite_level === opt.value
-                          ? "2px solid #2e7d32"
-                          : "1px solid #ddd",
+                          ? "2px solid #131413"
+                          : "1px solid rgba(0,0,0,0.1)",
                       background:
-                        form.appetite_level === opt.value ? "#f1f8f1" : "#fff",
+                        form.appetite_level === opt.value ? "#f7f7f7" : "#fff",
                       color: "#1a1a1a",
                       cursor: "pointer",
                       fontWeight: form.appetite_level === opt.value ? 600 : 400,
@@ -865,10 +865,10 @@ export default function OnboardingPage() {
                         borderRadius: 20,
                         fontSize: 13,
                         border: selected
-                          ? "2px solid #2e7d32"
-                          : "1px solid #ddd",
-                        background: selected ? "#f1f8f1" : "#fff",
-                        color: selected ? "#1b5e20" : "#1a1a1a",
+                          ? "2px solid #131413"
+                          : "1px solid rgba(0,0,0,0.1)",
+                        background: selected ? "#f7f7f7" : "#fff",
+                        color: selected ? "#131413" : "#585A59",
                         cursor: "pointer",
                         fontWeight: selected ? 600 : 400,
                         display: "flex",
@@ -904,7 +904,7 @@ export default function OnboardingPage() {
                       style={{
                         padding: "10px 12px",
                         borderRadius: 8,
-                        border: "1px solid #ddd",
+                        border: "1px solid rgba(0,0,0,0.1)",
                         fontSize: 14,
                         color: form.primary_activity ? "#1a1a1a" : "#999",
                         background: "#fff",
@@ -963,8 +963,8 @@ export default function OnboardingPage() {
                       fontSize: 13,
                       border:
                         form.activity_frequency === opt.value
-                          ? "2px solid #2e7d32"
-                          : "1px solid #ddd",
+                          ? "2px solid #131413"
+                          : "1px solid rgba(0,0,0,0.1)",
                       background:
                         form.activity_frequency === opt.value
                           ? "#f1f8f1"
@@ -1015,8 +1015,8 @@ export default function OnboardingPage() {
                       fontSize: 13,
                       border:
                         form.experience_level === opt.value
-                          ? "2px solid #2e7d32"
-                          : "1px solid #ddd",
+                          ? "2px solid #131413"
+                          : "1px solid rgba(0,0,0,0.1)",
                       background:
                         form.experience_level === opt.value
                           ? "#f1f8f1"
@@ -1077,10 +1077,10 @@ export default function OnboardingPage() {
                           fontSize: 14,
                           border:
                             form.equipment === opt.value
-                              ? "2px solid #2e7d32"
-                              : "1px solid #ddd",
+                              ? "2px solid #131413"
+                              : "1px solid rgba(0,0,0,0.1)",
                           background:
-                            form.equipment === opt.value ? "#f1f8f1" : "#fff",
+                            form.equipment === opt.value ? "#f7f7f7" : "#fff",
                           color: "#1a1a1a",
                           cursor: "pointer",
                           fontWeight: form.equipment === opt.value ? 600 : 400,
@@ -1129,7 +1129,7 @@ export default function OnboardingPage() {
                     borderRadius: 8,
                     fontSize: 14,
                     fontWeight: 600,
-                    border: "1px solid #ddd",
+                    border: "1px solid rgba(0,0,0,0.1)",
                     background: "#fff",
                     color: "#1a1a1a",
                     cursor: "pointer",
@@ -1149,7 +1149,7 @@ export default function OnboardingPage() {
                     fontSize: 14,
                     fontWeight: 600,
                     border: "none",
-                    background: "#2e7d32",
+                    background: "#131413",
                     color: "#fff",
                     cursor: "pointer",
                   }}
@@ -1168,7 +1168,7 @@ export default function OnboardingPage() {
                     fontSize: 14,
                     fontWeight: 600,
                     border: "none",
-                    background: saving ? "#ccc" : "#2e7d32",
+                    background: saving ? "#ccc" : "#131413",
                     color: "#fff",
                     cursor: saving ? "not-allowed" : "pointer",
                   }}

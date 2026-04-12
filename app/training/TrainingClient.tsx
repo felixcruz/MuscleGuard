@@ -119,28 +119,28 @@ export function TrainingClient({
       {/* ── Header + streak badges ── */}
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">
+          <h1 className="text-2xl font-bold text-obsidian">
             {protocol.emoji} {protocol.displayName}
           </h1>
-          <p className="text-gray-500 mt-1 text-sm max-w-xs">
+          <p className="text-mgray mt-1 text-sm max-w-xs">
             {protocol.glp1Note}
           </p>
         </div>
         <div className="flex flex-col items-end gap-1.5">
           {/* Workout streak */}
           <div className={`flex items-center gap-1 px-2.5 py-1.5 rounded-full border flex-shrink-0 ${
-            streak >= 1 ? "bg-orange-50 border-orange-100" : "bg-gray-50 border-gray-200"
+            streak >= 1 ? "bg-surface border-black/5" : "bg-surface border-black/5"
           }`}>
             <span className="text-sm">{streak >= 7 ? "🔥🔥" : streak >= 1 ? "🔥" : "💤"}</span>
-            <span className={`text-xs font-semibold ${streak >= 1 ? "text-orange-700" : "text-gray-400"}`}>
+            <span className={`text-xs font-semibold ${streak >= 1 ? "text-obsidian" : "text-muted"}`}>
               {streak} workout{streak !== 1 ? "s" : ""}
             </span>
           </div>
           {/* Protein streak (cross-context) */}
           {proteinStreakDays >= 1 && (
-            <div className="flex items-center gap-1 bg-green-50 border border-green-100 px-2.5 py-1.5 rounded-full">
+            <div className="flex items-center gap-1 bg-surface border border-black/5 px-2.5 py-1.5 rounded-full">
               <span className="text-xs">🥩</span>
-              <span className="text-xs font-semibold text-green-700">
+              <span className="text-xs font-semibold text-obsidian">
                 {proteinStreakDays}d protein
               </span>
             </div>
@@ -150,22 +150,22 @@ export function TrainingClient({
 
       {/* Milestone */}
       {milestoneLabel && (
-        <div className="flex items-center gap-2 px-3 py-2 bg-yellow-50 border border-yellow-200 rounded-lg">
-          <Trophy className="h-4 w-4 text-yellow-600 flex-shrink-0" />
-          <span className="text-sm font-medium text-yellow-800">{milestoneLabel}</span>
+        <div className="flex items-center gap-2 px-3 py-2 bg-[#CDFF00]/10 border border-[#CDFF00]/20 rounded-lg">
+          <Trophy className="h-4 w-4 text-obsidian flex-shrink-0" />
+          <span className="text-sm font-medium text-obsidian">{milestoneLabel}</span>
         </div>
       )}
 
       {/* Weekly progress */}
-      <div className="flex gap-2 items-center bg-white border border-gray-200 rounded-xl px-4 py-3">
-        <span className="text-sm text-gray-500 mr-1">This week</span>
+      <div className="flex gap-2 items-center bg-white border border-black/5 rounded-xl px-4 py-3">
+        <span className="text-sm text-mgray mr-1">This week</span>
         {trackedSessions.map((session) => (
           <div
             key={session.id}
-            className={`h-2.5 flex-1 rounded-full transition-colors ${done.includes(session.id) ? "bg-green-500" : "bg-gray-200"}`}
+            className={`h-2.5 flex-1 rounded-full transition-colors ${done.includes(session.id) ? "bg-obsidian" : "bg-muted/30"}`}
           />
         ))}
-        <span className="text-sm font-semibold text-green-700 ml-1">
+        <span className="text-sm font-semibold text-obsidian ml-1">
           {trackedDoneCount}/{trackedSessions.length}
         </span>
         {trackedDoneCount === trackedSessions.length && trackedSessions.length > 0 && (
@@ -175,18 +175,18 @@ export function TrainingClient({
 
       {/* Points */}
       <div className="flex items-center gap-1.5 justify-center">
-        <Flame className="h-3.5 w-3.5 text-orange-400" />
-        <span className="text-xs text-gray-400 font-medium">{points} total points · +5 per workout</span>
+        <Flame className="h-3.5 w-3.5 text-obsidian" />
+        <span className="text-xs text-muted font-medium">{points} total points · +5 per workout</span>
       </div>
 
       {/* ── Primary activity sessions ── */}
       {protocol.needsComplementaryStrength && (
         <div className="space-y-4">
           <div>
-            <h2 className="text-base font-semibold text-gray-800 mb-1">
+            <h2 className="text-base font-medium text-obsidian mb-1">
               {protocol.emoji} {protocol.displayName} Sessions
             </h2>
-            <p className="text-xs text-gray-500">Mark each session when you complete it.</p>
+            <p className="text-xs text-mgray">Mark each session when you complete it.</p>
           </div>
           {protocol.primarySessions.map((session) => (
             <StrengthCard
@@ -234,21 +234,21 @@ export function TrainingClient({
       {protocol.needsComplementaryStrength && (
         <div className="space-y-4">
           {/* GLP-1 warning */}
-          <div className="flex items-start gap-3 p-4 bg-red-50 border border-red-200 rounded-lg">
-            <AlertTriangle className="h-5 w-5 text-red-600 mt-0.5 flex-shrink-0" />
+          <div className="flex items-start gap-3 p-4 bg-obsidian rounded-[10px]">
+            <AlertTriangle className="h-5 w-5 text-[#FFB4AB] mt-0.5 flex-shrink-0" />
             <div>
-              <p className="font-semibold text-red-800 text-sm">
+              <p className="font-semibold text-[#FFB4AB] text-sm">
                 Muscle Preservation — Required on GLP-1
               </p>
-              <p className="text-xs text-red-700 mt-1">{protocol.glp1Note}</p>
+              <p className="text-xs text-white mt-1">{protocol.glp1Note}</p>
             </div>
           </div>
 
           <div>
-            <h2 className="text-base font-semibold text-gray-800 mb-1">
+            <h2 className="text-base font-medium text-obsidian mb-1">
               💪 Complementary Strength Sessions
             </h2>
-            <p className="text-xs text-gray-500 mb-3">
+            <p className="text-xs text-mgray mb-3">
               Complete 2x/week to prevent muscle loss on GLP-1.
             </p>
           </div>
@@ -279,24 +279,24 @@ interface StrengthCardProps {
 
 function StrengthCard({ session, isDone, toggling, onToggle }: StrengthCardProps) {
   return (
-    <Card className={isDone ? "opacity-75" : ""}>
+    <Card className={`border-black/5 rounded-[10px] ${isDone ? "opacity-75" : ""}`}>
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-base">{session.label}</CardTitle>
+          <CardTitle className="text-base font-medium text-obsidian">{session.label}</CardTitle>
           <Badge variant={isDone ? "secondary" : "outline"}>~{session.duration}</Badge>
         </div>
-        <p className="text-sm text-gray-500">{session.description}</p>
+        <p className="text-sm text-mgray">{session.description}</p>
       </CardHeader>
       <CardContent className="space-y-4">
         {session.exercises && session.exercises.length > 0 && (
-          <div className="divide-y">
+          <div className="divide-y divide-black/5">
             {session.exercises.map((ex) => (
               <div key={ex.name} className="py-2.5 flex justify-between items-start gap-2">
                 <div>
-                  <p className="text-sm font-medium">{ex.name}</p>
-                  <p className="text-xs text-gray-400">{ex.why}</p>
+                  <p className="text-sm font-medium text-obsidian">{ex.name}</p>
+                  <p className="text-xs text-muted">{ex.why}</p>
                 </div>
-                <span className="text-sm text-gray-600 shrink-0">
+                <span className="text-sm text-mgray shrink-0">
                   {ex.sets} × {ex.reps}
                 </span>
               </div>
@@ -306,7 +306,7 @@ function StrengthCard({ session, isDone, toggling, onToggle }: StrengthCardProps
 
         <Button
           variant={isDone ? "secondary" : "default"}
-          className="w-full"
+          className={`w-full ${isDone ? "bg-surface text-mgray" : "bg-obsidian text-white hover:bg-obsidian-light"}`}
           onClick={onToggle}
           disabled={toggling}
         >

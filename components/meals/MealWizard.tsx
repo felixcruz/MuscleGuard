@@ -38,11 +38,11 @@ function AiBubble({ children }: { children: React.ReactNode }) {
     <div className="flex gap-2 items-start">
       <div
         className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
-        style={{ backgroundColor: "#e8f5e9" }}
+        style={{ backgroundColor: "#f7f7f7" }}
       >
-        <Sparkles className="h-3.5 w-3.5" style={{ color: "#2e7d32" }} />
+        <Sparkles className="h-3.5 w-3.5" style={{ color: "#131413" }} />
       </div>
-      <div className="bg-gray-100 rounded-2xl rounded-tl-sm px-4 py-3 text-sm text-gray-800 max-w-xs leading-relaxed">
+      <div className="bg-surface rounded-2xl rounded-tl-sm px-4 py-3 text-sm text-obsidian max-w-xs leading-relaxed">
         {children}
       </div>
     </div>
@@ -54,7 +54,7 @@ function UserBubble({ children }: { children: React.ReactNode }) {
     <div className="flex justify-end">
       <div
         className="px-4 py-2 rounded-2xl rounded-tr-sm text-sm font-medium text-white"
-        style={{ backgroundColor: "#2e7d32" }}
+        style={{ backgroundColor: "#131413" }}
       >
         {children}
       </div>
@@ -141,11 +141,11 @@ export function MealWizard({ userId, proteinRemainingG, dietaryPrefs, onMealLogg
     return (
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <p className="text-sm font-semibold text-gray-900">Your personalized meals</p>
+          <p className="text-sm font-semibold text-obsidian">Your personalized meals</p>
           <button
             onClick={reset}
             className="text-xs hover:underline"
-            style={{ color: "#2e7d32" }}
+            style={{ color: "#131413" }}
           >
             Start over
           </button>
@@ -178,7 +178,7 @@ export function MealWizard({ userId, proteinRemainingG, dietaryPrefs, onMealLogg
             <button
               key={value}
               onClick={() => { setMealTime(value); setStep(1); }}
-              className="px-4 py-2 rounded-full border border-gray-200 bg-white text-sm text-gray-700 hover:border-gray-400 hover:bg-gray-50 transition-colors"
+              className="px-4 py-2 rounded-full border border-black/5 bg-white text-sm text-mgray hover:border-black/10 hover:bg-surface transition-colors"
             >
               {label}
             </button>
@@ -199,7 +199,7 @@ export function MealWizard({ userId, proteinRemainingG, dietaryPrefs, onMealLogg
                 <button
                   key={value}
                   onClick={() => { setHungerLevel(value); setStep(2); }}
-                  className="px-4 py-2 rounded-full border border-gray-200 bg-white text-sm text-gray-700 hover:border-gray-400 hover:bg-gray-50 transition-colors"
+                  className="px-4 py-2 rounded-full border border-black/5 bg-white text-sm text-mgray hover:border-black/10 hover:bg-surface transition-colors"
                 >
                   {label}
                 </button>
@@ -218,10 +218,10 @@ export function MealWizard({ userId, proteinRemainingG, dietaryPrefs, onMealLogg
           </AiBubble>
 
           {generating ? (
-            <div className="pl-9 flex items-center gap-2 text-sm text-gray-500 py-2">
+            <div className="pl-9 flex items-center gap-2 text-sm text-mgray py-2">
               <div
                 className="w-4 h-4 rounded-full border-2 border-t-transparent animate-spin"
-                style={{ borderColor: "#2e7d32", borderTopColor: "transparent" }}
+                style={{ borderColor: "#131413", borderTopColor: "transparent" }}
               />
               Generating your meals…
             </div>
@@ -238,11 +238,11 @@ export function MealWizard({ userId, proteinRemainingG, dietaryPrefs, onMealLogg
                       className={`px-3 py-1.5 rounded-full text-xs border transition-colors ${
                         on
                           ? "font-medium"
-                          : "border-gray-200 bg-white text-gray-600 hover:border-gray-300"
+                          : "border-black/5 bg-white text-mgray hover:border-black/10"
                       }`}
                       style={
                         on
-                          ? { borderColor: "#2e7d32", backgroundColor: "#e8f5e9", color: "#1b5e20" }
+                          ? { borderColor: "#131413", backgroundColor: "#f7f7f7", color: "#131413" }
                           : {}
                       }
                     >
@@ -257,7 +257,7 @@ export function MealWizard({ userId, proteinRemainingG, dietaryPrefs, onMealLogg
                 <Button
                   onClick={() => generate(ingredients)}
                   disabled={generating}
-                  className="flex-1"
+                  className="flex-1 bg-obsidian text-white hover:bg-obsidian-light"
                   size="sm"
                 >
                   <Sparkles className="h-4 w-4 mr-1.5" />
@@ -268,7 +268,7 @@ export function MealWizard({ userId, proteinRemainingG, dietaryPrefs, onMealLogg
                 {ingredients.length > 0 && (
                   <button
                     onClick={() => setIngredients([])}
-                    className="text-xs text-gray-400 hover:text-gray-600 px-2 py-1"
+                    className="text-xs text-muted hover:text-obsidian px-2 py-1"
                   >
                     Clear
                   </button>

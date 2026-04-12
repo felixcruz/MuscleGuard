@@ -94,8 +94,8 @@ export function ProgressClient({
   return (
     <div className="max-w-lg mx-auto px-4 py-8 space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Progress</h1>
-        <p className="text-gray-500 mt-1">
+        <h1 className="text-2xl font-bold text-obsidian">Progress</h1>
+        <p className="text-mgray mt-1">
           Track your weight and muscle mass weekly.
         </p>
       </div>
@@ -120,7 +120,7 @@ export function ProgressClient({
         </div>
       )}
 
-      <Card>
+      <Card className="border-black/5 rounded-[10px]">
         <CardHeader className="pb-3">
           <CardTitle className="text-base">
             Log today&apos;s measurement
@@ -132,11 +132,11 @@ export function ProgressClient({
       </Card>
 
       {chartData.length >= 2 && (
-        <Card>
+        <Card className="border-black/5 rounded-[10px]">
           <CardHeader className="pb-2">
             <CardTitle className="text-base">Weight trend</CardTitle>
             {doseDates.length > 0 && (
-              <p className="text-xs text-gray-400">
+              <p className="text-xs text-muted">
                 Dashed lines indicate dose changes
               </p>
             )}
@@ -178,7 +178,7 @@ export function ProgressClient({
       )}
 
       {chartData.some((d) => d.muscle !== null) && (
-        <Card>
+        <Card className="border-black/5 rounded-[10px]">
           <CardHeader className="pb-2">
             <CardTitle className="text-base">Muscle mass trend</CardTitle>
           </CardHeader>
@@ -218,7 +218,7 @@ export function ProgressClient({
       )}
 
       {measurements.length === 0 && (
-        <p className="text-center text-gray-400 text-sm py-8">
+        <p className="text-center text-muted text-sm py-8">
           Log your first measurement to start tracking your progress.
         </p>
       )}
