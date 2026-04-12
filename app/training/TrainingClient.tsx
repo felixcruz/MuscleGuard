@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { CheckCircle2, Circle, Flame, Trophy, AlertTriangle } from "lucide-react";
+import { CheckCircle2, Circle, Flame, Trophy, AlertTriangle, Plus } from "lucide-react";
 import { intensityInfo } from "@/lib/personalization";
 import { getIntensityAdvice, type CommStyle } from "@/lib/comm-style";
 import { getProtocol, COMPLEMENTARY_STRENGTH_SESSIONS, type WorkoutSession } from "@/lib/workout-protocols";
@@ -37,6 +37,26 @@ export function TrainingClient({
   const [streak, setStreak] = useState(workoutStreakDays);
   const [points, setPoints] = useState(totalPoints);
   const [toggling, setToggling] = useState<string | null>(null);
+  const [extraPrimary, setExtraPrimary] = useState<WorkoutSession[]>([]);
+  const [extraStrength, setExtraStrength] = useState<WorkoutSession[]>([]);
+
+  function addExtraSession(type: "primary" | "strength") {
+    const setter = type === "primary" ? setExtraPrimary : setExtraStrength;
+    setter((prev) => {
+      const num = prev.length + 1;
+      const label = type === "primary"
+        ? `Extra ${protocol.displayName} #${num}`
+        : `Extra Strength #${num}`;
+      const id = type === "primary" ? `extra-primary-${num}` : `extra-strength-${num}`;
+      return [...prev, {
+        id,
+        label,
+        duration: "20+ min",
+        description: "Additional session logged by you.",
+        type: type === "primary" ? protocol.primarySessions[0]?.type ?? "cardio" : "strength" as const,
+      }];
+    });
+  }
 
   const protocol = getProtocol(primaryActivity || "strength");
   const info = intensityInfo(intensityPct);
@@ -69,8 +89,8 @@ export function TrainingClient({
   }
 
   const trackedSessions = protocol.needsComplementaryStrength
-    ? [...protocol.primarySessions, ...COMPLEMENTARY_STRENGTH_SESSIONS]
-    : protocol.primarySessions;
+    ? [...protocol.primarySessions, ...extraPrimary, ...COMPLEMENTARY_STRENGTH_SESSIONS, ...extraStrength]
+    : [...protocol.primarySessions, ...extraPrimary];
   const trackedIds = trackedSessions.map((s) => s.id);
   const trackedDoneCount = done.filter((d) => trackedIds.includes(d)).length;
 
@@ -184,12 +204,22 @@ export function TrainingClient({
                 onToggle={() => toggleDay(session.id)}
               />
             ))}
+            {extraPrimary.map((session) => (
+              <SessionCard
+                key={session.id}
+                session={session}
+                isDone={done.includes(session.id)}
+                toggling={toggling === session.id}
+                onToggle={() => toggleDay(session.id)}
+              />
+            ))}
+            <AddSessionButton onClick={() => addExtraSession("primary")} />
           </div>
         </div>
       )}
 
-      {/* ── Strength protocol (for primary=strength) ── */}
-      {!protocol.needsComplementaryStrength && primaryActivity === "strength" && (
+      {/* ── Strength / HIIT / other non-complementary protocols ── */}
+      {!protocol.needsComplementaryStrength && (
         <div className="grid sm:grid-cols-2 gap-4">
           {protocol.primarySessions.map((session) => (
             <SessionCard
@@ -200,13 +230,7 @@ export function TrainingClient({
               onToggle={() => toggleDay(session.id)}
             />
           ))}
-        </div>
-      )}
-
-      {/* ── HIIT sessions (no complementary needed) ── */}
-      {!protocol.needsComplementaryStrength && primaryActivity !== "strength" && (
-        <div className="grid sm:grid-cols-2 gap-4">
-          {protocol.primarySessions.map((session) => (
+          {extraPrimary.map((session) => (
             <SessionCard
               key={session.id}
               session={session}
@@ -215,6 +239,7 @@ export function TrainingClient({
               onToggle={() => toggleDay(session.id)}
             />
           ))}
+          <AddSessionButton onClick={() => addExtraSession("primary")} />
         </div>
       )}
 
@@ -251,6 +276,16 @@ export function TrainingClient({
                 onToggle={() => toggleDay(session.id)}
               />
             ))}
+            {extraStrength.map((session) => (
+              <SessionCard
+                key={session.id}
+                session={session}
+                isDone={done.includes(session.id)}
+                toggling={toggling === session.id}
+                onToggle={() => toggleDay(session.id)}
+              />
+            ))}
+            <AddSessionButton onClick={() => addExtraSession("strength")} />
           </div>
         </div>
       )}
@@ -323,3 +358,19 @@ function SessionCard({ session, isDone, toggling, onToggle }: SessionCardProps) 
     </div>
   );
 }
+
+// ── Add Session Button ───────────────────────────────────────────────────────
+
+function AddSessionButton({ onClick }: { onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="flex flex-col items-center justify-center gap-2 border border-dashed border-black/10 rounded-[10px] py-8 text-mgray hover:border-black/20 hover:text-obsidian transition-colors"
+    >
+      <Plus className="h-5 w-5" />
+      <span className="text-xs font-medium">Add session</span>
+    </button>
+  );
+}
+
