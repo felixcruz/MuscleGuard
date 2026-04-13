@@ -27,14 +27,22 @@ export const metadata: Metadata = {
   authors: [{ name: "MuscleGuard" }],
   creator: "MuscleGuard",
   publisher: "MuscleGuard",
-  metadataBase: new URL("https://muscle-guard.vercel.app"),
+  metadataBase: new URL("https://muscleguard.app"),
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+    ],
+    apple: "/apple-touch-icon.png",
+  },
   alternates: {
     canonical: "/",
   },
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://muscle-guard.vercel.app",
+    url: "https://muscleguard.app",
     siteName: "MuscleGuard",
     title: "MuscleGuard — Preserve Muscle on GLP-1 Medications",
     description:
