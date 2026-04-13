@@ -8,8 +8,12 @@ import { MealWizard } from "@/components/meals/MealWizard";
 interface USDAFood {
   fdcId: number;
   description: string;
+  brandName?: string | null;
   proteinPer100g: number;
   caloriesPer100g: number;
+  fatPer100g?: number;
+  carbsPer100g?: number;
+  portions?: { label: string; gramWeight: number }[];
 }
 
 interface Props {
