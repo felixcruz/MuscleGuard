@@ -367,62 +367,39 @@ export function SettingsClient({ userId, email, profile }: Props) {
               <p className="text-xs text-mgray mb-4">Trial ends {trialEnd}</p>
             )}
 
-            {/* Upgrade CTA (non-active users) */}
-            {!isActive && (
-              <div className="bg-obsidian rounded-[10px] p-5 space-y-4">
-                <div className="flex items-start gap-3">
-                  <Shield className="h-5 w-5 text-[#CDFF00] mt-0.5 shrink-0" />
-                  <div>
-                    <p className="font-semibold text-white">MuscleGuard Pro</p>
-                    <p className="text-sm text-white/50">$14.99/month · Cancel anytime</p>
-                    <ul className="text-sm text-white/70 mt-3 space-y-1.5">
-                      <li className="flex items-center gap-2">
-                        <Check className="h-3.5 w-3.5 text-[#CDFF00]" /> Unlimited protein tracking
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <Check className="h-3.5 w-3.5 text-[#CDFF00]" /> Smart meal generation
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <Check className="h-3.5 w-3.5 text-[#CDFF00]" /> Muscle loss alerts
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <Check className="h-3.5 w-3.5 text-[#CDFF00]" /> Personalized training plan
-                      </li>
-                    </ul>
-                  </div>
+            {/* Plan details */}
+            {isActive && (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-mgray">Plan</span>
+                  <span className="font-medium text-obsidian">MuscleGuard Pro</span>
                 </div>
-                <button
-                  onClick={handleUpgrade}
-                  disabled={upgrading}
-                  className="w-full py-2.5 bg-[#CDFF00] text-obsidian text-sm font-medium rounded-lg hover:bg-[#b8e600] transition-colors disabled:opacity-50 flex items-center justify-center gap-1.5"
-                >
-                  <CreditCard className="h-4 w-4" />
-                  {upgrading ? "Redirecting…" : "Upgrade to Pro"}
-                </button>
-              </div>
-            )}
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-mgray">Price</span>
+                  <span className="font-medium text-obsidian">$14.99/month</span>
+                </div>
 
-            {/* Active plan actions */}
-            {isActive && profile.stripe_customer_id && (
-              <div className="space-y-3">
-                <button
-                  onClick={handlePortal}
-                  disabled={portal}
-                  className="w-full py-2.5 bg-obsidian text-white text-sm font-medium rounded-lg hover:bg-obsidian-light transition-colors disabled:opacity-50 flex items-center justify-center gap-1.5"
-                >
-                  <CreditCard className="h-4 w-4" />
-                  {portal ? "Opening…" : "Manage billing"}
-                </button>
-                <button
-                  onClick={handlePortal}
-                  disabled={portal}
-                  className="w-full py-2.5 rounded-lg text-sm font-medium text-[#FFB4AB] hover:bg-[#FFB4AB]/10 transition-colors disabled:opacity-50"
-                >
-                  {portal ? "Opening…" : "Cancel plan"}
-                </button>
-                <p className="text-xs text-center text-mgray">
-                  Cancellation is handled securely via Stripe. Your access continues until the end of the billing period.
-                </p>
+                {profile.stripe_customer_id && (
+                  <>
+                    <div className="pt-2 border-t border-black/5">
+                      <button
+                        onClick={handlePortal}
+                        disabled={portal}
+                        className="w-full py-2.5 bg-obsidian text-white text-sm font-medium rounded-lg hover:bg-obsidian-light transition-colors disabled:opacity-50 flex items-center justify-center gap-1.5"
+                      >
+                        <CreditCard className="h-4 w-4" />
+                        {portal ? "Opening…" : "Manage billing"}
+                      </button>
+                    </div>
+                    <button
+                      onClick={handlePortal}
+                      disabled={portal}
+                      className="text-xs text-muted hover:text-[#FFB4AB] transition-colors w-full text-center"
+                    >
+                      {portal ? "Opening…" : "Cancel membership"}
+                    </button>
+                  </>
+                )}
               </div>
             )}
           </div>
