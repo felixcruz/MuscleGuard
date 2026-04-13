@@ -177,8 +177,8 @@ MuscleGuard is not a medical device. It is not intended to diagnose, treat, cure
 
 ## Links
 
-- Website: https://muscle-guard.vercel.app
-- Terms of Use: https://muscle-guard.vercel.app/legal/terms
-- Privacy Policy: https://muscle-guard.vercel.app/legal/privacy
-- Cookie Policy: https://muscle-guard.vercel.app/legal/cookies
-- Refund Policy: https://muscle-guard.vercel.app/legal/refund
+- Website: https://muscleguard.app
+- Terms of Use: https://muscleguard.app/legal/terms
+- Privacy Policy: https://muscleguard.app/legal/privacy
+- Cookie Policy: https://muscleguard.app/legal/cookies
+- Refund Policy: https://muscleguard.app/legal/refund

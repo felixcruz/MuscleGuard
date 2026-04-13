@@ -155,7 +155,7 @@ export default function LandingPage() {
             operatingSystem: "Web",
             description:
               "Preserve lean muscle during GLP-1 weight loss with dose-adjusted protein targets, smart meal planning, and training protocols.",
-            url: "https://muscle-guard.vercel.app",
+            url: "https://muscleguard.app",
             offers: {
               "@type": "Offer",
               price: "14.99",

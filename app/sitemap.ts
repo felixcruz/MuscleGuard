@@ -1,7 +1,7 @@
 import { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = "https://muscle-guard.vercel.app";
+  const baseUrl = "https://muscleguard.app";
   return [
     {
       url: baseUrl,

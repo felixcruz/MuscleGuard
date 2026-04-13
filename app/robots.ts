@@ -22,6 +22,6 @@ export default function robots(): MetadataRoute.Robots {
         ],
       },
     ],
-    sitemap: "https://muscle-guard.vercel.app/sitemap.xml",
+    sitemap: "https://muscleguard.app/sitemap.xml",
   };
 }

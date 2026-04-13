@@ -48,7 +48,7 @@ export async function GET(req: NextRequest) {
   const admin = createAdminClient();
   const today = new Date();
   const todayStr = today.toISOString().split("T")[0];
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://muscle-guard.vercel.app";
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://muscleguard.app";
 
   interface ProfileRow {
     id: string;

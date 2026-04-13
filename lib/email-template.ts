@@ -35,7 +35,7 @@ export function brandedEmail({
 <tr><td style="padding:32px 32px 24px;text-align:center;">
   <table cellpadding="0" cellspacing="0" style="margin:0 auto;"><tr>
     <td style="padding-right:8px;vertical-align:middle;">
-      <img src="https://muscle-guard.vercel.app/icon-shield.png" width="20" height="20" alt="" style="display:block;" onerror="this.style.display='none'">
+      <img src="https://muscleguard.app/icon-shield.png" width="20" height="20" alt="" style="display:block;" onerror="this.style.display='none'">
     </td>
     <td style="vertical-align:middle;">
       <span style="font-size:18px;font-weight:700;color:#ffffff;letter-spacing:-0.3px;">MuscleGuard</span>
