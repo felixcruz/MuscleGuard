@@ -44,13 +44,13 @@ export default async function DashboardPage() {
       .single(),
     supabase
       .from("food_logs")
-      .select("id, food_name, protein_g, calories, portion_g, logged_at")
+      .select("id, food_name, protein_g, calories, portion_g, logged_at, meal_type")
       .eq("user_id", user.id)
       .eq("log_date", today)
       .order("logged_at", { ascending: true }),
     supabase
       .from("food_logs")
-      .select("id, food_name, protein_g, log_date, logged_at")
+      .select("id, food_name, protein_g, log_date, logged_at, meal_type")
       .eq("user_id", user.id)
       .gte("log_date", weekStart)
       .lte("log_date", today)

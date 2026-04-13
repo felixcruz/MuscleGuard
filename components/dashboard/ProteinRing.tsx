@@ -37,7 +37,7 @@ export function ProteinRing({ goalG, loggedG }: Props) {
           ) : (
             <>
               <span className="text-3xl font-bold text-white">{remaining}g</span>
-              <span className="text-xs text-white/50">remaining</span>
+              <span className="text-[10px] text-white/50">protein remaining</span>
             </>
           )}
         </div>

@@ -234,6 +234,7 @@ interface FoodLogEntry {
   calories: number | null;
   portion_g: number | null;
   logged_at?: string | null;
+  meal_type?: string | null;
 }
 
 interface WeekLogEntry {
@@ -242,6 +243,7 @@ interface WeekLogEntry {
   protein_g: number;
   log_date: string;
   logged_at: string;
+  meal_type?: string | null;
 }
 
 interface Props {
@@ -317,6 +319,19 @@ export function DashboardClient({
     setMounted(true);
   }, []);
 
+  // Merge today's live logs into weekLogs for accurate This Week totals
+  const today = new Date().toISOString().split("T")[0];
+  const weekLogsWithoutToday = weekLogs.filter(wl => wl.log_date !== today);
+  const todayAsWeekLogs: WeekLogEntry[] = logs.map(l => ({
+    id: l.id,
+    food_name: l.food_name,
+    protein_g: l.protein_g,
+    log_date: today,
+    logged_at: l.logged_at ?? new Date().toISOString(),
+    meal_type: l.meal_type,
+  }));
+  const mergedWeekLogs = [...weekLogsWithoutToday, ...todayAsWeekLogs];
+
   const totalProtein = logs.reduce((sum, l) => sum + Number(l.protein_g), 0);
   const pct = proteinGoalG > 0 ? totalProtein / proteinGoalG : 0;
   const remaining = Math.max(0, proteinGoalG - totalProtein);
@@ -343,7 +358,7 @@ export function DashboardClient({
     const today = new Date().toISOString().split("T")[0];
     const { data } = await supabase
       .from("food_logs")
-      .select("id, food_name, protein_g, calories, portion_g, logged_at")
+      .select("id, food_name, protein_g, calories, portion_g, logged_at, meal_type")
       .eq("user_id", userId)
       .eq("log_date", today)
       .order("logged_at", { ascending: true });
@@ -664,7 +679,7 @@ export function DashboardClient({
 
       {/* ── This Week (collapsible) ── */}
       <ThisWeek
-        weekLogs={weekLogs}
+        weekLogs={mergedWeekLogs}
         weekStart={weekStart}
         expanded={weekExpanded}
         onToggle={() => setWeekExpanded(e => !e)}

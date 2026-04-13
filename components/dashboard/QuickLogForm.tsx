@@ -31,6 +31,13 @@ export function QuickLogForm({ userId, onLogged }: Props) {
   const [selected, setSelected] = useState<USDAResult | null>(null);
   const [portionIdx, setPortionIdx] = useState(0);
   const [servings, setServings] = useState("1");
+  const [mealType, setMealType] = useState<string>(() => {
+    const h = new Date().getHours();
+    if (h < 11) return "breakfast";
+    if (h < 15) return "lunch";
+    if (h < 17) return "snack";
+    return "dinner";
+  });
   const [searching, setSearching] = useState(false);
   const [saving, setSaving] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
@@ -95,6 +102,7 @@ export function QuickLogForm({ userId, onLogged }: Props) {
       protein_g: calc.protein,
       calories: calc.calories,
       portion_g: calc.grams,
+      meal_type: mealType,
     });
     setQuery("");
     setSelected(null);
@@ -246,6 +254,35 @@ export function QuickLogForm({ userId, onLogged }: Props) {
               <div>
                 <p className="text-lg font-bold text-obsidian">{calc.fat}g</p>
                 <p className="text-[10px] text-mgray uppercase tracking-wider">Fat</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Meal type */}
+          <div className="px-4 py-3 border-t border-black/5">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-medium text-mgray">Meal</span>
+              <div className="flex gap-1 bg-white border border-black/5 rounded-lg p-0.5">
+                {[
+                  { value: "breakfast", label: "B", full: "Breakfast" },
+                  { value: "lunch", label: "L", full: "Lunch" },
+                  { value: "dinner", label: "D", full: "Dinner" },
+                  { value: "snack", label: "S", full: "Snack" },
+                ].map((m) => (
+                  <button
+                    key={m.value}
+                    type="button"
+                    onClick={() => setMealType(m.value)}
+                    title={m.full}
+                    className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                      mealType === m.value
+                        ? "bg-obsidian text-white"
+                        : "text-mgray hover:text-obsidian"
+                    }`}
+                  >
+                    {m.full}
+                  </button>
+                ))}
               </div>
             </div>
           </div>
