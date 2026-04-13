@@ -65,10 +65,17 @@ export async function updateSession(request: NextRequest) {
       .single();
 
     // Force onboarding if not completed
-    if (profile && !profile.onboarding_done) {
+    if (profile && !profile.onboarding_done && pathname !== "/onboarding") {
       const onboardingUrl = request.nextUrl.clone();
       onboardingUrl.pathname = "/onboarding";
       return NextResponse.redirect(onboardingUrl);
+    }
+
+    // Block access to onboarding if already completed
+    if (profile && profile.onboarding_done && pathname === "/onboarding") {
+      const dashboardUrl = request.nextUrl.clone();
+      dashboardUrl.pathname = "/dashboard";
+      return NextResponse.redirect(dashboardUrl);
     }
 
     // Block expired/cancelled accounts (except settings)
