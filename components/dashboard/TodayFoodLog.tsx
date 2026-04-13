@@ -70,7 +70,7 @@ export function TodayFoodLog({ entries, onDeleted }: Props) {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-1">
       {MEAL_ORDER.map((slot) => {
         const items = grouped[slot];
         if (!items || items.length === 0) return null;
@@ -79,14 +79,14 @@ export function TodayFoodLog({ entries, onDeleted }: Props) {
         const slotProtein = items.reduce((s, e) => s + Number(e.protein_g), 0);
 
         return (
-          <div key={slot}>
+          <div key={slot} className="bg-surface rounded-[10px] p-3">
             {/* Meal header */}
-            <div className="flex items-center justify-between mb-1.5">
+            <div className="flex items-center justify-between mb-1">
               <div className="flex items-center gap-1.5">
                 <Icon className="h-3.5 w-3.5 text-mgray" />
-                <span className="text-xs font-medium text-mgray">{config.label}</span>
+                <span className="text-xs font-medium text-obsidian">{config.label}</span>
               </div>
-              <span className="text-xs font-medium text-green-600">{slotProtein}g</span>
+              <span className="text-xs font-medium text-green-600">{slotProtein}g protein</span>
             </div>
             {/* Items */}
             <div className="divide-y divide-black/5">
