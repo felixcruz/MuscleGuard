@@ -184,6 +184,30 @@ export default function UserDetailClient({
                 </div>
               </div>
 
+              {/* Grant free access */}
+              <div>
+                <label className="text-xs font-medium text-mgray">
+                  Free Access
+                </label>
+                <button
+                  onClick={async () => {
+                    setSaving(true);
+                    setMessage(null);
+                    const res = await fetch(`/api/admin/users/${user.id}`, {
+                      method: "PATCH",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ subscription_status: "active" }),
+                    });
+                    setMessage(res.ok ? "Free access granted" : "Failed to grant access");
+                    setSaving(false);
+                  }}
+                  disabled={saving || user.subscription_status === "active"}
+                  className="mt-1 h-9 px-4 bg-[#CDFF00] text-obsidian rounded-lg text-sm font-medium hover:bg-[#b8e600] transition-colors disabled:opacity-50 w-full"
+                >
+                  {user.subscription_status === "active" ? "Already active" : "Grant free access"}
+                </button>
+              </div>
+
               {/* Reset onboarding */}
               <div>
                 <label className="text-xs font-medium text-mgray">

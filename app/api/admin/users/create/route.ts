@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { email, role } = await req.json();
+  const { email, role, freeAccess } = await req.json();
 
   if (!email || typeof email !== "string") {
     return NextResponse.json({ error: "Email is required" }, { status: 400 });
@@ -65,7 +65,7 @@ export async function POST(req: NextRequest) {
   await supabase.from("profiles").upsert({
     id: newUser.user.id,
     role: userRole,
-    subscription_status: "trial",
+    subscription_status: freeAccess ? "active" : "trial",
     onboarding_done: false,
   });
 
@@ -79,7 +79,7 @@ export async function POST(req: NextRequest) {
     action: "create_user",
     targetType: "user",
     targetId: newUser.user.id,
-    details: { email, role: userRole, invite_sent: true },
+    details: { email, role: userRole, invite_sent: true, free_access: !!freeAccess },
     ipAddress: req.headers.get("x-forwarded-for") ?? undefined,
   });
 

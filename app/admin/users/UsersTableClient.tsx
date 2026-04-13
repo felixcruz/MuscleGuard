@@ -52,6 +52,7 @@ export default function UsersTableClient({ users: initialUsers }: { users: User[
   const [showCreate, setShowCreate] = useState(false);
   const [newEmail, setNewEmail] = useState("");
   const [newRole, setNewRole] = useState("user");
+  const [freeAccess, setFreeAccess] = useState(false);
   const [creating, setCreating] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
 
@@ -70,7 +71,7 @@ export default function UsersTableClient({ users: initialUsers }: { users: User[
       const res = await fetch("/api/admin/users/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: newEmail, role: newRole }),
+        body: JSON.stringify({ email: newEmail, role: newRole, freeAccess }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
@@ -79,7 +80,7 @@ export default function UsersTableClient({ users: initialUsers }: { users: User[
         email: data.user.email,
         name: "",
         role: newRole,
-        subscription_status: "trial",
+        subscription_status: freeAccess ? "active" : "trial",
         protein_goal_g: 0,
         workout_streak_days: 0,
         onboarding_done: false,
@@ -87,6 +88,7 @@ export default function UsersTableClient({ users: initialUsers }: { users: User[
       }, ...prev]);
       setNewEmail("");
       setNewRole("user");
+      setFreeAccess(false);
       setShowCreate(false);
     } catch (err) {
       setCreateError(err instanceof Error ? err.message : "Failed to create user");
@@ -153,10 +155,19 @@ export default function UsersTableClient({ users: initialUsers }: { users: User[
               {creating ? "Creating..." : "Create"}
             </button>
           </div>
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={freeAccess}
+              onChange={(e) => setFreeAccess(e.target.checked)}
+              className="w-4 h-4 rounded border-black/10 accent-[#CDFF00]"
+            />
+            <span className="text-xs text-mgray">Grant free access (skip Stripe checkout)</span>
+          </label>
           {createError && (
             <p className="text-xs text-[#FFB4AB]">{createError}</p>
           )}
-          <p className="text-xs text-mgray">User will be created with email confirmed. They can log in via magic link.</p>
+          <p className="text-xs text-muted">User will receive an invite email with a direct login link.</p>
         </div>
       )}
 
