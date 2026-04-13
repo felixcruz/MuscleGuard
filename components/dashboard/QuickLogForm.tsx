@@ -186,6 +186,31 @@ export function QuickLogForm({ userId, onLogged }: Props) {
             </button>
           </div>
 
+          {/* Meal type (visible immediately) */}
+          <div className="px-4 pb-2">
+            <div className="flex gap-1 bg-white border border-black/5 rounded-lg p-0.5">
+              {[
+                { value: "breakfast", label: "Breakfast" },
+                { value: "lunch", label: "Lunch" },
+                { value: "dinner", label: "Dinner" },
+                { value: "snack", label: "Snack" },
+              ].map((m) => (
+                <button
+                  key={m.value}
+                  type="button"
+                  onClick={() => setMealType(m.value)}
+                  className={`flex-1 px-2 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                    mealType === m.value
+                      ? "bg-obsidian text-white"
+                      : "text-mgray hover:text-obsidian"
+                  }`}
+                >
+                  {m.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
           {/* Serving controls */}
           <div className="px-4 py-3 space-y-3">
             {/* Serving size (unit selector) */}
@@ -254,35 +279,6 @@ export function QuickLogForm({ userId, onLogged }: Props) {
               <div>
                 <p className="text-lg font-bold text-obsidian">{calc.fat}g</p>
                 <p className="text-[10px] text-mgray uppercase tracking-wider">Fat</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Meal type */}
-          <div className="px-4 py-3 border-t border-black/5">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-mgray">Meal</span>
-              <div className="flex gap-1 bg-white border border-black/5 rounded-lg p-0.5">
-                {[
-                  { value: "breakfast", label: "B", full: "Breakfast" },
-                  { value: "lunch", label: "L", full: "Lunch" },
-                  { value: "dinner", label: "D", full: "Dinner" },
-                  { value: "snack", label: "S", full: "Snack" },
-                ].map((m) => (
-                  <button
-                    key={m.value}
-                    type="button"
-                    onClick={() => setMealType(m.value)}
-                    title={m.full}
-                    className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
-                      mealType === m.value
-                        ? "bg-obsidian text-white"
-                        : "text-mgray hover:text-obsidian"
-                    }`}
-                  >
-                    {m.full}
-                  </button>
-                ))}
               </div>
             </div>
           </div>
