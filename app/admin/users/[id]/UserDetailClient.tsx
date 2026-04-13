@@ -248,39 +248,44 @@ export default function UserDetailClient({
         {/* Food logs */}
         <LogTable
           title={`Recent Food Logs (${foodLogs.length})`}
-          columns={["Date", "Food", "Protein"]}
+          columns={["Date", "Meal", "Food", "Protein", "Cal"]}
           rows={foodLogs.map((l) => [
             l.log_date
-              ? new Date(l.log_date as string).toLocaleDateString()
+              ? new Date((l.log_date as string) + "T12:00:00Z").toLocaleDateString("en-US", { month: "short", day: "numeric" })
               : "-",
-            (l.food_name as string) || (l.description as string) || "-",
+            (l.meal_type as string) ?? "-",
+            (l.food_name as string) || "-",
             l.protein_g ? `${l.protein_g}g` : "-",
+            l.calories ? `${l.calories}` : "-",
           ])}
         />
 
         {/* Workout logs */}
         <LogTable
           title={`Recent Workouts (${workoutLogs.length})`}
-          columns={["Date", "Day", "Duration"]}
+          columns={["Date", "Session", "Week"]}
           rows={workoutLogs.map((l) => [
             l.completed_at
-              ? new Date(l.completed_at as string).toLocaleDateString()
+              ? new Date(l.completed_at as string).toLocaleDateString("en-US", { month: "short", day: "numeric" })
               : "-",
             (l.workout_day as string) || "-",
-            l.duration_minutes ? `${l.duration_minutes}m` : "-",
+            (l.week_key as string) || "-",
           ])}
         />
 
         {/* Medication logs */}
         <LogTable
           title={`Recent Medications (${medicationLogs.length})`}
-          columns={["Date", "Medication", "Dose"]}
+          columns={["Date", "Type", "Dose", "Appetite"]}
           rows={medicationLogs.map((l) => [
-            l.taken_at
-              ? new Date(l.taken_at as string).toLocaleDateString()
+            l.change_date
+              ? new Date((l.change_date as string) + "T12:00:00Z").toLocaleDateString("en-US", { month: "short", day: "numeric" })
+              : l.created_at
+              ? new Date(l.created_at as string).toLocaleDateString("en-US", { month: "short", day: "numeric" })
               : "-",
-            (l.medication_name as string) || "-",
+            ((l.change_type as string) ?? "-").replace("_", " "),
             l.dose_mg ? `${l.dose_mg}mg` : "-",
+            ((l.appetite_level as string) ?? "-").replace("_", " "),
           ])}
         />
       </div>

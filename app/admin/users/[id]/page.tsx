@@ -32,15 +32,15 @@ export default async function AdminUserDetailPage({
   // Get recent food logs
   const { data: foodLogs } = await supabase
     .from("food_logs")
-    .select("*")
+    .select("id, food_name, protein_g, calories, portion_g, logged_at, log_date, meal_type")
     .eq("user_id", id)
-    .order("created_at", { ascending: false })
+    .order("logged_at", { ascending: false })
     .limit(20);
 
   // Get recent workout logs
   const { data: workoutLogs } = await supabase
     .from("workout_logs")
-    .select("*")
+    .select("id, workout_day, week_key, completed_at")
     .eq("user_id", id)
     .order("completed_at", { ascending: false })
     .limit(20);
@@ -48,9 +48,9 @@ export default async function AdminUserDetailPage({
   // Get recent medication logs
   const { data: medicationLogs } = await supabase
     .from("medication_logs")
-    .select("*")
+    .select("id, medication, dose_mg, change_date, change_type, appetite_level, notes, created_at")
     .eq("user_id", id)
-    .order("taken_at", { ascending: false })
+    .order("created_at", { ascending: false })
     .limit(20);
 
   const user = {
