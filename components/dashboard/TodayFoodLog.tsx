@@ -86,7 +86,7 @@ export function TodayFoodLog({ entries, onDeleted }: Props) {
                 <Icon className="h-3.5 w-3.5 text-mgray" />
                 <span className="text-xs font-medium text-obsidian">{config.label}</span>
               </div>
-              <span className="text-xs font-medium text-green-600">{slotProtein}g protein</span>
+              <span className="text-xs font-medium text-obsidian">Total Protein: {slotProtein}g</span>
             </div>
             {/* Items */}
             <div className="divide-y divide-black/5">
