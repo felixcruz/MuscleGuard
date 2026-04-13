@@ -3,7 +3,7 @@
 import { useState, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { MeasurementForm } from "@/components/progress/MeasurementForm";
-import { AlertTriangle, TrendingDown, TrendingUp, Scale } from "lucide-react";
+import { AlertTriangle, TrendingDown, TrendingUp, Scale, Trash2, ChevronDown, ChevronRight } from "lucide-react";
 import {
   LineChart,
   Line,
@@ -16,6 +16,7 @@ import {
 } from "recharts";
 
 interface Measurement {
+  id: string;
   measured_at: string;
   weight_kg: number | null;
   muscle_mass_kg: number | null;
@@ -56,17 +57,23 @@ export function ProgressClient({
   medicationLogs = [],
 }: Props) {
   const [measurements, setMeasurements] = useState(initialMeasurements);
+  const [historyExpanded, setHistoryExpanded] = useState(false);
   const supabase = createClient();
 
   const refresh = useCallback(async () => {
     const { data } = await supabase
       .from("body_measurements")
-      .select("measured_at, weight_kg, muscle_mass_kg, body_fat_pct")
+      .select("id, measured_at, weight_kg, muscle_mass_kg, body_fat_pct")
       .eq("user_id", userId)
       .order("measured_at", { ascending: true })
       .limit(60);
     setMeasurements(data ?? []);
   }, [supabase, userId]);
+
+  async function handleDelete(id: string) {
+    await supabase.from("body_measurements").delete().eq("id", id);
+    await refresh();
+  }
 
   const muscleLossAlert = checkMuscleLoss(measurements);
 
@@ -324,6 +331,61 @@ export function ProgressClient({
                   />
                 </LineChart>
               </ResponsiveContainer>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Recent measurements history */}
+      {measurements.length > 0 && (
+        <div className="bg-white border border-black/5 rounded-[10px] overflow-hidden">
+          <button
+            type="button"
+            onClick={() => setHistoryExpanded(!historyExpanded)}
+            className="w-full flex items-center justify-between px-5 py-4 hover:bg-surface transition-colors"
+          >
+            <span className="text-sm font-medium text-obsidian">Recent measurements</span>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-mgray">{measurements.length} entries</span>
+              {historyExpanded
+                ? <ChevronDown className="h-4 w-4 text-muted" />
+                : <ChevronRight className="h-4 w-4 text-muted" />
+              }
+            </div>
+          </button>
+          {historyExpanded && (
+            <div className="border-t border-black/5 divide-y divide-black/5">
+              {[...measurements].reverse().slice(0, 10).map((m) => (
+                <div key={m.id} className="flex items-center justify-between px-5 py-3">
+                  <div className="flex items-center gap-4">
+                    <span className="text-xs text-mgray w-20">
+                      {new Date(m.measured_at).toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                      })}
+                    </span>
+                    <div className="flex items-center gap-3 text-sm">
+                      {m.weight_kg && (
+                        <span className="text-obsidian font-medium">{m.weight_kg} kg</span>
+                      )}
+                      {m.muscle_mass_kg && (
+                        <span className="text-mgray">{m.muscle_mass_kg} kg muscle</span>
+                      )}
+                      {m.body_fat_pct && (
+                        <span className="text-mgray">{m.body_fat_pct}% fat</span>
+                      )}
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => handleDelete(m.id)}
+                    className="text-muted hover:text-[#FFB4AB] transition-colors p-1"
+                    aria-label="Delete measurement"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
+              ))}
             </div>
           )}
         </div>

@@ -17,7 +17,7 @@ export default async function ProgressPage() {
   const [{ data: measurements }, { data: medicationLogs }] = await Promise.all([
     supabase
       .from("body_measurements")
-      .select("measured_at, weight_kg, muscle_mass_kg, body_fat_pct")
+      .select("id, measured_at, weight_kg, muscle_mass_kg, body_fat_pct")
       .eq("user_id", user.id)
       .order("measured_at", { ascending: true })
       .limit(60),
