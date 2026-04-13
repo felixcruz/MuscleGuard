@@ -209,7 +209,7 @@ export default function OnboardingPage() {
     setSaving(false);
 
     setTimeout(() => {
-      router.push("/dashboard");
+      router.push("/checkout");
     }, 3000);
   }
 

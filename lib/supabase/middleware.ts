@@ -46,6 +46,7 @@ export async function updateSession(request: NextRequest) {
     "/onboarding",
     "/medication",
     "/reports",
+    "/checkout",
   ];
   const isProtected = protectedPaths.some((p) => pathname.startsWith(p));
 
@@ -78,9 +79,16 @@ export async function updateSession(request: NextRequest) {
       return NextResponse.redirect(dashboardUrl);
     }
 
-    // Block expired/cancelled accounts (except settings)
+    // Force checkout if onboarding done but no subscription
+    if (profile && profile.onboarding_done && profile.subscription_status === "trial" && pathname !== "/checkout" && pathname !== "/settings") {
+      const checkoutUrl = request.nextUrl.clone();
+      checkoutUrl.pathname = "/checkout";
+      return NextResponse.redirect(checkoutUrl);
+    }
+
+    // Block expired/cancelled accounts (except settings and checkout)
     const blockedStatuses = ["past_due", "cancelled"];
-    if (profile && blockedStatuses.includes(profile.subscription_status) && pathname !== "/settings") {
+    if (profile && blockedStatuses.includes(profile.subscription_status) && pathname !== "/settings" && pathname !== "/checkout") {
       const settingsUrl = request.nextUrl.clone();
       settingsUrl.pathname = "/settings";
       return NextResponse.redirect(settingsUrl);
