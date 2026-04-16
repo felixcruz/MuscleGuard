@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { useLocale } from "next-intl";
+import { useRouter as useIntlRouter, usePathname as useIntlPathname } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { CreditCard, LogOut, Shield, User, Receipt, Settings, Check } from "lucide-react";
 
@@ -61,7 +63,15 @@ export function SettingsClient({ userId, email, profile }: Props) {
   const [favProteins, setFavProteins] = useState<string[]>(profile.favorite_proteins ?? []);
 
   const router = useRouter();
+  const locale = useLocale();
+  const intlRouter = useIntlRouter();
+  const intlPathname = useIntlPathname();
   const supabase = createClient();
+
+  function switchLanguage(newLocale: string) {
+    document.cookie = `NEXT_LOCALE=${newLocale};path=/;max-age=31536000`;
+    intlRouter.replace(intlPathname, { locale: newLocale as "en" | "es" });
+  }
 
   const status = profile.subscription_status ?? "trial";
   const trialEnd = profile.trial_ends_at
@@ -310,6 +320,32 @@ export function SettingsClient({ userId, email, profile }: Props) {
                   );
                 })}
               </div>
+            </div>
+          </div>
+
+          {/* Language */}
+          <div className="bg-white border border-black/5 rounded-[10px] p-5 space-y-3">
+            <div>
+              <p className="text-[10px] font-medium text-mgray uppercase tracking-widest">{t("language")}</p>
+            </div>
+            <div className="flex gap-2">
+              {[
+                { value: "en", label: t("english") },
+                { value: "es", label: t("spanish") },
+              ].map((opt) => (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => switchLanguage(opt.value)}
+                  className={`px-4 py-2 rounded-lg text-sm border transition-colors ${
+                    locale === opt.value
+                      ? "border-obsidian bg-obsidian text-white font-medium"
+                      : "border-black/5 bg-white text-mgray hover:border-black/10"
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              ))}
             </div>
           </div>
 

@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl";
 import { Shield, LayoutDashboard, Sparkles, Dumbbell, TrendingUp, BarChart2, Settings, Pill } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { LucideIcon } from "lucide-react";
-import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+
 
 interface NavItem {
   href: string;
@@ -59,9 +59,7 @@ export function AppNav() {
               </Link>
             );
           })}
-          <div className="ml-1 border-l border-black/5 pl-1">
-            <LanguageSwitcher />
-          </div>
+
         </nav>
       </header>
 

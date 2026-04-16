@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
 import { Trash2, Sunrise, Sun, Moon, Cookie } from "lucide-react";
 
@@ -19,11 +20,11 @@ interface Props {
 }
 
 const MEAL_ORDER = ["breakfast", "lunch", "dinner", "snack"];
-const MEAL_CONFIG: Record<string, { label: string; icon: typeof Sunrise }> = {
-  breakfast: { label: "Breakfast", icon: Sunrise },
-  lunch: { label: "Lunch", icon: Sun },
-  dinner: { label: "Dinner", icon: Moon },
-  snack: { label: "Snack", icon: Cookie },
+const MEAL_ICONS: Record<string, typeof Sunrise> = {
+  breakfast: Sunrise,
+  lunch: Sun,
+  dinner: Moon,
+  snack: Cookie,
 };
 
 function formatTime(ts: string) {
@@ -46,6 +47,7 @@ function getMealSlot(entry: FoodLogEntry): string {
 }
 
 export function TodayFoodLog({ entries, onDeleted }: Props) {
+  const t = useTranslations("dashboard");
   const supabase = createClient();
 
   async function handleDelete(id: string) {
@@ -56,7 +58,7 @@ export function TodayFoodLog({ entries, onDeleted }: Props) {
   if (entries.length === 0) {
     return (
       <p className="text-sm text-muted text-center py-4">
-        Nothing logged yet today. Add your first meal above.
+        {t("nothingLoggedYet")}
       </p>
     );
   }
@@ -74,8 +76,8 @@ export function TodayFoodLog({ entries, onDeleted }: Props) {
       {MEAL_ORDER.map((slot) => {
         const items = grouped[slot];
         if (!items || items.length === 0) return null;
-        const config = MEAL_CONFIG[slot];
-        const Icon = config.icon;
+        const Icon = MEAL_ICONS[slot];
+        const label = t(slot as "breakfast" | "lunch" | "dinner" | "snack");
         const slotProtein = items.reduce((s, e) => s + Number(e.protein_g), 0);
 
         return (
@@ -84,9 +86,9 @@ export function TodayFoodLog({ entries, onDeleted }: Props) {
             <div className="flex items-center justify-between mb-1">
               <div className="flex items-center gap-1.5">
                 <Icon className="h-3.5 w-3.5 text-mgray" />
-                <span className="text-xs font-medium text-obsidian">{config.label}</span>
+                <span className="text-xs font-medium text-obsidian">{label}</span>
               </div>
-              <span className="text-xs font-medium text-obsidian">Total Protein: {slotProtein}g</span>
+              <span className="text-xs font-medium text-obsidian">{t("totalProtein")}: {slotProtein}g</span>
             </div>
             {/* Items */}
             <div className="divide-y divide-black/5">

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useEffect, useRef } from "react";
+import { useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
 import { ProteinRing } from "@/components/dashboard/ProteinRing";
 import { QuickLogForm } from "@/components/dashboard/QuickLogForm";
@@ -10,7 +11,6 @@ import { getDynamicMsg, getSevereAppetiteAlert, type CommStyle } from "@/lib/com
 
 // ── Meal slot logic ──
 const MEAL_ICONS = { breakfast: Sunrise, lunch: Sun, dinner: Moon, snack: Cookie } as const;
-const MEAL_LABELS = { breakfast: "Breakfast", lunch: "Lunch", dinner: "Dinner", snack: "Snack" } as const;
 type MealType = "breakfast" | "lunch" | "dinner" | "snack";
 
 interface QuickFood {
@@ -69,28 +69,28 @@ interface RecentFoodLog {
 
 // All available protein sources for the setup overlay
 const PROTEIN_SOURCES = [
-  { id: "chicken", label: "Chicken", emoji: "🍗" },
-  { id: "eggs", label: "Eggs", emoji: "🥚" },
-  { id: "greek_yogurt", label: "Greek yogurt", emoji: "🥛" },
-  { id: "cottage_cheese", label: "Cottage cheese", emoji: "🧀" },
-  { id: "protein_shake", label: "Protein shake", emoji: "🥤" },
-  { id: "tuna", label: "Tuna", emoji: "🐟" },
-  { id: "salmon", label: "Salmon", emoji: "🐠" },
-  { id: "turkey", label: "Turkey", emoji: "🦃" },
-  { id: "beef", label: "Beef", emoji: "🥩" },
-  { id: "shrimp", label: "Shrimp", emoji: "🦐" },
-  { id: "tofu", label: "Tofu", emoji: "🫘" },
-  { id: "edamame", label: "Edamame", emoji: "🌱" },
-  { id: "protein_bar", label: "Protein bar", emoji: "🍫" },
-  { id: "lentils", label: "Lentils", emoji: "🫘" },
+  { id: "chicken", labelKey: "chicken" as const, emoji: "🍗" },
+  { id: "eggs", labelKey: "eggs" as const, emoji: "🥚" },
+  { id: "greek_yogurt", labelKey: "greekYogurt" as const, emoji: "🥛" },
+  { id: "cottage_cheese", labelKey: "cottageCheese" as const, emoji: "🧀" },
+  { id: "protein_shake", labelKey: "proteinShake" as const, emoji: "🥤" },
+  { id: "tuna", labelKey: "tuna" as const, emoji: "🐟" },
+  { id: "salmon", labelKey: "salmon" as const, emoji: "🐠" },
+  { id: "turkey", labelKey: "turkey" as const, emoji: "🦃" },
+  { id: "beef", labelKey: "beef" as const, emoji: "🥩" },
+  { id: "shrimp", labelKey: "shrimp" as const, emoji: "🦐" },
+  { id: "tofu", labelKey: "tofu" as const, emoji: "🫘" },
+  { id: "edamame", labelKey: "edamame" as const, emoji: "🌱" },
+  { id: "protein_bar", labelKey: "proteinBar" as const, emoji: "🍫" },
+  { id: "lentils", labelKey: "lentils" as const, emoji: "🫘" },
 ];
 
 const DIETARY_OPTIONS = [
-  { value: "none", label: "No restrictions" },
-  { value: "vegetarian", label: "Vegetarian" },
-  { value: "vegan", label: "Vegan" },
-  { value: "pescatarian", label: "Pescatarian" },
-  { value: "dairy_free", label: "Dairy-free" },
+  { value: "none", labelKey: "noRestrictions" as const },
+  { value: "vegetarian", labelKey: "vegetarian" as const },
+  { value: "vegan", labelKey: "vegan" as const },
+  { value: "pescatarian", labelKey: "pescatarian" as const },
+  { value: "dairy_free", labelKey: "dairyFree" as const },
 ];
 
 function buildSmartPresets(
@@ -289,6 +289,8 @@ export function DashboardClient({
   trainingIntensityPct, appetiteLevel, commStyle,
   recentFoods, dietaryPrefs, favoriteProteins,
 }: Props) {
+  const t = useTranslations("dashboard");
+  const tc = useTranslations("common");
   const supabase = createClient();
 
   const [logs, setLogs] = useState<FoodLogEntry[]>(initialLogs);
@@ -403,11 +405,11 @@ export function DashboardClient({
     setQuickAdding(false);
   }
 
-  const msg = mounted ? getDynamicMsg(hour, pct, remaining, commStyle as CommStyle) : { title: "Today", sub: "" };
+  const msg = mounted ? getDynamicMsg(hour, pct, remaining, commStyle as CommStyle) : { title: tc("today"), sub: "" };
   const milestoneLabel =
-    streak >= 30 ? "🏆 30-day protein streak!" :
-    streak >= 14 ? "⭐ 14-day protein streak!" :
-    streak >= 7  ? "🎖 7-day protein streak!"  : null;
+    streak >= 30 ? `🏆 ${t("proteinStreak30")}` :
+    streak >= 14 ? `⭐ ${t("proteinStreak14")}` :
+    streak >= 7  ? `🎖 ${t("proteinStreak7")}`  : null;
 
   const isSevereAppetite = appetiteLevel === "severe" || appetiteLevel === "very_severe";
 
@@ -435,7 +437,7 @@ export function DashboardClient({
       {/* ── Header ── */}
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-obsidian">Today</h1>
+          <h1 className="text-2xl font-bold text-obsidian">{tc("today")}</h1>
           {mounted && <p className="text-sm text-mgray mt-0.5 max-w-xs">{msg.title}</p>}
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
@@ -443,14 +445,14 @@ export function DashboardClient({
             <div className="flex items-center gap-1 bg-white border border-black/5 px-2.5 py-1.5 rounded-full">
               <Flame className="h-3.5 w-3.5 text-obsidian" />
               <span className="text-xs font-semibold text-obsidian">
-                {workoutStreakDays} workout{workoutStreakDays !== 1 ? "s" : ""}
+                {workoutStreakDays !== 1 ? t("workoutCountPlural", { count: workoutStreakDays }) : t("workoutCount", { count: workoutStreakDays })}
               </span>
             </div>
           )}
           <div className="flex items-center gap-1 bg-white border border-black/5 px-2.5 py-1.5 rounded-full">
             <span className="text-sm">{streak >= 7 ? "🔥🔥" : streak >= 1 ? "🔥" : "💤"}</span>
             <span className={`text-xs font-semibold ${streak >= 1 ? "text-obsidian" : "text-muted"}`}>
-              {streak}d protein
+              {t("proteinDaysStreak", { count: streak })}
             </span>
           </div>
         </div>
@@ -491,7 +493,7 @@ export function DashboardClient({
                     </div>
                     <div className="text-center">
                       <p className="text-xs font-medium text-white">{val}g</p>
-                      <p className="text-[10px] text-white capitalize">{meal}</p>
+                      <p className="text-[10px] text-white capitalize">{t(meal)}</p>
                     </div>
                   </div>
                 );
@@ -502,7 +504,7 @@ export function DashboardClient({
             <div className="flex items-center gap-3 text-xs">
               {trainingIntensityPct < 95 && (
                 <span className="px-2 py-1 rounded bg-white/10 text-white/60">
-                  Training: {trainingIntensityPct}%
+                  {t("training")}: {trainingIntensityPct}%
                 </span>
               )}
               <span className="px-2 py-1 rounded bg-white/10 text-white/60">
@@ -525,12 +527,12 @@ export function DashboardClient({
           /* First-time food preferences setup */
           <div className="bg-white border border-black/5 rounded-[14px] p-5 space-y-4">
             <div>
-              <p className="text-sm font-medium text-obsidian">Personalize your quick meals</p>
-              <p className="text-xs text-mgray mt-1">Tell us your preferences so we can suggest the right foods for you.</p>
+              <p className="text-sm font-medium text-obsidian">{t("personalizeQuickMeals")}</p>
+              <p className="text-xs text-mgray mt-1">{t("personalizeQuickMealsDesc")}</p>
             </div>
 
             <div>
-              <p className="text-xs font-medium text-obsidian mb-2">Dietary preference</p>
+              <p className="text-xs font-medium text-obsidian mb-2">{t("dietaryPreference")}</p>
               <div className="flex flex-wrap gap-2">
                 {DIETARY_OPTIONS.map((opt) => (
                   <button
@@ -543,14 +545,14 @@ export function DashboardClient({
                         : "border-black/5 bg-white text-mgray hover:border-black/10"
                     }`}
                   >
-                    {opt.label}
+                    {t(opt.labelKey)}
                   </button>
                 ))}
               </div>
             </div>
 
             <div>
-              <p className="text-xs font-medium text-obsidian mb-2">Your go-to protein sources</p>
+              <p className="text-xs font-medium text-obsidian mb-2">{t("goToProteinSources")}</p>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                 {PROTEIN_SOURCES.map((src) => {
                   const selected = setupFavorites.includes(src.id);
@@ -568,7 +570,7 @@ export function DashboardClient({
                       }`}
                     >
                       <span>{src.emoji}</span>
-                      {src.label}
+                      {t(src.labelKey)}
                     </button>
                   );
                 })}
@@ -581,7 +583,7 @@ export function DashboardClient({
               disabled={setupSaving || setupFavorites.length === 0}
               className="w-full py-2.5 bg-obsidian text-white text-sm font-medium rounded-lg hover:bg-obsidian-light transition-colors disabled:opacity-50"
             >
-              {setupSaving ? "Saving…" : `Save preferences (${setupFavorites.length} selected)`}
+              {setupSaving ? tc("saving") : t("savePreferencesCount", { count: setupFavorites.length })}
             </button>
           </div>
         ) : (
@@ -605,7 +607,7 @@ export function DashboardClient({
                   }`}
                 >
                   <Icon className="h-5 w-5" />
-                  {MEAL_LABELS[key]}
+                  {t(key)}
                   {hasRecents && (
                     <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-[#CDFF00]" />
                   )}
@@ -621,7 +623,7 @@ export function DashboardClient({
             <div className="flex items-center justify-between px-4 py-2.5 border-b border-black/5 bg-surface">
               <span className="text-sm font-semibold text-obsidian flex items-center gap-1.5">
                 {(() => { const Icon = MEAL_ICONS[activePreset]; return <Icon className="h-4 w-4" />; })()}
-                {MEAL_LABELS[activePreset]}
+                {t(activePreset)}
               </span>
               <button onClick={() => setActivePreset(null)} className="text-muted hover:text-obsidian transition-colors">
                 <X className="h-4 w-4" />
@@ -643,7 +645,7 @@ export function DashboardClient({
                   <span className={`text-sm font-semibold ml-3 flex-shrink-0 ${
                     loggingPreset === item.name ? "text-muted" : "text-green-600"
                   }`}>
-                    {loggingPreset === item.name ? "Adding…" : `+${item.protein_g}g`}
+                    {loggingPreset === item.name ? t("adding") : `+${item.protein_g}g`}
                   </span>
                 </button>
               ))}
@@ -659,7 +661,7 @@ export function DashboardClient({
           className="w-full flex items-center justify-center gap-2 py-2.5 rounded-[10px] bg-obsidian text-white text-sm font-medium transition-colors hover:bg-obsidian-light disabled:opacity-60"
         >
           <Zap className="h-4 w-4" />
-          {quickAdding ? "Adding…" : `Quick add ${quickAddFood.name} (+${quickAddFood.protein_g}g)`}
+          {quickAdding ? t("adding") : t("quickAddFood", { food: quickAddFood.name, protein: quickAddFood.protein_g })}
         </button>
           </>
         )}
@@ -667,13 +669,13 @@ export function DashboardClient({
 
       {/* ── Log food (USDA search) ── */}
       <div className="bg-white border border-black/5 rounded-[10px] p-4 space-y-1">
-        <h3 className="text-sm font-medium text-obsidian mb-2">Log food</h3>
+        <h3 className="text-sm font-medium text-obsidian mb-2">{t("logFood")}</h3>
         <QuickLogForm userId={userId} onLogged={refreshLogs} />
       </div>
 
       {/* ── Today's log ── */}
       <div className="bg-white border border-black/5 rounded-[10px] p-4">
-        <h3 className="text-sm font-medium text-obsidian mb-2">Today&apos;s food</h3>
+        <h3 className="text-sm font-medium text-obsidian mb-2">{t("todaysFood")}</h3>
         <TodayFoodLog entries={logs} onDeleted={refreshLogs} />
       </div>
 
@@ -708,6 +710,7 @@ interface ThisWeekProps {
 }
 
 function ThisWeek({ weekLogs, weekStart, expanded, onToggle, expandedDays, onToggleDay }: ThisWeekProps) {
+  const tc = useTranslations("common");
   const today = new Date().toISOString().split("T")[0];
   const days: string[] = [];
   const cursor = new Date(weekStart + "T12:00:00Z");
@@ -737,7 +740,7 @@ function ThisWeek({ weekLogs, weekStart, expanded, onToggle, expandedDays, onTog
             ? <ChevronDown className="h-4 w-4 text-muted" />
             : <ChevronRight className="h-4 w-4 text-muted" />
           }
-          <span className="text-sm font-semibold text-obsidian">This Week</span>
+          <span className="text-sm font-semibold text-obsidian">{tc("thisWeek")}</span>
         </div>
         <span className="text-xs text-muted">{weekTotalProtein}g protein total</span>
       </button>
@@ -767,7 +770,7 @@ function ThisWeek({ weekLogs, weekStart, expanded, onToggle, expandedDays, onTog
                       : <span className="w-3.5" />
                     }
                     <span className={`text-sm ${isToday ? "font-semibold text-obsidian" : "text-mgray"}`}>
-                      {isToday ? "Today" : formatDayLabel(date)}
+                      {isToday ? tc("today") : formatDayLabel(date)}
                     </span>
                   </div>
                   <span className={`text-xs font-medium ${

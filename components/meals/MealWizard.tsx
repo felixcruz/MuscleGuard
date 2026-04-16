@@ -1,23 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Sparkles, Sunrise, Sun, Moon, Cookie } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
 import { MealCard, type Meal } from "./MealCard";
-
-const MEAL_TIMES = [
-  { value: "breakfast", label: "Breakfast", icon: Sunrise },
-  { value: "lunch", label: "Lunch", icon: Sun },
-  { value: "dinner", label: "Dinner", icon: Moon },
-  { value: "snack", label: "Snack", icon: Cookie },
-];
-
-const HUNGER_LEVELS = [
-  { value: "low", label: "🤏 Not very hungry" },
-  { value: "moderate", label: "😐 Could eat" },
-  { value: "high", label: "😋 Really hungry" },
-];
 
 const INGREDIENTS = [
   "Chicken breast", "Eggs", "Greek yogurt", "Cottage cheese",
@@ -63,7 +51,22 @@ function UserBubble({ children }: { children: React.ReactNode }) {
 }
 
 export function MealWizard({ userId, proteinRemainingG, dietaryPrefs, onMealLogged }: Props) {
+  const t = useTranslations("meals");
+  const tc = useTranslations("common");
   const supabase = createClient();
+
+  const MEAL_TIMES = [
+    { value: "breakfast", label: t("breakfast"), icon: Sunrise },
+    { value: "lunch", label: t("lunch"), icon: Sun },
+    { value: "dinner", label: t("dinner"), icon: Moon },
+    { value: "snack", label: t("snack"), icon: Cookie },
+  ];
+
+  const HUNGER_LEVELS = [
+    { value: "low", label: `🤏 ${t("notHungry")}` },
+    { value: "moderate", label: `😐 ${t("couldEat")}` },
+    { value: "high", label: `😋 ${t("reallyHungry")}` },
+  ];
   const [step, setStep] = useState(0); // 0=q1, 1=q2, 2=q3, 3=results
   const [mealTime, setMealTime] = useState<string | null>(null);
   const [hungerLevel, setHungerLevel] = useState<string | null>(null);
@@ -143,13 +146,13 @@ export function MealWizard({ userId, proteinRemainingG, dietaryPrefs, onMealLogg
     return (
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <p className="text-sm font-semibold text-obsidian">Your personalized meals</p>
+          <p className="text-sm font-semibold text-obsidian">{t("yourMeals")}</p>
           <button
             onClick={reset}
             className="text-xs hover:underline"
             style={{ color: "#131413" }}
           >
-            Start over
+            {t("startOver")}
           </button>
         </div>
         {meals.map((meal, i) => (
@@ -170,7 +173,7 @@ export function MealWizard({ userId, proteinRemainingG, dietaryPrefs, onMealLogg
     <div className="space-y-4">
 
       {/* Q1: Meal time */}
-      <AiBubble>What meal are you planning?</AiBubble>
+      <AiBubble>{t("whatMeal")}</AiBubble>
 
       {mealTime ? (
         <UserBubble>{MEAL_TIMES.find((m) => m.value === mealTime)?.label}</UserBubble>
@@ -192,7 +195,7 @@ export function MealWizard({ userId, proteinRemainingG, dietaryPrefs, onMealLogg
       {/* Q2: Hunger */}
       {step >= 1 && (
         <>
-          <AiBubble>How&rsquo;s your appetite right now?</AiBubble>
+          <AiBubble>{t("howAppetite")}</AiBubble>
 
           {hungerLevel ? (
             <UserBubble>{HUNGER_LEVELS.find((h) => h.value === hungerLevel)?.label}</UserBubble>
@@ -216,8 +219,8 @@ export function MealWizard({ userId, proteinRemainingG, dietaryPrefs, onMealLogg
       {step >= 2 && (
         <>
           <AiBubble>
-            Any ingredients you&rsquo;d like to use?{" "}
-            <span className="text-gray-500 text-xs">(optional)</span>
+            {t("anyIngredients")}{" "}
+            <span className="text-gray-500 text-xs">({tc("optional")})</span>
           </AiBubble>
 
           {generating ? (
@@ -226,7 +229,7 @@ export function MealWizard({ userId, proteinRemainingG, dietaryPrefs, onMealLogg
                 className="w-4 h-4 rounded-full border-2 border-t-transparent animate-spin"
                 style={{ borderColor: "#131413", borderTopColor: "transparent" }}
               />
-              Generating your meals…
+              {t("generatingMeals")}
             </div>
           ) : (
             <div className="pl-9 space-y-3">
@@ -273,16 +276,14 @@ export function MealWizard({ userId, proteinRemainingG, dietaryPrefs, onMealLogg
                   size="sm"
                 >
                   <Sparkles className="h-4 w-4 mr-1.5" />
-                  {ingredients.length > 0 || customRequest.trim()
-                    ? "Generate meals"
-                    : "Generate meals"}
+                  {t("generateMeals")}
                 </Button>
                 {(ingredients.length > 0 || customRequest.trim()) && (
                   <button
                     onClick={() => { setIngredients([]); setCustomRequest(""); }}
                     className="text-xs text-muted hover:text-obsidian px-2 py-1"
                   >
-                    Clear
+                    {t("clear")}
                   </button>
                 )}
               </div>

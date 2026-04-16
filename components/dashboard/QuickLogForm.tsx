@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
 import { Search, Plus, X } from "lucide-react";
 
@@ -26,6 +27,8 @@ interface Props {
 }
 
 export function QuickLogForm({ userId, onLogged }: Props) {
+  const t = useTranslations("dashboard");
+  const tc = useTranslations("common");
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<USDAResult[]>([]);
   const [selected, setSelected] = useState<USDAResult | null>(null);
@@ -56,7 +59,7 @@ export function QuickLogForm({ userId, onLogged }: Props) {
         if (data.error) setSearchError(data.error);
         setResults(data.foods ?? []);
       } catch {
-        setSearchError("Search failed. Check your connection.");
+        setSearchError(t("searchFailed"));
       } finally {
         setSearching(false);
       }
@@ -129,14 +132,14 @@ export function QuickLogForm({ userId, onLogged }: Props) {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted" />
           <input
             type="text"
-            placeholder="Search food (e.g. eggs, chicken, greek yogurt)"
+            placeholder={t("searchFoodPlaceholder")}
             value={query}
             onChange={(e) => { setQuery(e.target.value); setSelected(null); }}
             className="w-full pl-9 pr-4 py-2.5 border border-black/10 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-obsidian/20 bg-white"
           />
           {searching && (
             <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted">
-              Searching…
+              {tc("loading")}
             </span>
           )}
         </div>
@@ -160,7 +163,7 @@ export function QuickLogForm({ userId, onLogged }: Props) {
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-medium text-obsidian truncate">{food.description}</p>
                 <p className="text-xs text-mgray mt-0.5">
-                  {food.caloriesPer100g} cal, {food.proteinPer100g}g protein per 100g
+                  {food.caloriesPer100g} {t("cal")}, {food.proteinPer100g}g {tc("protein")} {t("perHundredG")}
                   {food.brandName && <span className="text-muted"> · {food.brandName}</span>}
                 </p>
               </div>
@@ -190,10 +193,10 @@ export function QuickLogForm({ userId, onLogged }: Props) {
           <div className="px-4 pb-2">
             <div className="flex gap-1 bg-white border border-black/5 rounded-lg p-0.5">
               {[
-                { value: "breakfast", label: "Breakfast" },
-                { value: "lunch", label: "Lunch" },
-                { value: "dinner", label: "Dinner" },
-                { value: "snack", label: "Snack" },
+                { value: "breakfast", label: t("breakfast") },
+                { value: "lunch", label: t("lunch") },
+                { value: "dinner", label: t("dinner") },
+                { value: "snack", label: t("snack") },
               ].map((m) => (
                 <button
                   key={m.value}
@@ -215,7 +218,7 @@ export function QuickLogForm({ userId, onLogged }: Props) {
           <div className="px-4 py-3 space-y-3">
             {/* Serving size (unit selector) */}
             <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-mgray">Serving size</span>
+              <span className="text-xs font-medium text-mgray">{t("servingSize")}</span>
               <select
                 value={portionIdx}
                 onChange={(e) => setPortionIdx(parseInt(e.target.value))}
@@ -232,7 +235,7 @@ export function QuickLogForm({ userId, onLogged }: Props) {
             {/* Number of servings */}
             <div className="flex items-center justify-between">
               <span className="text-xs font-medium text-mgray">
-                {selected.portions[portionIdx]?.label === "g" ? "Amount" : "Number of servings"}
+                {selected.portions[portionIdx]?.label === "g" ? t("amount") : t("numberOfServings")}
               </span>
               <div className="flex items-center gap-2">
                 <button
@@ -266,19 +269,19 @@ export function QuickLogForm({ userId, onLogged }: Props) {
             <div className="grid grid-cols-4 gap-2 text-center">
               <div>
                 <p className="text-lg font-bold text-obsidian">{calc.calories}</p>
-                <p className="text-[10px] text-mgray uppercase tracking-wider">Cal</p>
+                <p className="text-[10px] text-mgray uppercase tracking-wider">{t("cal")}</p>
               </div>
               <div>
                 <p className="text-lg font-bold text-green-600">{calc.protein}g</p>
-                <p className="text-[10px] text-mgray uppercase tracking-wider">Protein</p>
+                <p className="text-[10px] text-mgray uppercase tracking-wider">{tc("protein")}</p>
               </div>
               <div>
                 <p className="text-lg font-bold text-obsidian">{calc.carbs}g</p>
-                <p className="text-[10px] text-mgray uppercase tracking-wider">Carbs</p>
+                <p className="text-[10px] text-mgray uppercase tracking-wider">{t("carbs")}</p>
               </div>
               <div>
                 <p className="text-lg font-bold text-obsidian">{calc.fat}g</p>
-                <p className="text-[10px] text-mgray uppercase tracking-wider">Fat</p>
+                <p className="text-[10px] text-mgray uppercase tracking-wider">{t("fat")}</p>
               </div>
             </div>
           </div>
@@ -291,7 +294,7 @@ export function QuickLogForm({ userId, onLogged }: Props) {
               className="w-full py-2.5 bg-obsidian text-white text-sm font-medium rounded-lg hover:bg-obsidian-light transition-colors disabled:opacity-50 flex items-center justify-center gap-1.5"
             >
               <Plus className="h-4 w-4" />
-              {saving ? "Logging…" : `Log ${calc.protein}g protein`}
+              {saving ? tc("saving") : t("logProtein", { amount: calc.protein })}
             </button>
           </div>
         </div>

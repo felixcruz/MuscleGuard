@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { Check, Clock, Dumbbell, Flame, Plus } from "lucide-react";
 
 export interface Meal {
@@ -20,6 +21,8 @@ interface Props {
 }
 
 export function MealCard({ meal, onLog, logging, logged }: Props) {
+  const t = useTranslations("meals");
+  const tc = useTranslations("common");
   return (
     <div className="bg-white border border-black/5 rounded-[10px] p-5 space-y-3">
       <div className="flex items-start justify-between gap-2">
@@ -42,7 +45,7 @@ export function MealCard({ meal, onLog, logging, logged }: Props) {
       </div>
 
       <div>
-        <p className="text-[10px] font-medium text-muted uppercase tracking-widest mb-1.5">Ingredients</p>
+        <p className="text-[10px] font-medium text-muted uppercase tracking-widest mb-1.5">{t("ingredients")}</p>
         <ul className="text-sm text-mgray space-y-0.5">
           {meal.ingredients.map((ing, i) => (
             <li key={i} className="flex items-start gap-1.5">
@@ -59,7 +62,7 @@ export function MealCard({ meal, onLog, logging, logged }: Props) {
           <div className="w-5 h-5 rounded-full bg-[#CDFF00] flex items-center justify-center">
             <Check className="h-3 w-3 text-obsidian" />
           </div>
-          <span className="text-white">Logged!</span>
+          <span className="text-white">{tc("logged")}</span>
         </div>
       ) : (
         <button
@@ -68,7 +71,7 @@ export function MealCard({ meal, onLog, logging, logged }: Props) {
           className="w-full py-2.5 bg-obsidian text-white text-sm font-medium rounded-lg hover:bg-obsidian-light transition-colors disabled:opacity-50 flex items-center justify-center gap-1.5"
         >
           <Plus className="h-4 w-4" />
-          {logging ? "Logging…" : "Log this meal"}
+          {logging ? tc("saving") : t("logThisMeal")}
         </button>
       )}
     </div>
