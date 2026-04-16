@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
 import { CreditCard, LogOut, Shield, User, Receipt, Settings, Check } from "lucide-react";
 
@@ -40,33 +41,12 @@ const PROTEIN_SOURCES = [
   { id: "lentils", label: "Lentils", emoji: "🫘" },
 ];
 
-const DIETARY_OPTIONS = [
-  { value: "none", label: "No restrictions" },
-  { value: "vegetarian", label: "Vegetarian" },
-  { value: "vegan", label: "Vegan" },
-  { value: "pescatarian", label: "Pescatarian" },
-  { value: "dairy_free", label: "Dairy-free" },
-];
-
-const STATUS_LABELS: Record<string, string> = {
-  trial: "Free trial",
-  trialing: "Trial (card on file)",
-  active: "Active",
-  past_due: "Payment past due",
-  cancelled: "Cancelled",
-};
-
-const COMM_STYLES = [
-  { value: "balanced",     label: "Balanced",     desc: "Mix of motivation and facts" },
-  { value: "direct",       label: "Direct",       desc: "Short, no-fluff responses" },
-  { value: "clinical",     label: "Clinical",     desc: "Data-driven, evidence-based" },
-  { value: "supportive",   label: "Supportive",   desc: "Warm and encouraging" },
-  { value: "motivational", label: "Motivational", desc: "High-energy, push harder" },
-];
-
 type Tab = "general" | "billing";
 
 export function SettingsClient({ userId, email, profile }: Props) {
+  const t = useTranslations("settings");
+  const tc = useTranslations("common");
+  const td = useTranslations("dashboard");
   const [tab, setTab] = useState<Tab>("general");
 
   const [saving, setSaving] = useState(false);
@@ -143,9 +123,9 @@ export function SettingsClient({ userId, email, profile }: Props) {
       <div className="bg-obsidian rounded-[14px] p-6">
         <div className="flex items-center gap-2">
           <Settings className="h-5 w-5 text-[#CDFF00]" />
-          <h1 className="text-2xl font-bold text-white">Settings</h1>
+          <h1 className="text-2xl font-bold text-white">{t("title")}</h1>
         </div>
-        <p className="text-white/50 mt-1 text-sm">Manage your profile, preferences, and billing.</p>
+        <p className="text-white/50 mt-1 text-sm">{t("subtitle")}</p>
 
         {/* Tab switcher */}
         <div className="flex gap-2 mt-5 pt-4 border-t border-white/5">
@@ -158,7 +138,7 @@ export function SettingsClient({ userId, email, profile }: Props) {
             }`}
           >
             <User className="h-4 w-4" />
-            General
+            {t("general")}
           </button>
           <button
             onClick={() => setTab("billing")}
@@ -169,7 +149,7 @@ export function SettingsClient({ userId, email, profile }: Props) {
             }`}
           >
             <Receipt className="h-4 w-4" />
-            Billing
+            {t("billing")}
           </button>
         </div>
       </div>
@@ -179,12 +159,12 @@ export function SettingsClient({ userId, email, profile }: Props) {
         <div className="space-y-5">
           {/* Profile */}
           <div className="bg-white border border-black/5 rounded-[10px] p-5 space-y-4">
-            <p className="text-[10px] font-medium text-mgray uppercase tracking-widest">Profile</p>
+            <p className="text-[10px] font-medium text-mgray uppercase tracking-widest">{t("profile")}</p>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-mgray">Name</label>
+              <label className="text-xs font-medium text-mgray">{t("name")}</label>
               <input
-                placeholder="Your name"
+                placeholder={t("namePlaceholder")}
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
                 className="w-full px-3 py-2 border border-black/10 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-obsidian/20 bg-white"
@@ -192,13 +172,13 @@ export function SettingsClient({ userId, email, profile }: Props) {
             </div>
 
             <div>
-              <label className="text-xs font-medium text-mgray block mb-2">Gender</label>
+              <label className="text-xs font-medium text-mgray block mb-2">{t("gender")}</label>
               <div className="flex gap-2">
                 {[
-                  { value: "male", label: "Male" },
-                  { value: "female", label: "Female" },
-                  { value: "other", label: "Other" },
-                  { value: "prefer_not", label: "Prefer not to say" },
+                  { value: "male", label: t("male") },
+                  { value: "female", label: t("female") },
+                  { value: "other", label: t("other") },
+                  { value: "prefer_not", label: t("preferNotToSay") },
                 ].map((opt) => (
                   <button
                     key={opt.value}
@@ -217,7 +197,7 @@ export function SettingsClient({ userId, email, profile }: Props) {
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-mgray">Email</label>
+              <label className="text-xs font-medium text-mgray">{t("emailLabel")}</label>
               <div className="px-3 py-2 bg-surface border border-black/5 rounded-lg text-sm text-mgray">
                 {email}
               </div>
@@ -226,13 +206,13 @@ export function SettingsClient({ userId, email, profile }: Props) {
             <div className="grid grid-cols-2 gap-3 pt-1">
               {profile.weight_kg && (
                 <div className="bg-surface rounded-lg p-3">
-                  <p className="text-[10px] text-mgray uppercase tracking-widest">Weight</p>
+                  <p className="text-[10px] text-mgray uppercase tracking-widest">{t("weightLabel")}</p>
                   <p className="text-lg font-bold text-obsidian mt-0.5">{profile.weight_kg} kg</p>
                 </div>
               )}
               {profile.protein_goal_g && (
                 <div className="bg-surface rounded-lg p-3">
-                  <p className="text-[10px] text-mgray uppercase tracking-widest">Protein goal</p>
+                  <p className="text-[10px] text-mgray uppercase tracking-widest">{t("proteinGoalLabel")}</p>
                   <p className="text-lg font-bold text-obsidian mt-0.5">{profile.protein_goal_g}g</p>
                 </div>
               )}
@@ -242,16 +222,16 @@ export function SettingsClient({ userId, email, profile }: Props) {
           {/* Communication style */}
           <div className="bg-white border border-black/5 rounded-[10px] p-5 space-y-3">
             <div>
-              <p className="text-[10px] font-medium text-mgray uppercase tracking-widest">Communication style</p>
-              <p className="text-xs text-mgray mt-1">How the app talks to you across all sections.</p>
+              <p className="text-[10px] font-medium text-mgray uppercase tracking-widest">{t("commStyle")}</p>
+              <p className="text-xs text-mgray mt-1">{t("commStyleDesc")}</p>
             </div>
             <div className="space-y-2">
-              {COMM_STYLES.map((s) => {
-                const isSelected = commStyle === s.value;
+              {(["balanced", "direct", "clinical", "supportive", "motivational"] as const).map((value) => {
+                const isSelected = commStyle === value;
                 return (
                   <button
-                    key={s.value}
-                    onClick={() => setCommStyle(s.value)}
+                    key={value}
+                    onClick={() => setCommStyle(value)}
                     className={`w-full flex items-center justify-between px-4 py-3 rounded-[10px] border text-sm transition-colors ${
                       isSelected
                         ? "border-obsidian bg-obsidian text-white"
@@ -264,9 +244,9 @@ export function SettingsClient({ userId, email, profile }: Props) {
                           <Check className="h-2.5 w-2.5 text-obsidian" />
                         </div>
                       )}
-                      <span className="font-medium">{s.label}</span>
+                      <span className="font-medium">{t(value)}</span>
                     </div>
-                    <span className={`text-xs ${isSelected ? "text-white/60" : "text-mgray"}`}>{s.desc}</span>
+                    <span className={`text-xs ${isSelected ? "text-white/60" : "text-mgray"}`}>{t(`${value}Desc`)}</span>
                   </button>
                 );
               })}
@@ -276,14 +256,20 @@ export function SettingsClient({ userId, email, profile }: Props) {
           {/* Food preferences */}
           <div className="bg-white border border-black/5 rounded-[10px] p-5 space-y-3">
             <div>
-              <p className="text-[10px] font-medium text-mgray uppercase tracking-widest">Food preferences</p>
-              <p className="text-xs text-mgray mt-1">Used to personalize your quick meal suggestions.</p>
+              <p className="text-[10px] font-medium text-mgray uppercase tracking-widest">{t("foodPreferences")}</p>
+              <p className="text-xs text-mgray mt-1">{t("foodPreferencesDesc")}</p>
             </div>
 
             <div>
-              <p className="text-xs font-medium text-obsidian mb-2">Dietary preference</p>
+              <p className="text-xs font-medium text-obsidian mb-2">{t("dietaryPreference")}</p>
               <div className="flex flex-wrap gap-2">
-                {DIETARY_OPTIONS.map((opt) => (
+                {([
+                  { value: "none", labelKey: "noRestrictions" as const },
+                  { value: "vegetarian", labelKey: "vegetarian" as const },
+                  { value: "vegan", labelKey: "vegan" as const },
+                  { value: "pescatarian", labelKey: "pescatarian" as const },
+                  { value: "dairy_free", labelKey: "dairyFree" as const },
+                ]).map((opt) => (
                   <button
                     key={opt.value}
                     type="button"
@@ -294,14 +280,14 @@ export function SettingsClient({ userId, email, profile }: Props) {
                         : "border-black/5 bg-white text-mgray hover:border-black/10"
                     }`}
                   >
-                    {opt.label}
+                    {td(opt.labelKey)}
                   </button>
                 ))}
               </div>
             </div>
 
             <div>
-              <p className="text-xs font-medium text-obsidian mb-2">Favorite protein sources</p>
+              <p className="text-xs font-medium text-obsidian mb-2">{t("favoriteProteinSources")}</p>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                 {PROTEIN_SOURCES.map((src) => {
                   const selected = favProteins.includes(src.id);
@@ -337,7 +323,7 @@ export function SettingsClient({ userId, email, profile }: Props) {
                 : "bg-obsidian text-white hover:bg-obsidian-light"
             }`}
           >
-            {saving ? "Saving…" : saved ? "✓ Saved!" : "Save changes"}
+            {saving ? tc("saving") : saved ? `✓ ${tc("saved")}` : tc("save")}
           </button>
 
           {/* Sign out */}
@@ -346,7 +332,7 @@ export function SettingsClient({ userId, email, profile }: Props) {
             className="w-full py-2.5 rounded-lg text-sm font-medium text-mgray hover:text-obsidian hover:bg-surface transition-colors flex items-center justify-center gap-2"
           >
             <LogOut className="h-4 w-4" />
-            Sign out
+            {tc("signOut")}
           </button>
         </div>
       )}
@@ -357,25 +343,29 @@ export function SettingsClient({ userId, email, profile }: Props) {
           {/* Plan status */}
           <div className="bg-white border border-black/5 rounded-[10px] p-5">
             <div className="flex items-center justify-between mb-4">
-              <p className="text-[10px] font-medium text-mgray uppercase tracking-widest">Plan</p>
+              <p className="text-[10px] font-medium text-mgray uppercase tracking-widest">{t("plan")}</p>
               <span className={`px-3 py-1 rounded-full text-xs font-semibold ${statusBg}`}>
-                {STATUS_LABELS[status] ?? status}
+                {status === "trial" ? t("freeTrial") :
+                 status === "trialing" ? t("trialCardOnFile") :
+                 status === "active" ? t("active") :
+                 status === "past_due" ? t("paymentPastDue") :
+                 status === "cancelled" ? t("cancelled") : status}
               </span>
             </div>
 
             {isTrial && trialEnd && (
-              <p className="text-xs text-mgray mb-4">Trial ends {trialEnd}</p>
+              <p className="text-xs text-mgray mb-4">{t("trialEnds", { date: trialEnd })}</p>
             )}
 
             {/* Plan details */}
             {isActive && (
               <div className="space-y-4">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-mgray">Plan</span>
+                  <span className="text-mgray">{t("plan")}</span>
                   <span className="font-medium text-obsidian">MuscleGuard Pro</span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-mgray">Price</span>
+                  <span className="text-mgray">{t("price")}</span>
                   <span className="font-medium text-obsidian">$14.99/month</span>
                 </div>
 
@@ -388,7 +378,7 @@ export function SettingsClient({ userId, email, profile }: Props) {
                         className="w-full py-2.5 bg-obsidian text-white text-sm font-medium rounded-lg hover:bg-obsidian-light transition-colors disabled:opacity-50 flex items-center justify-center gap-1.5"
                       >
                         <CreditCard className="h-4 w-4" />
-                        {portal ? "Opening…" : "Manage billing"}
+                        {portal ? t("opening") : t("manageBilling")}
                       </button>
                     </div>
                     <button
@@ -396,7 +386,7 @@ export function SettingsClient({ userId, email, profile }: Props) {
                       disabled={portal}
                       className="text-xs text-muted hover:text-[#FFB4AB] transition-colors w-full text-center"
                     >
-                      {portal ? "Opening…" : "Cancel membership"}
+                      {portal ? t("opening") : t("cancelMembership")}
                     </button>
                   </>
                 )}

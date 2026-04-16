@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
 import { Shield, Check } from "lucide-react";
 import { calculateProteinGoal, type Goal } from "@/lib/personalization";
@@ -11,24 +12,24 @@ const TOTAL_STEPS = 3;
 const SEMAGLUTIDE_DOSES = [0.25, 0.5, 1.0, 1.7, 2.4];
 const TIRZEPATIDE_DOSES = [2.5, 5, 7.5, 10, 12.5, 15];
 
-const ACTIVITY_OPTIONS = [
-  { value: "strength", label: "Strength training", emoji: "🏋️" },
-  { value: "running", label: "Running", emoji: "🏃" },
-  { value: "cycling", label: "Cycling", emoji: "🚴" },
-  { value: "swimming", label: "Swimming", emoji: "🏊" },
-  { value: "yoga", label: "Yoga / Pilates", emoji: "🧘" },
-  { value: "padel", label: "Padel / Tennis", emoji: "🎾" },
-  { value: "hiit", label: "HIIT / Hyrox", emoji: "🔥" },
-  { value: "walking", label: "Walking", emoji: "🚶" },
-];
+const ACTIVITY_KEYS = [
+  { value: "strength", key: "strengthTraining", emoji: "🏋️" },
+  { value: "running", key: "running", emoji: "🏃" },
+  { value: "cycling", key: "cycling", emoji: "🚴" },
+  { value: "swimming", key: "swimming", emoji: "🏊" },
+  { value: "yoga", key: "yogaPilates", emoji: "🧘" },
+  { value: "padel", key: "padelTennis", emoji: "🎾" },
+  { value: "hiit", key: "hiitHyrox", emoji: "🔥" },
+  { value: "walking", key: "walking", emoji: "🚶" },
+] as const;
 
-const APPETITE_OPTIONS = [
-  { value: "none", label: "No suppression", emoji: "😊" },
-  { value: "mild", label: "Mild", emoji: "🙂" },
-  { value: "moderate", label: "Moderate", emoji: "😐" },
-  { value: "severe", label: "Severe", emoji: "😕" },
-  { value: "very_severe", label: "Very severe", emoji: "😔" },
-];
+const APPETITE_KEYS = [
+  { value: "none", key: "noSuppression", emoji: "😊" },
+  { value: "mild", key: "mild", emoji: "🙂" },
+  { value: "moderate", key: "moderate", emoji: "😐" },
+  { value: "severe", key: "severe", emoji: "😕" },
+  { value: "very_severe", key: "verySevere", emoji: "😔" },
+] as const;
 
 const DAYS_OF_WEEK = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
@@ -50,6 +51,8 @@ type Form = {
 
 export default function OnboardingPage() {
   const router = useRouter();
+  const t = useTranslations("onboarding");
+  const tc = useTranslations("common");
   const supabase = createClient();
   const [step, setStep] = useState(1);
   const [saving, setSaving] = useState(false);
@@ -129,7 +132,7 @@ export default function OnboardingPage() {
 
   function handleNext() {
     if (!canAdvance()) {
-      setFieldError("Please complete all questions before continuing.");
+      setFieldError(t("completeAllQuestions"));
       return;
     }
     setFieldError(null);
@@ -145,7 +148,7 @@ export default function OnboardingPage() {
 
   async function handleFinish() {
     if (!canAdvance()) {
-      setFieldError("Please complete all questions before continuing.");
+      setFieldError(t("completeAllQuestions"));
       return;
     }
     setSaving(true);
@@ -237,7 +240,7 @@ export default function OnboardingPage() {
       {/* Logo */}
       <div className="flex items-center gap-2 mb-6">
         <Shield className="h-5 w-5 text-obsidian" />
-        <span className="font-semibold text-obsidian tracking-tight">MuscleGuard</span>
+        <span className="font-semibold text-obsidian tracking-tight">{tc("appName")}</span>
       </div>
 
       <div className="w-full max-w-[540px]">
@@ -245,7 +248,7 @@ export default function OnboardingPage() {
         {!done && (
           <div className="mb-5">
             <div className="flex justify-between mb-1.5">
-              <span className="text-xs text-mgray">Step {step} of {TOTAL_STEPS}</span>
+              <span className="text-xs text-mgray">{t("stepOf", { step, total: TOTAL_STEPS })}</span>
               <span className="text-xs text-mgray">{progress}%</span>
             </div>
             <div className="h-1.5 bg-muted/30 rounded-full overflow-hidden">
@@ -266,38 +269,38 @@ export default function OnboardingPage() {
               <div className="w-14 h-14 rounded-full bg-[#CDFF00] flex items-center justify-center mx-auto mb-4">
                 <Check className="h-7 w-7 text-obsidian" />
               </div>
-              <h2 className="text-xl font-bold text-obsidian mb-2">Assessment complete</h2>
+              <h2 className="text-xl font-bold text-obsidian mb-2">{t("assessmentComplete")}</h2>
               <p className="text-sm text-mgray mb-6">
-                Your personalized muscle preservation protocol is being generated:
+                {t("assessmentCompleteDesc")}
               </p>
               <div className="text-left space-y-3">
-                {[
-                  "Protein target adjusted to your dose",
-                  "Resistance plan to protect lean mass",
-                  "Activity-specific training protocol",
-                  "Body composition monitoring (not just weight)",
-                ].map((item) => (
-                  <div key={item} className="flex items-center gap-3">
+                {([
+                  "proteinAdjusted",
+                  "resistancePlan",
+                  "activityProtocol",
+                  "bodyCompMonitoring",
+                ] as const).map((key) => (
+                  <div key={key} className="flex items-center gap-3">
                     <div className="w-5 h-5 rounded-full bg-[#CDFF00] flex items-center justify-center shrink-0">
                       <Check className="h-3 w-3 text-obsidian" />
                     </div>
-                    <span className="text-sm text-obsidian">{item}</span>
+                    <span className="text-sm text-obsidian">{t(key)}</span>
                   </div>
                 ))}
               </div>
-              <p className="text-xs text-mgray mt-6">Redirecting in a moment…</p>
+              <p className="text-xs text-mgray mt-6">{t("redirecting")}</p>
             </div>
           )}
 
           {/* ── STEP 1: Body & Goal ── */}
           {!done && step === 1 && (
             <div>
-              <h2 className="text-xl font-bold text-obsidian mb-1">Your body and goal</h2>
+              <h2 className="text-xl font-bold text-obsidian mb-1">{t("bodyAndGoal")}</h2>
               <p className="text-sm text-mgray mb-6">
-                This helps us calculate your personalized protein target.
+                {t("bodyAndGoalDesc")}
               </p>
 
-              <label className="text-xs font-medium text-obsidian block mb-2">Current weight</label>
+              <label className="text-xs font-medium text-obsidian block mb-2">{t("currentWeight")}</label>
               <div className="flex items-center gap-3 mb-6">
                 <div className="relative max-w-[160px]">
                   <input
@@ -331,12 +334,12 @@ export default function OnboardingPage() {
                 </div>
               </div>
 
-              <label className="text-xs font-medium text-obsidian block mb-2">What is your primary goal?</label>
+              <label className="text-xs font-medium text-obsidian block mb-2">{t("primaryGoal")}</label>
               <div className="space-y-2.5">
                 {[
-                  { value: "preserve_muscle", label: "Preserve muscle", desc: "Maintain lean mass while losing weight on GLP-1" },
-                  { value: "build_strength", label: "Build strength", desc: "Add muscle while managing weight" },
-                  { value: "general_health", label: "General health", desc: "Stay active and feel better" },
+                  { value: "preserve_muscle", labelKey: "preserveMuscle", descKey: "preserveMuscleDesc" },
+                  { value: "build_strength", labelKey: "buildStrength", descKey: "buildStrengthDesc" },
+                  { value: "general_health", labelKey: "generalHealth", descKey: "generalHealthDesc" },
                 ].map((opt) => {
                   const selected = form.primary_goal === opt.value;
                   return (
@@ -347,10 +350,10 @@ export default function OnboardingPage() {
                       className={optionClass(selected)}
                     >
                       <div className={`text-sm font-medium ${selected ? "text-white" : "text-obsidian"}`}>
-                        {opt.label}
+                        {t(opt.labelKey)}
                       </div>
                       <div className={`text-xs mt-1 ${selected ? "text-white/60" : "text-mgray"}`}>
-                        {opt.desc}
+                        {t(opt.descKey)}
                       </div>
                     </button>
                   );
@@ -362,19 +365,19 @@ export default function OnboardingPage() {
           {/* ── STEP 2: GLP-1 Medication ── */}
           {!done && step === 2 && (
             <div>
-              <h2 className="text-xl font-bold text-obsidian mb-1">Your GLP-1 medication</h2>
+              <h2 className="text-xl font-bold text-obsidian mb-1">{t("glp1Medication")}</h2>
               <p className="text-sm text-mgray mb-6">
-                We use this to adjust your protein and training intensity.
+                {t("glp1MedicationDesc")}
               </p>
 
               {/* Section: Medication type */}
               <div className="bg-surface rounded-[10px] p-4 mb-4">
-                <label className="text-xs font-medium text-obsidian block mb-2">Medication type</label>
+                <label className="text-xs font-medium text-obsidian block mb-2">{t("medicationType")}</label>
                 <div className="space-y-2">
                   {[
-                    { value: "semaglutide", label: "Semaglutide (Ozempic / Wegovy)" },
-                    { value: "tirzepatide", label: "Tirzepatide (Mounjaro / Zepbound)" },
-                    { value: "other", label: "Other GLP-1" },
+                    { value: "semaglutide", labelKey: "semaglutide" },
+                    { value: "tirzepatide", labelKey: "tirzepatide" },
+                    { value: "other", labelKey: "otherGlp1" },
                   ].map((med) => {
                     const selected = form.medication === med.value;
                     return (
@@ -388,7 +391,7 @@ export default function OnboardingPage() {
                             : "border-black/5 bg-white text-mgray hover:border-black/10"
                         }`}
                       >
-                        {med.label}
+                        {t(med.labelKey)}
                       </button>
                     );
                   })}
@@ -398,7 +401,7 @@ export default function OnboardingPage() {
               {/* Section: Current dose */}
               {form.medication && (
                 <div className="bg-surface rounded-[10px] p-4 mb-4">
-                  <label className="text-xs font-medium text-obsidian block mb-2">Current dose</label>
+                  <label className="text-xs font-medium text-obsidian block mb-2">{t("currentDose")}</label>
                   {form.medication === "other" ? (
                     <div className="relative max-w-[160px]">
                       <input
@@ -416,7 +419,7 @@ export default function OnboardingPage() {
                       onChange={(e) => set("dose_mg", e.target.value)}
                       className="px-3 py-2.5 border border-black/10 rounded-lg text-base bg-white min-w-[160px] focus:outline-none focus:ring-2 focus:ring-obsidian/20"
                     >
-                      <option value="">Select dose…</option>
+                      <option value="">{t("selectDose")}</option>
                       {doses.map((d) => (
                         <option key={d} value={String(d)}>{d} mg</option>
                       ))}
@@ -427,12 +430,12 @@ export default function OnboardingPage() {
 
               {/* Section: Injection frequency */}
               <div className="bg-surface rounded-[10px] p-4 mb-4">
-                <label className="text-xs font-medium text-obsidian block mb-2">Injection frequency</label>
+                <label className="text-xs font-medium text-obsidian block mb-2">{t("injectionFrequency")}</label>
                 <div className="flex flex-wrap gap-2">
                   {[
-                    { value: "weekly", label: "Weekly" },
-                    { value: "biweekly", label: "Every 2 weeks" },
-                    { value: "monthly", label: "Monthly" },
+                    { value: "weekly", labelKey: "weekly" },
+                    { value: "biweekly", labelKey: "every2Weeks" },
+                    { value: "monthly", labelKey: "monthly" },
                   ].map((opt) => (
                     <button
                       key={opt.value}
@@ -440,7 +443,7 @@ export default function OnboardingPage() {
                       onClick={() => { set("frequency", opt.value); if (opt.value !== "weekly") set("injection_day", ""); }}
                       className={pillClass(form.frequency === opt.value)}
                     >
-                      {opt.label}
+                      {t(opt.labelKey)}
                     </button>
                   ))}
                 </div>
@@ -449,7 +452,7 @@ export default function OnboardingPage() {
               {/* Section: Injection day */}
               {form.frequency === "weekly" && (
                 <div className="bg-surface rounded-[10px] p-4 mb-4">
-                  <label className="text-xs font-medium text-obsidian block mb-2">Injection day</label>
+                  <label className="text-xs font-medium text-obsidian block mb-2">{t("injectionDay")}</label>
                   <div className="grid grid-cols-7 gap-1.5">
                     {DAYS_OF_WEEK.map((day) => {
                       const selected = form.injection_day === day;
@@ -474,9 +477,9 @@ export default function OnboardingPage() {
 
               {/* Section: Appetite */}
               <div className="bg-surface rounded-[10px] p-4">
-                <label className="text-xs font-medium text-obsidian block mb-2">Appetite suppression right now</label>
+                <label className="text-xs font-medium text-obsidian block mb-2">{t("appetiteSuppression")}</label>
                 <div className="space-y-2">
-                {APPETITE_OPTIONS.map((opt) => {
+                {APPETITE_KEYS.map((opt) => {
                   const selected = form.appetite_level === opt.value;
                   return (
                     <button
@@ -490,7 +493,7 @@ export default function OnboardingPage() {
                       }`}
                     >
                       <span className="text-base">{opt.emoji}</span>
-                      {opt.label}
+                      {t(opt.key)}
                     </button>
                   );
                 })}
@@ -502,19 +505,19 @@ export default function OnboardingPage() {
           {/* ── STEP 3: Activity ── */}
           {!done && step === 3 && (
             <div>
-              <h2 className="text-xl font-bold text-obsidian mb-1">Your activity</h2>
+              <h2 className="text-xl font-bold text-obsidian mb-1">{t("yourActivity")}</h2>
               <p className="text-sm text-mgray mb-6">
-                Tell us about your exercise habits so we can build your training protocol.
+                {t("yourActivityDesc")}
               </p>
 
               {/* Section: Exercise types */}
               <div className="bg-surface rounded-[10px] p-4 mb-4">
                 <label className="text-xs font-medium text-obsidian block mb-2">
-                  What types of exercise do you do?{" "}
-                  <span className="text-mgray font-normal">(select all that apply)</span>
+                  {t("exerciseTypes")}{" "}
+                  <span className="text-mgray font-normal">({t("selectAllThatApply")})</span>
                 </label>
                 <div className="flex flex-wrap gap-2">
-                  {ACTIVITY_OPTIONS.map((opt) => {
+                  {ACTIVITY_KEYS.map((opt) => {
                     const selected = form.activity_types.includes(opt.value);
                     return (
                       <button
@@ -528,7 +531,7 @@ export default function OnboardingPage() {
                         }`}
                       >
                         <span>{opt.emoji}</span>
-                        {opt.label}
+                        {t(opt.key)}
                       </button>
                     );
                   })}
@@ -538,17 +541,17 @@ export default function OnboardingPage() {
               {/* Section: Primary activity */}
               {form.activity_types.length >= 2 && (
                 <div className="bg-surface rounded-[10px] p-4 mb-4">
-                  <label className="text-xs font-medium text-obsidian block mb-2">Which is your primary activity?</label>
+                  <label className="text-xs font-medium text-obsidian block mb-2">{t("primaryActivity")}</label>
                   <select
                     value={form.primary_activity}
                     onChange={(e) => set("primary_activity", e.target.value)}
                     className="px-3 py-2.5 border border-black/10 rounded-lg text-base bg-white min-w-[200px] focus:outline-none focus:ring-2 focus:ring-obsidian/20"
                   >
-                    <option value="">Select primary activity…</option>
+                    <option value="">{t("selectPrimaryActivity")}</option>
                     {form.activity_types.map((act) => {
-                      const opt = ACTIVITY_OPTIONS.find((o) => o.value === act);
+                      const opt = ACTIVITY_KEYS.find((o) => o.value === act);
                       return opt ? (
-                        <option key={act} value={act}>{opt.emoji} {opt.label}</option>
+                        <option key={act} value={act}>{opt.emoji} {t(opt.key)}</option>
                       ) : null;
                     })}
                   </select>
@@ -557,12 +560,12 @@ export default function OnboardingPage() {
 
               {/* Section: Frequency */}
               <div className="bg-surface rounded-[10px] p-4 mb-4">
-                <label className="text-xs font-medium text-obsidian block mb-2">How often do you exercise?</label>
+                <label className="text-xs font-medium text-obsidian block mb-2">{t("howOften")}</label>
                 <div className="flex flex-wrap gap-2">
                   {[
-                    { value: "1_2x", label: "1-2x/week" },
-                    { value: "3_4x", label: "3-4x/week" },
-                    { value: "5x_plus", label: "5+x/week" },
+                    { value: "1_2x", labelKey: "freq12" },
+                    { value: "3_4x", labelKey: "freq34" },
+                    { value: "5x_plus", labelKey: "freq5plus" },
                   ].map((opt) => (
                     <button
                       key={opt.value}
@@ -570,7 +573,7 @@ export default function OnboardingPage() {
                       onClick={() => set("activity_frequency", opt.value)}
                       className={pillClass(form.activity_frequency === opt.value)}
                     >
-                      {opt.label}
+                      {t(opt.labelKey)}
                     </button>
                   ))}
                 </div>
@@ -578,12 +581,12 @@ export default function OnboardingPage() {
 
               {/* Section: Experience */}
               <div className="bg-surface rounded-[10px] p-4 mb-4">
-                <label className="text-xs font-medium text-obsidian block mb-2">Experience level</label>
+                <label className="text-xs font-medium text-obsidian block mb-2">{t("experienceLevel")}</label>
                 <div className="flex flex-wrap gap-2">
                   {[
-                    { value: "beginner", label: "Beginner" },
-                    { value: "intermediate", label: "Intermediate" },
-                    { value: "advanced", label: "Advanced" },
+                    { value: "beginner", labelKey: "beginner" },
+                    { value: "intermediate", labelKey: "intermediate" },
+                    { value: "advanced", labelKey: "advanced" },
                   ].map((opt) => (
                     <button
                       key={opt.value}
@@ -591,7 +594,7 @@ export default function OnboardingPage() {
                       onClick={() => set("experience_level", opt.value)}
                       className={pillClass(form.experience_level === opt.value)}
                     >
-                      {opt.label}
+                      {t(opt.labelKey)}
                     </button>
                   ))}
                 </div>
@@ -600,12 +603,12 @@ export default function OnboardingPage() {
               {/* Section: Equipment */}
               {form.activity_types.includes("strength") && (
                 <div className="bg-surface rounded-[10px] p-4">
-                  <label className="text-xs font-medium text-obsidian block mb-2">Equipment available</label>
+                  <label className="text-xs font-medium text-obsidian block mb-2">{t("equipmentAvailable")}</label>
                   <div className="space-y-2">
                     {[
-                      { value: "gym", label: "Full gym", emoji: "🏋️" },
-                      { value: "dumbbells", label: "Dumbbells at home", emoji: "💪" },
-                      { value: "bodyweight", label: "Bodyweight only", emoji: "🤸" },
+                      { value: "gym", labelKey: "fullGym", emoji: "🏋️" },
+                      { value: "dumbbells", labelKey: "dumbbellsHome", emoji: "💪" },
+                      { value: "bodyweight", labelKey: "bodyweightOnly", emoji: "🤸" },
                     ].map((opt) => {
                       const selected = form.equipment === opt.value;
                       return (
@@ -620,7 +623,7 @@ export default function OnboardingPage() {
                           }`}
                         >
                           <span className="text-base">{opt.emoji}</span>
-                          {opt.label}
+                          {t(opt.labelKey)}
                         </button>
                       );
                     })}
@@ -646,7 +649,7 @@ export default function OnboardingPage() {
                   onClick={handleBack}
                   className="flex-1 py-2.5 rounded-lg text-sm font-medium border border-black/10 bg-white text-obsidian hover:bg-surface transition-colors"
                 >
-                  Back
+                  {tc("back")}
                 </button>
               )}
               {step < TOTAL_STEPS ? (
@@ -655,7 +658,7 @@ export default function OnboardingPage() {
                   onClick={handleNext}
                   className="flex-1 py-2.5 rounded-lg text-sm font-medium bg-obsidian text-white hover:bg-obsidian-light transition-colors"
                 >
-                  Next
+                  {tc("next")}
                 </button>
               ) : (
                 <button
@@ -664,7 +667,7 @@ export default function OnboardingPage() {
                   disabled={saving}
                   className="flex-1 py-2.5 rounded-lg text-sm font-medium bg-obsidian text-white hover:bg-obsidian-light transition-colors disabled:opacity-50"
                 >
-                  {saving ? "Saving…" : "Complete"}
+                  {saving ? tc("saving") : tc("complete")}
                 </button>
               )}
             </div>

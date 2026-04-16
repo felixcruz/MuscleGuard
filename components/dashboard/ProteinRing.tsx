@@ -1,11 +1,14 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 interface Props {
   goalG: number;
   loggedG: number;
 }
 
 export function ProteinRing({ goalG, loggedG }: Props) {
+  const t = useTranslations("dashboard");
   const pct = goalG > 0 ? Math.min(1, loggedG / goalG) : 0;
   const radius = 72;
   const stroke = 10;
@@ -37,7 +40,7 @@ export function ProteinRing({ goalG, loggedG }: Props) {
           ) : (
             <>
               <span className="text-3xl font-bold text-white">{remaining}g</span>
-              <span className="text-[10px] text-white/50">protein remaining</span>
+              <span className="text-[10px] text-white/50">{t("proteinRemaining")}</span>
             </>
           )}
         </div>

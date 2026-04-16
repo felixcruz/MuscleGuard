@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Pill, Check, ChevronDown, ChevronRight } from "lucide-react";
 import { SEMAGLUTIDE_DOSES, TIRZEPATIDE_DOSES, getNextDueDate, getMedicationStatus } from "@/lib/personalization";
 
@@ -33,20 +34,8 @@ interface Props {
   currentIntensityPct: number;
 }
 
-const APPETITE_OPTIONS = [
-  { value: "none", label: "No suppression" },
-  { value: "mild", label: "Mild" },
-  { value: "moderate", label: "Moderate" },
-  { value: "severe", label: "Severe" },
-  { value: "very_severe", label: "Very severe" },
-];
-
-const CHANGE_TYPES = [
-  { value: "increase", label: "Dose increase" },
-  { value: "decrease", label: "Dose decrease" },
-  { value: "switch", label: "Switch medication" },
-  { value: "pause", label: "Pause medication" },
-];
+const APPETITE_VALUES = ["none", "mild", "moderate", "severe", "very_severe"] as const;
+const CHANGE_TYPE_VALUES = ["increase", "decrease", "switch", "pause"] as const;
 
 function formatDate(dateStr: string) {
   return new Date(dateStr + "T12:00:00Z").toLocaleDateString("en-US", {
@@ -76,6 +65,25 @@ export function MedicationClient({
   currentProteinGoal,
   currentIntensityPct,
 }: Props) {
+  const t = useTranslations("medication");
+  const tc = useTranslations("common");
+  const to = useTranslations("onboarding");
+
+  const APPETITE_OPTIONS = [
+    { value: "none", label: to("noSuppression") },
+    { value: "mild", label: to("mild") },
+    { value: "moderate", label: to("moderate") },
+    { value: "severe", label: to("severe") },
+    { value: "very_severe", label: to("verySevere") },
+  ];
+
+  const CHANGE_TYPES = [
+    { value: "increase", label: t("doseIncrease") },
+    { value: "decrease", label: t("doseDecrease") },
+    { value: "switch", label: t("switchMedication") },
+    { value: "pause", label: t("pauseMedication") },
+  ];
+
   const [logs, setLogs] = useState<MedLog[]>(initialLogs);
   const [lastDoseDate, setLastDoseDate] = useState<string | null>(nextDueDate ? null : null);
   const [currentStatus, setCurrentStatus] = useState({ status, statusLabel, statusColorClass, nextDueDate });
@@ -192,9 +200,9 @@ export function MedicationClient({
 
   const frequencyLabel =
     frequency === "weekly"
-      ? `Every week${injectionDay ? `, ${injectionDay}` : ""}`
+      ? `${t("everyWeek")}${injectionDay ? `, ${injectionDay}` : ""}`
       : frequency === "biweekly"
-      ? "Every 2 weeks"
+      ? t("every2Weeks")
       : "Monthly";
 
   const statusBg =
@@ -212,7 +220,7 @@ export function MedicationClient({
           <div className="space-y-1">
             <div className="flex items-center gap-2">
               <Pill className="h-5 w-5 text-[#CDFF00]" />
-              <h1 className="text-2xl font-bold text-white">Medication</h1>
+              <h1 className="text-2xl font-bold text-white">{t("title")}</h1>
             </div>
             <p className="text-xl font-medium text-white mt-2">
               {doseMg}mg {getMedLabel(medication)}
@@ -222,11 +230,11 @@ export function MedicationClient({
 
           <div className="mt-4 sm:mt-0 flex flex-col items-start sm:items-end gap-2">
             <span className={`px-3 py-1 rounded-full text-xs font-semibold ${statusBg} ${statusTextColor}`}>
-              {currentStatus.status === "on_schedule" ? "On schedule" : currentStatus.statusLabel}
+              {currentStatus.status === "on_schedule" ? t("onSchedule") : currentStatus.statusLabel}
             </span>
             {currentStatus.nextDueDate && (
               <p className="text-xs text-white/50">
-                Next dose: {formatDate(currentStatus.nextDueDate)}
+                {t("nextDose")} {formatDate(currentStatus.nextDueDate)}
               </p>
             )}
           </div>
@@ -244,14 +252,14 @@ export function MedicationClient({
                 : "bg-white text-obsidian hover:bg-white/90"
             } disabled:opacity-70`}
           >
-            {logTakenSuccess ? "✓ Logged!" : logTakenLoading ? "Logging…" : "✓ Log dose taken today"}
+            {logTakenSuccess ? `✓ ${tc("logged")}` : logTakenLoading ? tc("loading") : `✓ ${t("logDoseTaken")}`}
           </button>
           <button
             type="button"
             onClick={() => setShowDoseForm(!showDoseForm)}
             className="flex-1 py-2.5 rounded-lg text-sm font-medium border border-white/20 text-white hover:bg-white/10 transition-colors"
           >
-            Log dose change
+            {t("logDoseChange")}
           </button>
         </div>
       </div>
@@ -259,7 +267,7 @@ export function MedicationClient({
       {/* ── Dose change form ── */}
       {showDoseForm && (
         <div className="bg-white border border-black/5 rounded-[10px] p-5">
-          <h3 className="text-sm font-medium text-obsidian mb-4">Log dose change</h3>
+          <h3 className="text-sm font-medium text-obsidian mb-4">{t("logDoseChange")}</h3>
 
           {doseFormSuccess ? (
             <div className="bg-obsidian rounded-lg p-4">
@@ -267,18 +275,18 @@ export function MedicationClient({
                 <div className="w-5 h-5 rounded-full bg-[#CDFF00] flex items-center justify-center">
                   <Check className="h-3 w-3 text-obsidian" />
                 </div>
-                <span className="text-sm font-medium text-white">Plan updated!</span>
+                <span className="text-sm font-medium text-white">{t("planUpdated")}</span>
               </div>
               <p className="text-xs text-white/60">
-                New protein target: <span className="text-white font-medium">{doseFormSuccess.proteinGoal}g/day</span>
-                {" · "}Training intensity: <span className="text-white font-medium">{doseFormSuccess.intensityPct}%</span>
+                {t("newProteinTarget")} <span className="text-white font-medium">{doseFormSuccess.proteinGoal}g/day</span>
+                {" · "}{t("trainingIntensity")} <span className="text-white font-medium">{doseFormSuccess.intensityPct}%</span>
               </p>
             </div>
           ) : (
             <form onSubmit={handleDoseChange} className="space-y-4">
               {/* New dose */}
               <div>
-                <label className="text-xs font-medium text-mgray block mb-1.5">New dose</label>
+                <label className="text-xs font-medium text-mgray block mb-1.5">{t("newDose")}</label>
                 {getDosesForMed().length > 0 ? (
                   <select
                     value={newDose}
@@ -286,7 +294,7 @@ export function MedicationClient({
                     required
                     className="px-3 py-2 border border-black/10 rounded-lg text-sm bg-white min-w-[140px] focus:outline-none focus:ring-2 focus:ring-obsidian/20"
                   >
-                    <option value="">Select dose…</option>
+                    <option value="">{to("selectDose")}</option>
                     {getDosesForMed().map((d) => (
                       <option key={d} value={String(d)}>{d} mg</option>
                     ))}
@@ -305,7 +313,7 @@ export function MedicationClient({
 
               {/* Change type */}
               <div>
-                <label className="text-xs font-medium text-mgray block mb-1.5">Type of change</label>
+                <label className="text-xs font-medium text-mgray block mb-1.5">{t("typeOfChange")}</label>
                 <div className="flex flex-wrap gap-2">
                   {CHANGE_TYPES.map((ct) => (
                     <button
@@ -326,7 +334,7 @@ export function MedicationClient({
 
               {/* Appetite */}
               <div>
-                <label className="text-xs font-medium text-mgray block mb-1.5">Current appetite</label>
+                <label className="text-xs font-medium text-mgray block mb-1.5">{t("currentAppetite")}</label>
                 <div className="flex flex-wrap gap-2">
                   {APPETITE_OPTIONS.map((ao) => (
                     <button
@@ -347,20 +355,20 @@ export function MedicationClient({
 
               {/* Energy */}
               <div>
-                <label className="text-xs font-medium text-mgray block mb-1.5">Current energy level</label>
+                <label className="text-xs font-medium text-mgray block mb-1.5">{t("currentEnergy")}</label>
                 <div className="flex gap-2">
-                  {["low", "moderate", "high"].map((e) => (
+                  {(["low", "moderate", "high"] as const).map((e) => (
                     <button
                       key={e}
                       type="button"
                       onClick={() => setEnergyLevel(e)}
-                      className={`px-3 py-1.5 rounded-lg text-xs border capitalize transition-colors ${
+                      className={`px-3 py-1.5 rounded-lg text-xs border transition-colors ${
                         energyLevel === e
                           ? "border-obsidian bg-surface text-obsidian font-medium"
                           : "border-black/5 bg-white text-mgray hover:border-black/10"
                       }`}
                     >
-                      {e}
+                      {e === "low" ? t("low") : e === "high" ? t("high") : to("moderate")}
                     </button>
                   ))}
                 </div>
@@ -368,11 +376,11 @@ export function MedicationClient({
 
               {/* Notes */}
               <div>
-                <label className="text-xs font-medium text-mgray block mb-1.5">Notes (optional)</label>
+                <label className="text-xs font-medium text-mgray block mb-1.5">{t("notesOptional")}</label>
                 <textarea
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
-                  placeholder="Any relevant notes…"
+                  placeholder={t("notesPlaceholder")}
                   rows={2}
                   className="w-full px-3 py-2 border border-black/10 rounded-lg text-sm resize-vertical focus:outline-none focus:ring-2 focus:ring-obsidian/20"
                 />
@@ -383,7 +391,7 @@ export function MedicationClient({
                 disabled={doseFormLoading || !newDose}
                 className="w-full py-2.5 bg-obsidian text-white text-sm font-medium rounded-lg hover:bg-obsidian-light transition-colors disabled:opacity-50"
               >
-                {doseFormLoading ? "Saving…" : "Save dose change"}
+                {doseFormLoading ? tc("saving") : t("saveDoseChange")}
               </button>
             </form>
           )}
@@ -393,25 +401,25 @@ export function MedicationClient({
       {/* ── Your Plan ── */}
       <div className="grid grid-cols-2 gap-4">
         <div className="bg-white border border-black/5 rounded-[10px] p-5 text-center">
-          <p className="text-[10px] font-medium text-mgray uppercase tracking-widest mb-2">Protein goal</p>
+          <p className="text-[10px] font-medium text-mgray uppercase tracking-widest mb-2">{t("proteinGoal")}</p>
           <p className="text-3xl font-bold text-obsidian">
             {currentProteinGoal}g
           </p>
-          <p className="text-xs text-mgray mt-1">per day</p>
+          <p className="text-xs text-mgray mt-1">{tc("perDay")}</p>
         </div>
         <div className="bg-white border border-black/5 rounded-[10px] p-5 text-center">
-          <p className="text-[10px] font-medium text-mgray uppercase tracking-widest mb-2">Training intensity</p>
+          <p className="text-[10px] font-medium text-mgray uppercase tracking-widest mb-2">{t("trainingIntensityLabel")}</p>
           <p className="text-3xl font-bold text-obsidian">
             {currentIntensityPct}%
           </p>
           <p className="text-xs text-mgray mt-1">
             {currentIntensityPct >= 95
-              ? "Full intensity"
+              ? t("fullIntensity")
               : currentIntensityPct >= 85
-              ? "Moderate"
+              ? to("moderate")
               : currentIntensityPct >= 75
-              ? "Reduced"
-              : "Light"}
+              ? t("reduced")
+              : t("light")}
           </p>
         </div>
       </div>
@@ -423,9 +431,9 @@ export function MedicationClient({
           onClick={() => setHistoryExpanded(!historyExpanded)}
           className="w-full flex items-center justify-between px-5 py-4 hover:bg-surface transition-colors"
         >
-          <span className="text-sm font-medium text-obsidian">Dose history</span>
+          <span className="text-sm font-medium text-obsidian">{t("doseHistory")}</span>
           <div className="flex items-center gap-2">
-            <span className="text-xs text-mgray">{logs.length} entries</span>
+            <span className="text-xs text-mgray">{logs.length} {tc("entries")}</span>
             {historyExpanded
               ? <ChevronDown className="h-4 w-4 text-muted" />
               : <ChevronRight className="h-4 w-4 text-muted" />
@@ -437,7 +445,7 @@ export function MedicationClient({
           <div className="border-t border-black/5">
             {logs.length === 0 ? (
               <p className="text-sm text-muted text-center py-8">
-                No medication logs yet.
+                {t("noLogs")}
               </p>
             ) : (
               <div className="divide-y divide-black/5">
@@ -467,7 +475,7 @@ export function MedicationClient({
                       </div>
                       {log.appetite_level && (
                         <p className="text-xs text-mgray mt-1">
-                          Appetite: {log.appetite_level.replace("_", " ")}
+                          {t("appetite")} {log.appetite_level.replace("_", " ")}
                         </p>
                       )}
                       {log.notes && (

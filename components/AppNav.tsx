@@ -1,26 +1,36 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { Link } from "@/i18n/navigation";
+import { usePathname } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
 import { Shield, LayoutDashboard, Sparkles, Dumbbell, TrendingUp, BarChart2, Settings, Pill } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { LucideIcon } from "lucide-react";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
-const MOBILE_NAV = [
-  { href: "/dashboard", label: "Today", icon: LayoutDashboard },
-  { href: "/meals", label: "Meals", icon: Sparkles },
-  { href: "/training", label: "Training", icon: Dumbbell },
-  { href: "/medication", label: "Medication", icon: Pill },
-  { href: "/progress", label: "Progress", icon: TrendingUp },
+interface NavItem {
+  href: string;
+  labelKey: string;
+  icon: LucideIcon;
+}
+
+const MOBILE_NAV: NavItem[] = [
+  { href: "/dashboard", labelKey: "today", icon: LayoutDashboard },
+  { href: "/meals", labelKey: "meals", icon: Sparkles },
+  { href: "/training", labelKey: "training", icon: Dumbbell },
+  { href: "/medication", labelKey: "medication", icon: Pill },
+  { href: "/progress", labelKey: "progress", icon: TrendingUp },
 ];
 
-const DESKTOP_NAV = [
+const DESKTOP_NAV: NavItem[] = [
   ...MOBILE_NAV,
-  { href: "/reports", label: "Reports", icon: BarChart2 },
-  { href: "/settings", label: "Settings", icon: Settings },
+  { href: "/reports", labelKey: "reports", icon: BarChart2 },
+  { href: "/settings", labelKey: "settings", icon: Settings },
 ];
 
 export function AppNav() {
   const pathname = usePathname();
+  const t = useTranslations("nav");
 
   return (
     <>
@@ -30,7 +40,7 @@ export function AppNav() {
           <Shield className="h-5 w-5 text-obsidian" />
           <span className="font-semibold tracking-tight text-obsidian">MuscleGuard</span>
         </Link>
-        <nav className="flex gap-1">
+        <nav className="flex gap-1 items-center">
           {DESKTOP_NAV.map((item) => {
             const active = pathname.startsWith(item.href);
             return (
@@ -45,10 +55,13 @@ export function AppNav() {
                 )}
               >
                 <item.icon className="h-4 w-4" />
-                {item.label}
+                {t(item.labelKey as any)}
               </Link>
             );
           })}
+          <div className="ml-1 border-l border-black/5 pl-1">
+            <LanguageSwitcher />
+          </div>
         </nav>
       </header>
 
@@ -67,7 +80,7 @@ export function AppNav() {
                 )}
               >
                 <item.icon className="h-5 w-5" />
-                {item.label}
+                {t(item.labelKey as any)}
               </Link>
             );
           })}

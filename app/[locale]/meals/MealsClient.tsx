@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
 import { Check, Search, Plus } from "lucide-react";
 import { MealWizard } from "@/components/meals/MealWizard";
@@ -31,6 +32,8 @@ export function MealsClient({
   dietaryPrefs,
   proteinBreakdown,
 }: Props) {
+  const t = useTranslations("meals");
+  const tc = useTranslations("common");
   const supabase = createClient();
 
   const [proteinLogged, setProteinLogged] = useState(initialLogged);
@@ -137,18 +140,15 @@ export function MealsClient({
       <div className="bg-obsidian rounded-[14px] p-6">
         <div className="sm:flex sm:items-center sm:justify-between sm:gap-6">
           <div className="space-y-2">
-            <h1 className="text-2xl font-bold text-white">Meals</h1>
+            <h1 className="text-2xl font-bold text-white">{t("title")}</h1>
             <p className="text-sm text-white/50">
               {proteinRemaining > 0 ? (
-                <>
-                  <span className="text-[#CDFF00] font-semibold">
-                    {proteinRemaining}g protein
-                  </span>{" "}
-                  remaining today
-                </>
+                <span className="text-[#CDFF00] font-semibold">
+                  {t("proteinRemaining", { amount: proteinRemaining })}
+                </span>
               ) : (
                 <span className="text-[#CDFF00] font-semibold">
-                  Daily protein goal reached!
+                  {t("goalReached")}
                 </span>
               )}
             </p>
@@ -203,12 +203,12 @@ export function MealsClient({
 
       {/* ── Food Search ── */}
       <div className="bg-white border border-black/5 rounded-[10px] p-4 space-y-3">
-        <h2 className="text-sm font-medium text-obsidian">Log a food</h2>
+        <h2 className="text-sm font-medium text-obsidian">{t("logAFood")}</h2>
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted pointer-events-none" />
           <input
             type="text"
-            placeholder="Search USDA database (e.g. chicken breast)"
+            placeholder={t("searchPlaceholder")}
             value={query}
             onChange={(e) => {
               setQuery(e.target.value);
@@ -219,7 +219,7 @@ export function MealsClient({
           />
           {searching && (
             <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted">
-              Searching…
+              {t("searching")}
             </span>
           )}
         </div>
@@ -237,8 +237,8 @@ export function MealsClient({
                   {food.description}
                 </p>
                 <p className="text-xs text-mgray mt-0.5">
-                  {food.proteinPer100g}g protein · {food.caloriesPer100g} kcal
-                  per 100g
+                  {food.proteinPer100g}g {tc("protein")} · {food.caloriesPer100g} kcal
+                  {t("perHundredG")}
                 </p>
               </button>
             ))}
@@ -251,13 +251,13 @@ export function MealsClient({
               {selected.description}
             </p>
             <p className="text-xs text-mgray">
-              {selected.proteinPer100g}g protein · {selected.caloriesPer100g}{" "}
-              kcal per 100g
+              {selected.proteinPer100g}g {tc("protein")} · {selected.caloriesPer100g}{" "}
+              kcal {t("perHundredG")}
             </p>
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-2 flex-1">
                 <label className="text-sm text-mgray whitespace-nowrap">
-                  Portion
+                  {t("portion")}
                 </label>
                 <input
                   type="number"
@@ -273,7 +273,7 @@ export function MealsClient({
                 <span className="font-semibold text-green-600">
                   {nutrients.protein}g
                 </span>{" "}
-                protein
+                {tc("protein")}
                 {" · "}
                 {nutrients.calories} kcal
               </div>
@@ -284,7 +284,7 @@ export function MealsClient({
               className="w-full py-2.5 bg-obsidian text-white text-sm font-medium rounded-lg hover:bg-obsidian-light transition-colors disabled:opacity-50 flex items-center justify-center gap-1.5"
             >
               <Plus className="h-4 w-4" />
-              {logging ? "Logging…" : "Log food"}
+              {logging ? t("logging") : t("logFood")}
             </button>
           </div>
         )}
@@ -294,7 +294,7 @@ export function MealsClient({
             <div className="w-5 h-5 rounded-full bg-[#CDFF00] flex items-center justify-center">
               <Check className="h-3 w-3 text-obsidian" />
             </div>
-            <span className="text-white font-medium">Logged successfully!</span>
+            <span className="text-white font-medium">{tc("logged")}</span>
           </div>
         )}
 
@@ -309,7 +309,7 @@ export function MealsClient({
       <div className="flex items-center gap-3">
         <div className="h-px flex-1 bg-black/5" />
         <span className="text-xs text-muted uppercase tracking-widest font-medium">
-          or get meal ideas
+          {t("orGetMealIdeas")}
         </span>
         <div className="h-px flex-1 bg-black/5" />
       </div>

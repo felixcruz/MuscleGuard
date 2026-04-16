@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Sparkles, ChevronDown, ChevronRight, BarChart2 } from "lucide-react";
 import type { WeeklyReportData } from "@/lib/weekly-report";
 
@@ -40,7 +41,7 @@ function gradeConfig(grade: string) {
   return { bg: "bg-[#FFB4AB]", ring: "ring-[#FFB4AB]/30", emoji: "📈" };
 }
 
-function ReportCard({ report }: { report: WeeklyReportData }) {
+function ReportCard({ report, t }: { report: WeeklyReportData; t: ReturnType<typeof useTranslations> }) {
   const [expanded, setExpanded] = useState(false);
   const g = gradeConfig(report.grade);
   const proteinPct = Math.round((report.protein_days_hit / 7) * 100);
@@ -77,8 +78,8 @@ function ReportCard({ report }: { report: WeeklyReportData }) {
 
           {/* Stats row */}
           <div className="flex gap-4 mt-2 text-xs text-mgray">
-            <span>🥩 <span className="font-medium text-obsidian">{report.protein_days_hit}</span>/7 protein days</span>
-            <span>🏋️ <span className="font-medium text-obsidian">{report.workouts_count}</span> workout{report.workouts_count !== 1 ? "s" : ""}</span>
+            <span>🥩 <span className="font-medium text-obsidian">{report.protein_days_hit}</span>/7 {t("proteinDaysCount")}</span>
+            <span>🏋️ <span className="font-medium text-obsidian">{report.workouts_count}</span> {t("workouts").toLowerCase()}</span>
           </div>
         </div>
       </div>
@@ -89,7 +90,7 @@ function ReportCard({ report }: { report: WeeklyReportData }) {
           onClick={() => setExpanded(e => !e)}
           className="w-full flex items-center justify-between px-5 py-3 hover:bg-surface transition-colors"
         >
-          <span className="text-xs text-mgray font-medium">Weekly summary</span>
+          <span className="text-xs text-mgray font-medium">{t("weeklySummary")}</span>
           {expanded
             ? <ChevronDown className="h-4 w-4 text-muted" />
             : <ChevronRight className="h-4 w-4 text-muted" />
@@ -102,20 +103,20 @@ function ReportCard({ report }: { report: WeeklyReportData }) {
             {/* Detailed breakdown */}
             <div className="grid grid-cols-2 gap-3 mt-4">
               <div className="bg-surface rounded-lg p-3">
-                <p className="text-[10px] text-mgray uppercase tracking-widest">Protein consistency</p>
+                <p className="text-[10px] text-mgray uppercase tracking-widest">{t("proteinConsistency")}</p>
                 <div className="flex items-end gap-1.5 mt-1">
                   <span className="text-xl font-bold text-obsidian">{proteinPct}%</span>
-                  <span className="text-xs text-mgray mb-0.5">{report.protein_days_hit} of 7 days</span>
+                  <span className="text-xs text-mgray mb-0.5">{report.protein_days_hit} {t("ofDays")}</span>
                 </div>
                 <div className="h-1.5 bg-muted/20 rounded-full overflow-hidden mt-2">
                   <div className="h-full rounded-full bg-obsidian" style={{ width: `${proteinPct}%` }} />
                 </div>
               </div>
               <div className="bg-surface rounded-lg p-3">
-                <p className="text-[10px] text-mgray uppercase tracking-widest">Workout completion</p>
+                <p className="text-[10px] text-mgray uppercase tracking-widest">{t("workoutCompletion")}</p>
                 <div className="flex items-end gap-1.5 mt-1">
                   <span className="text-xl font-bold text-obsidian">{workoutPct}%</span>
-                  <span className="text-xs text-mgray mb-0.5">{report.workouts_count} of 3 target</span>
+                  <span className="text-xs text-mgray mb-0.5">{report.workouts_count} {t("ofTarget")}</span>
                 </div>
                 <div className="h-1.5 bg-muted/20 rounded-full overflow-hidden mt-2">
                   <div className="h-full rounded-full bg-obsidian" style={{ width: `${workoutPct}%` }} />
@@ -139,6 +140,7 @@ export function ReportsClient({
   lastWeekEnd,
   isSunday,
 }: Props) {
+  const t = useTranslations("reports");
   const [generating, setGenerating] = useState(false);
   const [liveReports, setLiveReports] = useState<WeeklyReportData[]>(reports);
   const [error, setError] = useState<string | null>(null);
@@ -188,10 +190,10 @@ export function ReportsClient({
           <div>
             <div className="flex items-center gap-2">
               <BarChart2 className="h-5 w-5 text-[#CDFF00]" />
-              <h1 className="text-2xl font-bold text-white">Reports</h1>
+              <h1 className="text-2xl font-bold text-white">{t("title")}</h1>
             </div>
             <p className="text-white/50 mt-1 text-sm">
-              Auto-generated every Sunday with your A/B/C grade.
+              {t("subtitle")}
             </p>
           </div>
 
@@ -203,8 +205,8 @@ export function ReportsClient({
               </span>
             </div>
             <div>
-              <p className="text-xs text-white/40">Projected</p>
-              <p className="text-sm font-medium text-white">Day {currentWeek.daysElapsed}/7</p>
+              <p className="text-xs text-white/40">{t("projected")}</p>
+              <p className="text-sm font-medium text-white">{t("day", { current: currentWeek.daysElapsed })}</p>
             </div>
           </div>
         </div>
@@ -213,7 +215,7 @@ export function ReportsClient({
         <div className="grid grid-cols-2 gap-4 mt-5 pt-4 border-t border-white/5">
           <div>
             <div className="flex justify-between text-xs mb-1.5">
-              <span className="text-white">Protein days</span>
+              <span className="text-white">{t("proteinDays")}</span>
               <span className="text-white font-medium">{currentWeek.proteinDaysHit}/{currentWeek.daysElapsed}</span>
             </div>
             <div className="h-2 bg-white/10 rounded-full overflow-hidden">
@@ -225,7 +227,7 @@ export function ReportsClient({
           </div>
           <div>
             <div className="flex justify-between text-xs mb-1.5">
-              <span className="text-white">Workouts</span>
+              <span className="text-white">{t("workouts")}</span>
               <span className="text-white font-medium">{currentWeek.workoutsCount}/3</span>
             </div>
             <div className="h-2 bg-white/10 rounded-full overflow-hidden">
@@ -244,8 +246,8 @@ export function ReportsClient({
           <Sparkles className="h-6 w-6 text-obsidian mx-auto" />
           <p className="text-sm text-mgray">
             {isSunday
-              ? "Today's report is ready to generate!"
-              : `Last week's report (${formatWeek(lastWeekStart, lastWeekEnd)}) is available.`}
+              ? t("todayReady")
+              : t("lastWeekAvailable", { week: formatWeek(lastWeekStart, lastWeekEnd) })}
           </p>
           <button
             onClick={generateReport}
@@ -253,7 +255,7 @@ export function ReportsClient({
             className="px-6 py-2.5 bg-obsidian text-white text-sm font-medium rounded-lg hover:bg-obsidian-light transition-colors disabled:opacity-50 inline-flex items-center gap-1.5"
           >
             <Sparkles className="h-4 w-4" />
-            {generating ? "Generating…" : "Generate report"}
+            {generating ? t("generating") : t("generateReport")}
           </button>
           {error && <p className="text-xs text-[#FFB4AB]">{error}</p>}
         </div>
@@ -263,19 +265,19 @@ export function ReportsClient({
       {liveReports.length > 0 ? (
         <div className="space-y-4">
           <p className="text-[10px] font-medium text-mgray uppercase tracking-widest">
-            Past reports
+            {t("pastReports")}
           </p>
           {liveReports.map((report) => (
-            <ReportCard key={report.id} report={report} />
+            <ReportCard key={report.id} report={report} t={t} />
           ))}
         </div>
       ) : (
         !showGenerateButton && (
           <div className="text-center py-16">
             <BarChart2 className="h-10 w-10 text-muted mx-auto mb-3" />
-            <p className="text-mgray text-sm">No reports yet.</p>
+            <p className="text-mgray text-sm">{t("noReports")}</p>
             <p className="text-xs text-muted mt-1">
-              Your first report will appear after the first Sunday.
+              {t("firstReport")}
             </p>
           </div>
         )

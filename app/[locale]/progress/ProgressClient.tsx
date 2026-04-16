@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import { useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
 import { MeasurementForm } from "@/components/progress/MeasurementForm";
 import { AlertTriangle, TrendingDown, TrendingUp, Scale, Trash2, ChevronDown, ChevronRight } from "lucide-react";
@@ -56,6 +57,8 @@ export function ProgressClient({
   initialMeasurements,
   medicationLogs = [],
 }: Props) {
+  const t = useTranslations("progress");
+  const tc = useTranslations("common");
   const [measurements, setMeasurements] = useState(initialMeasurements);
   const [historyExpanded, setHistoryExpanded] = useState(false);
   const supabase = createClient();
@@ -118,9 +121,9 @@ export function ProgressClient({
       <div className="bg-obsidian rounded-[14px] p-6">
         <div className="sm:flex sm:items-center sm:justify-between sm:gap-6">
           <div>
-            <h1 className="text-2xl font-bold text-white">Progress</h1>
+            <h1 className="text-2xl font-bold text-white">{t("title")}</h1>
             <p className="text-white/50 mt-1 text-sm">
-              Track your weight and muscle mass weekly.
+              {t("subtitle")}
             </p>
           </div>
 
@@ -136,13 +139,13 @@ export function ProgressClient({
               {latest.muscle_mass_kg && (
                 <div className="text-center">
                   <p className="text-2xl font-bold text-[#CDFF00]">{latest.muscle_mass_kg}</p>
-                  <p className="text-[10px] text-white uppercase">muscle kg</p>
+                  <p className="text-[10px] text-white uppercase">{t("kgMuscle")}</p>
                 </div>
               )}
               {latest.body_fat_pct && (
                 <div className="text-center">
                   <p className="text-2xl font-bold text-white">{latest.body_fat_pct}%</p>
-                  <p className="text-[10px] text-white uppercase">body fat</p>
+                  <p className="text-[10px] text-white uppercase">{t("bodyFat")}</p>
                 </div>
               )}
             </div>
@@ -159,7 +162,7 @@ export function ProgressClient({
                   : <TrendingUp className="h-4 w-4 text-[#FFB4AB]" />
                 }
                 <span className="text-white font-medium">{weightChange} kg</span>
-                <span className="text-white/40">weight</span>
+                <span className="text-white/40">{t("weight").toLowerCase()}</span>
               </div>
             )}
             {muscleChange && (
@@ -169,7 +172,7 @@ export function ProgressClient({
                   : <TrendingDown className="h-4 w-4 text-[#FFB4AB]" />
                 }
                 <span className="text-white font-medium">{muscleChange} kg</span>
-                <span className="text-white/40">muscle</span>
+                <span className="text-white/40">{t("muscle").toLowerCase()}</span>
               </div>
             )}
           </div>
@@ -181,15 +184,15 @@ export function ProgressClient({
         <div className="flex items-start gap-3 p-4 bg-obsidian rounded-[10px]">
           <AlertTriangle className="h-5 w-5 text-[#FFB4AB] mt-0.5 shrink-0" />
           <div>
-            <p className="font-medium text-[#FFB4AB] text-sm">Muscle loss detected</p>
+            <p className="font-medium text-[#FFB4AB] text-sm">{t("muscleLossDetected")}</p>
             <p className="text-xs text-white mt-0.5">
-              You lost more than 1kg of muscle this week. Check your{" "}
+              {t("muscleLossDesc")}{" "}
               <a href="/meals" className="underline text-[#CDFF00]">
-                meal plan
+                {t("mealPlan")}
               </a>{" "}
-              and{" "}
+              {t("and")}{" "}
               <a href="/training" className="underline text-[#CDFF00]">
-                strength training
+                {t("strengthTraining")}
               </a>
               .
             </p>
@@ -199,7 +202,7 @@ export function ProgressClient({
 
       {/* ── Log Measurement ── */}
       <div className="bg-white border border-black/5 rounded-[10px] p-5 space-y-1">
-        <h3 className="text-sm font-medium text-obsidian mb-3">Log today&apos;s measurement</h3>
+        <h3 className="text-sm font-medium text-obsidian mb-3">{t("logMeasurement")}</h3>
         <MeasurementForm userId={userId} onSaved={refresh} />
       </div>
 
@@ -209,12 +212,12 @@ export function ProgressClient({
           {/* Weight chart */}
           <div className="bg-white border border-black/5 rounded-[10px] p-5">
             <div className="flex items-center justify-between mb-1">
-              <h3 className="text-sm font-medium text-obsidian">Weight trend</h3>
+              <h3 className="text-sm font-medium text-obsidian">{t("weightTrend")}</h3>
               <Scale className="h-4 w-4 text-muted" />
             </div>
             {doseDates.length > 0 && (
               <p className="text-[10px] text-muted uppercase tracking-widest mb-3">
-                Dashed lines = dose changes
+                {t("doseChanges")}
               </p>
             )}
             <ResponsiveContainer width="100%" height={180}>
@@ -258,12 +261,12 @@ export function ProgressClient({
           {hasMuscleData && (
             <div className="bg-white border border-black/5 rounded-[10px] p-5">
               <div className="flex items-center justify-between mb-1">
-                <h3 className="text-sm font-medium text-obsidian">Muscle mass trend</h3>
+                <h3 className="text-sm font-medium text-obsidian">{t("muscleMassTrend")}</h3>
                 <TrendingUp className="h-4 w-4 text-muted" />
               </div>
               {doseDates.length > 0 && (
                 <p className="text-[10px] text-muted uppercase tracking-widest mb-3">
-                  Dashed lines = dose changes
+                  {t("doseChanges")}
                 </p>
               )}
               <ResponsiveContainer width="100%" height={180}>
@@ -308,7 +311,7 @@ export function ProgressClient({
           {hasFatData && (
             <div className={`bg-white border border-black/5 rounded-[10px] p-5 ${hasMuscleData ? "sm:col-span-2" : ""}`}>
               <div className="flex items-center justify-between mb-1">
-                <h3 className="text-sm font-medium text-obsidian">Body fat trend</h3>
+                <h3 className="text-sm font-medium text-obsidian">{t("bodyFatTrend")}</h3>
                 <TrendingDown className="h-4 w-4 text-muted" />
               </div>
               <ResponsiveContainer width="100%" height={180}>
@@ -344,9 +347,9 @@ export function ProgressClient({
             onClick={() => setHistoryExpanded(!historyExpanded)}
             className="w-full flex items-center justify-between px-5 py-4 hover:bg-surface transition-colors"
           >
-            <span className="text-sm font-medium text-obsidian">Recent measurements</span>
+            <span className="text-sm font-medium text-obsidian">{t("recentMeasurements")}</span>
             <div className="flex items-center gap-2">
-              <span className="text-xs text-mgray">{measurements.length} entries</span>
+              <span className="text-xs text-mgray">{measurements.length} {tc("entries")}</span>
               {historyExpanded
                 ? <ChevronDown className="h-4 w-4 text-muted" />
                 : <ChevronRight className="h-4 w-4 text-muted" />
@@ -370,10 +373,10 @@ export function ProgressClient({
                         <span className="text-obsidian font-medium">{m.weight_kg} kg</span>
                       )}
                       {m.muscle_mass_kg && (
-                        <span className="text-mgray">{m.muscle_mass_kg} kg muscle</span>
+                        <span className="text-mgray">{m.muscle_mass_kg} {t("kgMuscle")}</span>
                       )}
                       {m.body_fat_pct && (
-                        <span className="text-mgray">{m.body_fat_pct}% fat</span>
+                        <span className="text-mgray">{m.body_fat_pct}% {t("fat")}</span>
                       )}
                     </div>
                   </div>
@@ -394,7 +397,7 @@ export function ProgressClient({
       {measurements.length === 0 && (
         <div className="text-center py-12">
           <Scale className="h-10 w-10 text-muted mx-auto mb-3" />
-          <p className="text-mgray text-sm">Log your first measurement to start tracking your progress.</p>
+          <p className="text-mgray text-sm">{t("logFirst")}</p>
         </div>
       )}
     </div>

@@ -2,11 +2,14 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Shield, ArrowLeft } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 export default function LoginPage() {
+  const t = useTranslations("login");
+  const tc = useTranslations("common");
   const supabase = createClient();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -37,7 +40,7 @@ export default function LoginPage() {
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(targetEmail)) {
-      setError("Please enter a valid email address");
+      setError(t("invalidEmail"));
       setLoading(false);
       return;
     }
@@ -50,7 +53,7 @@ export default function LoginPage() {
       if (authError) throw authError;
       setStep("code");
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Failed to send code";
+      const message = err instanceof Error ? err.message : t("failedToSend");
       setError(message);
     } finally {
       setLoading(false);
@@ -123,7 +126,7 @@ export default function LoginPage() {
       router.push(target);
       router.refresh();
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Invalid code";
+      const message = err instanceof Error ? err.message : t("invalidCode");
       setError(message);
       setCode(["", "", "", "", "", ""]);
       inputRefs.current[0]?.focus();
@@ -137,7 +140,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md mb-4">
         <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-mgray hover:text-obsidian transition-colors">
           <ArrowLeft className="h-4 w-4" />
-          Back to home
+          {t("backToHome")}
         </Link>
       </div>
       <div className="w-full max-w-md bg-white rounded-[10px] border border-black/5 overflow-hidden">
@@ -145,8 +148,8 @@ export default function LoginPage() {
           <div className="flex justify-center mb-2">
             <Shield className="h-10 w-10 text-obsidian" />
           </div>
-          <h1 className="text-2xl font-medium tracking-tight text-obsidian">MuscleGuard</h1>
-          <p className="text-mgray text-sm mt-1">Your GLP-1 muscle protection coach</p>
+          <h1 className="text-2xl font-medium tracking-tight text-obsidian">{tc("appName")}</h1>
+          <p className="text-mgray text-sm mt-1">{tc("tagline")}</p>
         </div>
 
         <div className="px-6 pb-8 space-y-4">
@@ -159,11 +162,11 @@ export default function LoginPage() {
           {step === "email" && (
             <form onSubmit={handleSendCode} className="space-y-3">
               <div className="space-y-1">
-                <label htmlFor="email" className="text-sm font-medium text-obsidian">Email</label>
+                <label htmlFor="email" className="text-sm font-medium text-obsidian">{t("email")}</label>
                 <input
                   id="email"
                   type="email"
-                  placeholder="you@example.com"
+                  placeholder={t("emailPlaceholder")}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -175,7 +178,7 @@ export default function LoginPage() {
                 disabled={loading}
                 className="w-full py-2.5 bg-obsidian text-white text-sm font-medium rounded-lg hover:bg-obsidian-light transition-colors disabled:opacity-50"
               >
-                {loading ? "Sending…" : "Continue with email"}
+                {loading ? t("sending") : t("continueWithEmail")}
               </button>
             </form>
           )}
@@ -183,9 +186,9 @@ export default function LoginPage() {
           {step === "code" && (
             <div className="space-y-5">
               <div className="text-center">
-                <p className="text-sm text-obsidian font-medium">Enter your sign-in code</p>
+                <p className="text-sm text-obsidian font-medium">{t("enterCode")}</p>
                 <p className="text-xs text-mgray mt-1">
-                  We sent a code to <strong>{email}</strong>
+                  {t("codeSent")} <strong>{email}</strong>
                 </p>
               </div>
 
@@ -209,7 +212,7 @@ export default function LoginPage() {
               </div>
 
               {verifying && (
-                <p className="text-center text-sm text-mgray">Verifying…</p>
+                <p className="text-center text-sm text-mgray">{t("verifying")}</p>
               )}
 
               <div className="flex items-center justify-between">
@@ -217,14 +220,14 @@ export default function LoginPage() {
                   onClick={() => { setStep("email"); setCode(["", "", "", "", "", ""]); setError(null); }}
                   className="text-xs text-mgray hover:text-obsidian transition-colors"
                 >
-                  Use a different email
+                  {t("useDifferentEmail")}
                 </button>
                 <button
                   onClick={() => sendCode(email)}
                   disabled={loading}
                   className="text-xs text-mgray hover:text-obsidian transition-colors"
                 >
-                  {loading ? "Sending…" : "Resend code"}
+                  {loading ? t("sending") : t("resendCode")}
                 </button>
               </div>
             </div>

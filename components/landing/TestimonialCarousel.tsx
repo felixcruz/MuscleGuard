@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useTranslations } from "next-intl";
 import { ChevronLeft, ChevronRight, Quote } from "lucide-react";
 
 const testimonials = [
@@ -47,6 +48,7 @@ const testimonials = [
 ];
 
 export function TestimonialCarousel() {
+  const t = useTranslations("landing");
   const [current, setCurrent] = useState(0);
   const [paused, setPaused] = useState(false);
 
@@ -64,7 +66,7 @@ export function TestimonialCarousel() {
     return () => clearInterval(timer);
   }, [paused, next]);
 
-  const t = testimonials[current];
+  const item = testimonials[current];
 
   return (
     <div
@@ -75,10 +77,10 @@ export function TestimonialCarousel() {
       <div className="bg-white rounded-[10px] border border-black/5 p-8 sm:p-10 min-h-[220px] flex flex-col justify-center">
         <Quote className="h-8 w-8 text-[#BFC1C0] mb-4" />
         <p className="text-[#131413] leading-relaxed text-base sm:text-lg">
-          &ldquo;{t.text}&rdquo;
+          &ldquo;{item.text}&rdquo;
         </p>
-        <p className="mt-5 font-medium text-[#131413]">{t.name}</p>
-        <p className="text-xs text-[#BFC1C0]">MuscleGuard user</p>
+        <p className="mt-5 font-medium text-[#131413]">{item.name}</p>
+        <p className="text-xs text-[#BFC1C0]">{t("testimonialUser")}</p>
       </div>
 
       {/* Controls */}

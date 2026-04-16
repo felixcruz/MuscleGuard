@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
 
 interface Props {
@@ -17,6 +18,8 @@ function lbsToKg(lbs: number): number {
 }
 
 export function MeasurementForm({ userId, onSaved }: Props) {
+  const t = useTranslations("progress");
+  const tc = useTranslations("common");
   const [unit, setUnit] = useState<"kg" | "lbs">("kg");
   const [weight, setWeight] = useState("");
   const [muscleMass, setMuscleMass] = useState("");
@@ -79,7 +82,7 @@ export function MeasurementForm({ userId, onSaved }: Props) {
 
       <div className="grid grid-cols-3 gap-3">
         <div className="space-y-1">
-          <label htmlFor="wt" className="text-xs font-medium text-mgray">Weight ({unit}) *</label>
+          <label htmlFor="wt" className="text-xs font-medium text-mgray">{t("weight")} ({unit}) *</label>
           <input
             id="wt"
             type="number"
@@ -92,24 +95,24 @@ export function MeasurementForm({ userId, onSaved }: Props) {
           />
         </div>
         <div className="space-y-1">
-          <label htmlFor="mm" className="text-xs font-medium text-mgray">Muscle ({unit})</label>
+          <label htmlFor="mm" className="text-xs font-medium text-mgray">{t("muscle")} ({unit})</label>
           <input
             id="mm"
             type="number"
             step="0.1"
-            placeholder="optional"
+            placeholder={tc("optional")}
             value={muscleMass}
             onChange={(e) => setMuscleMass(e.target.value)}
             className="w-full px-3 py-2 border border-black/10 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-obsidian/20 bg-white"
           />
         </div>
         <div className="space-y-1">
-          <label htmlFor="bf" className="text-xs font-medium text-mgray">Body fat %</label>
+          <label htmlFor="bf" className="text-xs font-medium text-mgray">{t("bodyFat")}</label>
           <input
             id="bf"
             type="number"
             step="0.1"
-            placeholder="optional"
+            placeholder={tc("optional")}
             value={bodyFatPct}
             onChange={(e) => setBodyFatPct(e.target.value)}
             className="w-full px-3 py-2 border border-black/10 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-obsidian/20 bg-white"
@@ -117,14 +120,14 @@ export function MeasurementForm({ userId, onSaved }: Props) {
         </div>
       </div>
       <p className="text-xs text-mgray">
-        Muscle mass from smart scale (Withings, Renpho, etc.) or DEXA scan.
+        {t("smartScaleNote")}
       </p>
       <button
         type="submit"
         disabled={saving || !weight}
         className="w-full py-2.5 bg-obsidian text-white text-sm font-medium rounded-lg hover:bg-obsidian-light transition-colors disabled:opacity-50"
       >
-        {saving ? "Saving…" : "Log today's measurement"}
+        {saving ? tc("saving") : t("logToday")}
       </button>
     </form>
   );

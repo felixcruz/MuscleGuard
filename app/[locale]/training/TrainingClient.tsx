@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { CheckCircle2, Circle, Flame, Trophy, AlertTriangle, Plus } from "lucide-react";
 import { intensityInfo } from "@/lib/personalization";
 import { getIntensityAdvice, type CommStyle } from "@/lib/comm-style";
@@ -33,6 +34,9 @@ export function TrainingClient({
   equipment: _equipment,
   commStyle,
 }: Props) {
+  const t = useTranslations("training");
+  const tc = useTranslations("common");
+  const td = useTranslations("dashboard");
   const [done, setDone] = useState<string[]>(initialDone);
   const [streak, setStreak] = useState(workoutStreakDays);
   const [points, setPoints] = useState(totalPoints);
@@ -94,6 +98,12 @@ export function TrainingClient({
   const trackedIds = trackedSessions.map((s) => s.id);
   const trackedDoneCount = done.filter((d) => trackedIds.includes(d)).length;
 
+  const sessionCardI18n = {
+    savingLabel: tc("saving"),
+    doneLabel: t("doneThisWeek"),
+    markAsDoneLabel: t("markAsDone"),
+  };
+
   // Intensity bar width
   const intensityBarColor =
     info.colorClass === "green"  ? "#CDFF00" :
@@ -138,7 +148,7 @@ export function TrainingClient({
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <p className="text-sm font-medium text-white">
-              Training at {intensityPct}% intensity
+              {t("trainingAt", { pct: intensityPct })}
             </p>
             <span className="text-xs text-white/50">{info.label}</span>
           </div>
@@ -155,7 +165,7 @@ export function TrainingClient({
 
         {/* Weekly progress */}
         <div className="flex gap-2 items-center pt-2 border-t border-white/5">
-          <span className="text-sm text-white/40 mr-1">This week</span>
+          <span className="text-sm text-white/40 mr-1">{tc("thisWeek")}</span>
           {trackedSessions.map((session) => (
             <div
               key={session.id}
@@ -173,7 +183,7 @@ export function TrainingClient({
         {/* Points */}
         <div className="flex items-center gap-1.5 justify-center">
           <Flame className="h-3.5 w-3.5 text-white" />
-          <span className="text-xs text-white font-medium">{points} total points · +5 per workout</span>
+          <span className="text-xs text-white font-medium">{points} {td("points")}</span>
         </div>
       </div>
 
@@ -190,7 +200,7 @@ export function TrainingClient({
         <div className="space-y-4">
           <div>
             <h2 className="text-base font-medium text-obsidian mb-1">
-              {protocol.emoji} {protocol.displayName} Sessions
+              {protocol.emoji} {protocol.displayName} {t("sessions")}
             </h2>
             <p className="text-xs text-mgray">Mark each session when you complete it.</p>
           </div>
@@ -202,6 +212,7 @@ export function TrainingClient({
                 isDone={done.includes(session.id)}
                 toggling={toggling === session.id}
                 onToggle={() => toggleDay(session.id)}
+                {...sessionCardI18n}
               />
             ))}
             {extraPrimary.map((session) => (
@@ -211,9 +222,10 @@ export function TrainingClient({
                 isDone={done.includes(session.id)}
                 toggling={toggling === session.id}
                 onToggle={() => toggleDay(session.id)}
+                {...sessionCardI18n}
               />
             ))}
-            <AddSessionButton onClick={() => addExtraSession("primary")} />
+            <AddSessionButton onClick={() => addExtraSession("primary")} label={t("addSession")} />
           </div>
         </div>
       )}
@@ -228,6 +240,7 @@ export function TrainingClient({
               isDone={done.includes(session.id)}
               toggling={toggling === session.id}
               onToggle={() => toggleDay(session.id)}
+              {...sessionCardI18n}
             />
           ))}
           {extraPrimary.map((session) => (
@@ -237,9 +250,10 @@ export function TrainingClient({
               isDone={done.includes(session.id)}
               toggling={toggling === session.id}
               onToggle={() => toggleDay(session.id)}
+              {...sessionCardI18n}
             />
           ))}
-          <AddSessionButton onClick={() => addExtraSession("primary")} />
+          <AddSessionButton onClick={() => addExtraSession("primary")} label={t("addSession")} />
         </div>
       )}
 
@@ -251,7 +265,7 @@ export function TrainingClient({
             <AlertTriangle className="h-5 w-5 text-[#FFB4AB] mt-0.5 flex-shrink-0" />
             <div>
               <p className="font-medium text-[#FFB4AB] text-sm">
-                Muscle Preservation Required on GLP-1
+                {t("musclePreservation")}
               </p>
               <p className="text-xs text-white mt-1">{protocol.glp1Note}</p>
             </div>
@@ -259,10 +273,10 @@ export function TrainingClient({
 
           <div>
             <h2 className="text-base font-medium text-obsidian mb-1">
-              💪 Complementary Strength Sessions
+              💪 {t("complementaryStrength")}
             </h2>
             <p className="text-xs text-mgray mb-3">
-              Complete 2x/week to prevent muscle loss on GLP-1.
+              {t("complementaryStrengthDesc")}
             </p>
           </div>
 
@@ -274,6 +288,7 @@ export function TrainingClient({
                 isDone={done.includes(session.id)}
                 toggling={toggling === session.id}
                 onToggle={() => toggleDay(session.id)}
+                {...sessionCardI18n}
               />
             ))}
             {extraStrength.map((session) => (
@@ -283,9 +298,10 @@ export function TrainingClient({
                 isDone={done.includes(session.id)}
                 toggling={toggling === session.id}
                 onToggle={() => toggleDay(session.id)}
+                {...sessionCardI18n}
               />
             ))}
-            <AddSessionButton onClick={() => addExtraSession("strength")} />
+            <AddSessionButton onClick={() => addExtraSession("strength")} label={t("addSession")} />
           </div>
         </div>
       )}
@@ -300,9 +316,12 @@ interface SessionCardProps {
   isDone: boolean;
   toggling: boolean;
   onToggle: () => void;
+  savingLabel: string;
+  doneLabel: string;
+  markAsDoneLabel: string;
 }
 
-function SessionCard({ session, isDone, toggling, onToggle }: SessionCardProps) {
+function SessionCard({ session, isDone, toggling, onToggle, savingLabel, doneLabel, markAsDoneLabel }: SessionCardProps) {
   return (
     <div className={`bg-white border border-black/5 rounded-[10px] flex flex-col ${isDone ? "opacity-70" : ""}`}>
       {/* Header */}
@@ -347,11 +366,11 @@ function SessionCard({ session, isDone, toggling, onToggle }: SessionCardProps) 
           }`}
         >
           {toggling ? (
-            "Saving…"
+            savingLabel
           ) : isDone ? (
-            <><CheckCircle2 className="h-4 w-4" /> Done this week</>
+            <><CheckCircle2 className="h-4 w-4" /> {doneLabel}</>
           ) : (
-            <><Circle className="h-4 w-4" /> Mark as done (+5 pts)</>
+            <><Circle className="h-4 w-4" /> {markAsDoneLabel}</>
           )}
         </button>
       </div>
@@ -361,7 +380,7 @@ function SessionCard({ session, isDone, toggling, onToggle }: SessionCardProps) 
 
 // ── Add Session Button ───────────────────────────────────────────────────────
 
-function AddSessionButton({ onClick }: { onClick: () => void }) {
+function AddSessionButton({ onClick, label }: { onClick: () => void; label: string }) {
   return (
     <button
       type="button"
@@ -369,7 +388,7 @@ function AddSessionButton({ onClick }: { onClick: () => void }) {
       className="flex flex-col items-center justify-center gap-2 border border-dashed border-black/10 rounded-[10px] py-8 text-mgray hover:border-black/20 hover:text-obsidian transition-colors"
     >
       <Plus className="h-5 w-5" />
-      <span className="text-xs font-medium">Add session</span>
+      <span className="text-xs font-medium">{label}</span>
     </button>
   );
 }
