@@ -4,8 +4,9 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
-import { Shield, Check } from "lucide-react";
+import { Shield, Check, Square, CheckSquare } from "lucide-react";
 import { calculateProteinGoal, type Goal } from "@/lib/personalization";
+import { Link } from "@/i18n/navigation";
 
 const TOTAL_STEPS = 3;
 
@@ -60,6 +61,9 @@ export default function OnboardingPage() {
   const [fieldError, setFieldError] = useState<string | null>(null);
 
   const [weightUnit, setWeightUnit] = useState<"kg" | "lbs">("kg");
+
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [acceptedHealthData, setAcceptedHealthData] = useState(false);
 
   const [form, setForm] = useState<Form>({
     weight_kg: "",
@@ -125,7 +129,7 @@ export default function OnboardingPage() {
       const hasExp = !!form.experience_level;
       const needsEquipment = form.activity_types.includes("strength");
       const hasEquipment = !needsEquipment || !!form.equipment;
-      return hasActivities && hasPrimary && hasFreq && hasExp && hasEquipment;
+      return hasActivities && hasPrimary && hasFreq && hasExp && hasEquipment && acceptedTerms && acceptedHealthData;
     }
     return true;
   }
@@ -602,7 +606,7 @@ export default function OnboardingPage() {
 
               {/* Section: Equipment */}
               {form.activity_types.includes("strength") && (
-                <div className="bg-surface rounded-[10px] p-4">
+                <div className="bg-surface rounded-[10px] p-4 mb-4">
                   <label className="text-xs font-medium text-obsidian block mb-2">{t("equipmentAvailable")}</label>
                   <div className="space-y-2">
                     {[
@@ -630,6 +634,41 @@ export default function OnboardingPage() {
                   </div>
                 </div>
               )}
+
+              {/* Consent checkboxes */}
+              <div className="bg-surface rounded-[10px] p-4 space-y-3">
+                <button
+                  type="button"
+                  onClick={() => setAcceptedTerms((v) => !v)}
+                  className="w-full flex items-start gap-3 text-left"
+                >
+                  {acceptedTerms ? (
+                    <CheckSquare className="h-5 w-5 text-obsidian shrink-0 mt-0.5" />
+                  ) : (
+                    <Square className="h-5 w-5 text-mgray shrink-0 mt-0.5" />
+                  )}
+                  <span className="text-xs text-mgray leading-relaxed">
+                    {t("consentTerms")}{" "}
+                    <Link href="/legal/terms" target="_blank" className="underline text-obsidian">{t("termsLink")}</Link>
+                    {" "}{t("consentAnd")}{" "}
+                    <Link href="/legal/privacy" target="_blank" className="underline text-obsidian">{t("privacyLink")}</Link>.
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setAcceptedHealthData((v) => !v)}
+                  className="w-full flex items-start gap-3 text-left"
+                >
+                  {acceptedHealthData ? (
+                    <CheckSquare className="h-5 w-5 text-obsidian shrink-0 mt-0.5" />
+                  ) : (
+                    <Square className="h-5 w-5 text-mgray shrink-0 mt-0.5" />
+                  )}
+                  <span className="text-xs text-mgray leading-relaxed">
+                    {t("consentHealthData")}
+                  </span>
+                </button>
+              </div>
             </div>
           )}
 

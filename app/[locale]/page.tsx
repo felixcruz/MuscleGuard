@@ -17,7 +17,6 @@ import {
   Activity,
   Check,
 } from "lucide-react";
-import { TestimonialCarousel } from "@/components/landing/TestimonialCarousel";
 import { MuscleChart } from "@/components/landing/MuscleChart";
 import { getTranslations } from "next-intl/server";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
@@ -76,17 +75,17 @@ export default async function LandingPage() {
       highlight: true,
     },
     {
-      name: "MyFitnessPal",
+      name: t("compGenericCalorie"),
       glp1: false,
       doseProtein: false,
       mealPlanner: false,
       training: false,
       medReminders: false,
-      price: "$9.99/mo",
+      price: "$10–15/mo",
       highlight: false,
     },
     {
-      name: "Noom Med",
+      name: t("compGlp1Telehealth"),
       glp1: true,
       doseProtein: false,
       mealPlanner: false,
@@ -96,23 +95,23 @@ export default async function LandingPage() {
       highlight: false,
     },
     {
-      name: "Calibrate",
+      name: t("compWeightCoaching"),
       glp1: true,
       doseProtein: false,
       mealPlanner: false,
       training: true,
       medReminders: false,
-      price: "$199/mo",
+      price: "$99–199/mo",
       highlight: false,
     },
     {
-      name: "MacroFactor",
+      name: t("compMacroTracker"),
       glp1: false,
       doseProtein: false,
       mealPlanner: false,
       training: false,
       medReminders: false,
-      price: "$11.99/mo",
+      price: "$10–15/mo",
       highlight: false,
     },
   ];
@@ -150,7 +149,7 @@ export default async function LandingPage() {
             "@context": "https://schema.org",
             "@type": "SoftwareApplication",
             name: "MuscleGuard",
-            applicationCategory: "HealthApplication",
+            applicationCategory: "LifestyleApplication",
             operatingSystem: "Web",
             description:
               "Preserve lean muscle during GLP-1 weight loss with dose-adjusted protein targets, smart meal planning, and training protocols.",
@@ -410,22 +409,6 @@ export default async function LandingPage() {
         </div>
       </section>
 
-      {/* Testimonials */}
-      <section className="bg-white">
-        <div className="max-w-4xl mx-auto px-6 py-24">
-          <p className="text-sm font-medium tracking-widest text-[#585A59] uppercase text-center mb-4">
-            {t("testimonialsLabel")}
-          </p>
-          <h2 className="text-3xl sm:text-4xl font-medium text-[#131413] text-center mb-4 tracking-tight">
-            {t("testimonialsTitle")}
-          </h2>
-          <p className="text-[#585A59] text-center max-w-xl mx-auto mb-14">
-            {t("testimonialsDesc")}
-          </p>
-          <TestimonialCarousel />
-        </div>
-      </section>
-
       {/* Pricing */}
       <section className="bg-[#f7f7f7]">
         <div className="max-w-lg mx-auto px-6 py-24">
@@ -546,7 +529,7 @@ export default async function LandingPage() {
               {t("medicalDisclaimer")}
             </p>
             <p className="text-xs text-[#BFC1C0] mt-4">
-              &copy; {new Date().getFullYear()} {tc("appName")}. {t("allRightsReserved")}
+              &copy; {new Date().getFullYear()} {t("legalEntity")}. {t("allRightsReserved")}
             </p>
           </div>
         </div>
