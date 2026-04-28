@@ -17,6 +17,8 @@ interface Props {
     subscription_status?: string;
     trial_ends_at?: string;
     stripe_customer_id?: string;
+    cancel_at_period_end?: boolean;
+    subscription_period_end?: string;
     full_name?: string;
     language?: string;
     comm_style?: string;
@@ -79,6 +81,13 @@ export function SettingsClient({ userId, email, profile }: Props) {
     : null;
   const isActive = status === "active" || status === "trialing";
   const isTrial = status === "trial";
+  const isCancelled = status === "cancelled";
+  const isPastDue = status === "past_due";
+  const isCancellingAtPeriodEnd = profile.cancel_at_period_end && profile.subscription_period_end;
+  const periodEndDate = profile.subscription_period_end
+    ? new Date(profile.subscription_period_end).toLocaleDateString()
+    : null;
+  const stillHasAccess = isCancellingAtPeriodEnd && new Date(profile.subscription_period_end!) > new Date();
 
   async function handleSave() {
     setSaving(true);
@@ -376,6 +385,64 @@ export function SettingsClient({ userId, email, profile }: Props) {
       {/* ── BILLING TAB ── */}
       {tab === "billing" && (
         <div className="space-y-5">
+          {/* Cancelling at period end banner */}
+          {isActive && isCancellingAtPeriodEnd && stillHasAccess && (
+            <div className="bg-[#FFF3E0] border border-[#FFB74D]/30 rounded-[10px] p-5">
+              <p className="text-sm font-medium text-obsidian">{t("cancelScheduled")}</p>
+              <p className="text-xs text-mgray mt-1">{t("accessUntil", { date: periodEndDate! })}</p>
+              <button
+                onClick={handlePortal}
+                disabled={portal}
+                className="mt-3 w-full py-2.5 bg-obsidian text-white text-sm font-medium rounded-lg hover:bg-obsidian-light transition-colors disabled:opacity-50"
+              >
+                {portal ? t("opening") : t("undoCancellation")}
+              </button>
+            </div>
+          )}
+
+          {/* Cancelled banner */}
+          {isCancelled && !stillHasAccess && (
+            <div className="bg-surface border border-black/5 rounded-[10px] p-5">
+              <div className="flex items-center gap-2 mb-2">
+                <Shield className="h-5 w-5 text-mgray" />
+                <p className="text-sm font-medium text-obsidian">{t("subscriptionEnded")}</p>
+              </div>
+              <p className="text-xs text-mgray">{t("subscriptionEndedDesc")}</p>
+              <button
+                onClick={handleUpgrade}
+                disabled={upgrading}
+                className="mt-3 w-full py-2.5 bg-[#CDFF00] text-obsidian text-sm font-semibold rounded-lg hover:bg-[#CDFF00]/80 transition-colors disabled:opacity-50"
+              >
+                {upgrading ? t("opening") : t("reactivate")}
+              </button>
+              {profile.stripe_customer_id && (
+                <button
+                  onClick={handlePortal}
+                  disabled={portal}
+                  className="mt-2 text-xs text-mgray hover:text-obsidian transition-colors w-full text-center"
+                >
+                  {portal ? t("opening") : t("manageBilling")}
+                </button>
+              )}
+            </div>
+          )}
+
+          {/* Past due banner */}
+          {isPastDue && (
+            <div className="bg-[#FFB4AB]/10 border border-[#FFB4AB]/30 rounded-[10px] p-5">
+              <p className="text-sm font-medium text-obsidian">{t("paymentFailed")}</p>
+              <p className="text-xs text-mgray mt-1">{t("paymentFailedDesc")}</p>
+              <button
+                onClick={handlePortal}
+                disabled={portal}
+                className="mt-3 w-full py-2.5 bg-obsidian text-white text-sm font-medium rounded-lg hover:bg-obsidian-light transition-colors disabled:opacity-50 flex items-center justify-center gap-1.5"
+              >
+                <CreditCard className="h-4 w-4" />
+                {portal ? t("opening") : t("updatePayment")}
+              </button>
+            </div>
+          )}
+
           {/* Plan status */}
           <div className="bg-white border border-black/5 rounded-[10px] p-5">
             <div className="flex items-center justify-between mb-4">
@@ -383,7 +450,7 @@ export function SettingsClient({ userId, email, profile }: Props) {
               <span className={`px-3 py-1 rounded-full text-xs font-semibold ${statusBg}`}>
                 {status === "trial" ? t("freeTrial") :
                  status === "trialing" ? t("trialCardOnFile") :
-                 status === "active" ? t("active") :
+                 status === "active" ? (isCancellingAtPeriodEnd ? t("cancelScheduledBadge") : t("active")) :
                  status === "past_due" ? t("paymentPastDue") :
                  status === "cancelled" ? t("cancelled") : status}
               </span>
@@ -394,7 +461,7 @@ export function SettingsClient({ userId, email, profile }: Props) {
             )}
 
             {/* Plan details */}
-            {isActive && (
+            {(isActive || stillHasAccess) && (
               <div className="space-y-4">
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-mgray">{t("plan")}</span>
@@ -405,7 +472,7 @@ export function SettingsClient({ userId, email, profile }: Props) {
                   <span className="font-medium text-obsidian">$14.99/month</span>
                 </div>
 
-                {profile.stripe_customer_id && (
+                {profile.stripe_customer_id && !isCancellingAtPeriodEnd && (
                   <>
                     <div className="pt-2 border-t border-black/5">
                       <button

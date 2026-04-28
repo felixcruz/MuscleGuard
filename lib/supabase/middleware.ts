@@ -68,7 +68,7 @@ export async function updateSession(request: NextRequest) {
   if (user && isProtected && basePath !== "/onboarding") {
     const { data: profile } = await supabase
       .from("profiles")
-      .select("subscription_status, onboarding_done")
+      .select("subscription_status, onboarding_done, cancel_at_period_end, subscription_period_end")
       .eq("id", user.id)
       .single();
 
@@ -94,11 +94,19 @@ export async function updateSession(request: NextRequest) {
     }
 
     // Block expired/cancelled accounts (except settings and checkout)
+    // But allow access if user cancelled at period end and period hasn't expired yet
     const blockedStatuses = ["past_due", "cancelled"];
     if (profile && blockedStatuses.includes(profile.subscription_status) && basePath !== "/settings" && basePath !== "/checkout") {
-      const settingsUrl = request.nextUrl.clone();
-      settingsUrl.pathname = "/settings";
-      return NextResponse.redirect(settingsUrl);
+      const stillHasAccess =
+        profile.cancel_at_period_end &&
+        profile.subscription_period_end &&
+        new Date(profile.subscription_period_end) > new Date();
+
+      if (!stillHasAccess) {
+        const settingsUrl = request.nextUrl.clone();
+        settingsUrl.pathname = "/settings";
+        return NextResponse.redirect(settingsUrl);
+      }
     }
   }
 

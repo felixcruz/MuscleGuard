@@ -54,7 +54,13 @@ export async function POST(request: NextRequest) {
         const status = statusMap[sub.status];
         if (status) {
           await supabase.from("profiles")
-            .update({ subscription_status: status })
+            .update({
+              subscription_status: status,
+              cancel_at_period_end: sub.cancel_at_period_end ?? false,
+              subscription_period_end: sub.current_period_end
+                ? new Date(sub.current_period_end * 1000).toISOString()
+                : null,
+            })
             .eq("id", uid);
         }
       }
@@ -72,11 +78,16 @@ export async function POST(request: NextRequest) {
       break;
     }
     case "customer.subscription.deleted": {
+      // Subscription fully ended (period expired or immediate cancel)
       const sub = event.data.object as Stripe.Subscription;
       const uid = sub.metadata?.supabase_uid;
       if (uid) {
         await supabase.from("profiles")
-          .update({ subscription_status: "cancelled" })
+          .update({
+            subscription_status: "cancelled",
+            cancel_at_period_end: false,
+            subscription_period_end: null,
+          })
           .eq("id", uid);
       }
       break;
