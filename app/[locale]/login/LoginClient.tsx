@@ -114,12 +114,20 @@ export default function LoginPage() {
     setError(null);
 
     try {
-      const { error: verifyError } = await supabase.auth.verifyOtp({
+      const { data, error: verifyError } = await supabase.auth.verifyOtp({
         email,
         token: fullCode,
         type: "email",
       });
       if (verifyError) throw verifyError;
+
+      // Ensure profile exists (creates on first verified login)
+      if (data.user) {
+        await supabase.from("profiles").upsert(
+          { id: data.user.id },
+          { onConflict: "id", ignoreDuplicates: true }
+        );
+      }
 
       // Success — redirect
       const target = redirectTo && redirectTo.startsWith("/") ? redirectTo : "/dashboard";

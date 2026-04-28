@@ -29,20 +29,23 @@ export default async function AdminUsersPage() {
     profileMap.set(p.id as string, p);
   }
 
-  const users = (authData?.users ?? []).map((u) => {
-    const p = profileMap.get(u.id);
-    return {
-      id: u.id,
-      email: u.email ?? "",
-      name: (p?.full_name as string) ?? "",
-      role: (p?.role as string) ?? "user",
-      subscription_status: (p?.subscription_status as string) ?? "none",
-      protein_goal_g: (p?.protein_goal_g as number) ?? 0,
-      workout_streak_days: (p?.workout_streak_days as number) ?? 0,
-      onboarding_done: (p?.onboarding_done as boolean) ?? false,
-      created_at: u.created_at,
-    };
-  }).sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+  // Only show users who have a profile (verified users, not typos)
+  const users = (authData?.users ?? [])
+    .filter((u) => profileMap.has(u.id))
+    .map((u) => {
+      const p = profileMap.get(u.id)!;
+      return {
+        id: u.id,
+        email: u.email ?? "",
+        name: (p.full_name as string) ?? "",
+        role: (p.role as string) ?? "user",
+        subscription_status: (p.subscription_status as string) ?? "none",
+        protein_goal_g: (p.protein_goal_g as number) ?? 0,
+        workout_streak_days: (p.workout_streak_days as number) ?? 0,
+        onboarding_done: (p.onboarding_done as boolean) ?? false,
+        created_at: u.created_at,
+      };
+    }).sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
   return (
     <div className="min-h-screen bg-surface">
