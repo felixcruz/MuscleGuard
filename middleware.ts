@@ -21,6 +21,7 @@ export async function middleware(request: NextRequest) {
   if (
     pathname.startsWith("/api/") ||
     pathname.startsWith("/auth/") ||
+    pathname.startsWith("/admin") ||
     pathname.startsWith("/_next/") ||
     pathname.match(/\.(svg|png|jpg|jpeg|gif|webp|ico)$/)
   ) {
