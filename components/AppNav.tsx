@@ -32,6 +32,8 @@ export function AppNav() {
   const pathname = usePathname();
   const t = useTranslations("nav");
 
+  const isSettings = pathname.startsWith("/settings");
+
   return (
     <>
       {/* Top bar (desktop) */}
@@ -59,8 +61,26 @@ export function AppNav() {
               </Link>
             );
           })}
-
         </nav>
+      </header>
+
+      {/* Top bar (mobile) */}
+      <header className="sm:hidden flex items-center justify-between px-4 py-3 border-b border-black/5 bg-white/90 backdrop-blur-md sticky top-0 z-10">
+        <Link href="/dashboard" className="flex items-center gap-2">
+          <Shield className="h-5 w-5 text-obsidian" />
+          <span className="font-semibold tracking-tight text-obsidian">MuscleGuard</span>
+        </Link>
+        <Link
+          href="/settings"
+          className={cn(
+            "p-2 rounded-lg transition-colors",
+            isSettings
+              ? "bg-surface text-obsidian"
+              : "text-mgray hover:text-obsidian hover:bg-surface"
+          )}
+        >
+          <Settings className="h-5 w-5" />
+        </Link>
       </header>
 
       {/* Bottom tab bar (mobile) — 5 tabs */}
