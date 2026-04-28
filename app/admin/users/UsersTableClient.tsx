@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Search, Plus, X } from "lucide-react";
+import { Search, Plus, X, Trash2 } from "lucide-react";
 
 interface User {
   id: string;
@@ -55,6 +55,9 @@ export default function UsersTableClient({ users: initialUsers }: { users: User[
   const [freeAccess, setFreeAccess] = useState(false);
   const [creating, setCreating] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [bulkDeleting, setBulkDeleting] = useState(false);
+  const [showBulkConfirm, setShowBulkConfirm] = useState(false);
 
   const filtered = users.filter(
     (u) =>
@@ -97,8 +100,85 @@ export default function UsersTableClient({ users: initialUsers }: { users: User[
     }
   }
 
+  function toggleSelect(id: string) {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  function toggleSelectAll() {
+    if (selected.size === filtered.length) {
+      setSelected(new Set());
+    } else {
+      setSelected(new Set(filtered.map((u) => u.id)));
+    }
+  }
+
+  async function handleBulkDelete() {
+    setBulkDeleting(true);
+    try {
+      const res = await fetch("/api/admin/users/bulk-delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids: Array.from(selected) }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      setUsers((prev) => prev.filter((u) => !selected.has(u.id)));
+      setSelected(new Set());
+      setShowBulkConfirm(false);
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Failed to delete users");
+    } finally {
+      setBulkDeleting(false);
+    }
+  }
+
   return (
     <div>
+      {/* Bulk actions toolbar */}
+      {selected.size > 0 && (
+        <div className="flex items-center gap-3 mb-4 px-4 py-3 bg-obsidian text-white rounded-[10px] animate-in fade-in slide-in-from-top-1">
+          <span className="text-sm font-medium">{selected.size} selected</span>
+          <div className="flex-1" />
+          {!showBulkConfirm ? (
+            <button
+              onClick={() => setShowBulkConfirm(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-alert text-white text-xs font-medium rounded-lg hover:bg-alert/80 transition-colors"
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+              Delete
+            </button>
+          ) : (
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-white/70">Delete {selected.size} user{selected.size > 1 ? "s" : ""}?</span>
+              <button
+                onClick={handleBulkDelete}
+                disabled={bulkDeleting}
+                className="px-3 py-1.5 bg-alert text-white text-xs font-medium rounded-lg hover:bg-alert/80 transition-colors disabled:opacity-50"
+              >
+                {bulkDeleting ? "Deleting..." : "Confirm"}
+              </button>
+              <button
+                onClick={() => setShowBulkConfirm(false)}
+                className="px-3 py-1.5 bg-white/20 text-white text-xs font-medium rounded-lg hover:bg-white/30 transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          )}
+          <button
+            onClick={() => { setSelected(new Set()); setShowBulkConfirm(false); }}
+            className="p-1 hover:bg-white/20 rounded transition-colors"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+      )}
+
       {/* Search + Create */}
       <div className="flex items-center gap-3 mb-4">
         <div className="relative flex-1 max-w-sm">
@@ -177,6 +257,14 @@ export default function UsersTableClient({ users: initialUsers }: { users: User[
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-black/5 bg-surface">
+                <th className="w-10 px-4 py-3">
+                  <input
+                    type="checkbox"
+                    checked={filtered.length > 0 && selected.size === filtered.length}
+                    onChange={toggleSelectAll}
+                    className="w-4 h-4 rounded border-black/10 accent-obsidian cursor-pointer"
+                  />
+                </th>
                 <th className="text-left px-4 py-3 font-medium text-mgray">Email</th>
                 <th className="text-left px-4 py-3 font-medium text-mgray">Name</th>
                 <th className="text-left px-4 py-3 font-medium text-mgray">Role</th>
@@ -191,8 +279,16 @@ export default function UsersTableClient({ users: initialUsers }: { users: User[
               {filtered.map((u) => (
                 <tr
                   key={u.id}
-                  className="border-b border-black/5 last:border-0 hover:bg-surface/50 transition-colors"
+                  className={`border-b border-black/5 last:border-0 hover:bg-surface/50 transition-colors ${selected.has(u.id) ? "bg-[#CDFF00]/5" : ""}`}
                 >
+                  <td className="px-4 py-3">
+                    <input
+                      type="checkbox"
+                      checked={selected.has(u.id)}
+                      onChange={() => toggleSelect(u.id)}
+                      className="w-4 h-4 rounded border-black/10 accent-obsidian cursor-pointer"
+                    />
+                  </td>
                   <td className="px-4 py-3">
                     <Link
                       href={`/admin/users/${u.id}`}
@@ -214,7 +310,7 @@ export default function UsersTableClient({ users: initialUsers }: { users: User[
               ))}
               {filtered.length === 0 && (
                 <tr>
-                  <td colSpan={8} className="px-4 py-8 text-center text-mgray">
+                  <td colSpan={9} className="px-4 py-8 text-center text-mgray">
                     No users found
                   </td>
                 </tr>
