@@ -5,11 +5,74 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Loader2, Trash2 } from "lucide-react";
 
+interface Payment {
+  amount: number;
+  currency: string;
+  date: string;
+  status: string;
+}
+
+/**
+ * Shape of the profile row joined with the auth user, as assembled in page.tsx.
+ * Only the fields this view reads are listed; the row carries more.
+ */
+interface UserProfile {
+  id: string;
+  email: string;
+  auth_created_at: string | null;
+  full_name: string | null;
+  role: string;
+  subscription_status: string | null;
+  cancel_at_period_end: boolean | null;
+  subscription_period_end: string | null;
+  trial_ends_at: string | null;
+  protein_goal_g: number | null;
+  glp1_medication: string | null;
+  workout_streak_days: number;
+  protein_streak_days: number;
+  onboarding_done: boolean | null;
+  stripe_customer_id: string | null;
+}
+
+interface FoodLog {
+  id: string;
+  food_name: string | null;
+  protein_g: number | null;
+  calories: number | null;
+  log_date: string | null;
+  meal_type: string | null;
+}
+
+interface WorkoutLog {
+  id: string;
+  workout_day: string | null;
+  week_key: string | null;
+  completed_at: string | null;
+}
+
+interface MedicationLog {
+  id: string;
+  dose_mg: number | null;
+  change_date: string | null;
+  change_type: string | null;
+  appetite_level: string | null;
+  created_at: string | null;
+}
+
+interface ActivityLog {
+  id: string;
+  action: string | null;
+  changed_fields: Record<string, { old: string; new: string }> | null;
+  created_at: string | null;
+}
+
 interface UserDetailProps {
-  user: Record<string, unknown>;
-  foodLogs: Record<string, unknown>[];
-  workoutLogs: Record<string, unknown>[];
-  medicationLogs: Record<string, unknown>[];
+  user: UserProfile;
+  foodLogs: FoodLog[];
+  workoutLogs: WorkoutLog[];
+  medicationLogs: MedicationLog[];
+  activityLogs: ActivityLog[];
+  payments: Payment[];
   isSuperAdmin: boolean;
 }
 
@@ -18,10 +81,12 @@ export default function UserDetailClient({
   foodLogs,
   workoutLogs,
   medicationLogs,
+  activityLogs,
+  payments,
   isSuperAdmin,
 }: UserDetailProps) {
   const router = useRouter();
-  const [role, setRole] = useState((user.role as string) ?? "user");
+  const [role, setRole] = useState(user.role ?? "user");
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -50,7 +115,7 @@ export default function UserDetailClient({
     const res = await fetch(`/api/admin/users/${user.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ onboarding_completed: false }),
+      body: JSON.stringify({ onboarding_done: false }),
     });
     if (res.ok) {
       setMessage("Onboarding reset");
@@ -90,11 +155,11 @@ export default function UserDetailClient({
 
       <div className="bg-obsidian rounded-[14px] p-6 mb-6">
         <h1 className="text-lg font-medium text-white">
-          {(user.email as string) || "User"}
+          {user.email || "User"}
         </h1>
         <p className="text-sm text-white/60 mt-1">
-          {(user.full_name as string) || "No name"} / {user.role as string} /{" "}
-          {(user.subscription_status as string) || "none"}
+          {user.full_name || "No name"} / {user.role} /{" "}
+          {user.subscription_status || "none"}
         </p>
       </div>
 
@@ -109,23 +174,39 @@ export default function UserDetailClient({
         <div className="bg-white rounded-[10px] border border-black/5 p-5">
           <h3 className="text-sm font-medium text-obsidian mb-3">Profile</h3>
           <div className="space-y-2 text-sm">
-            <InfoRow label="ID" value={user.id as string} />
-            <InfoRow label="Email" value={user.email as string} />
-            <InfoRow label="Name" value={(user.full_name as string) || "-"} />
-            <InfoRow label="Role" value={user.role as string} />
+            <InfoRow label="ID" value={user.id} />
+            <InfoRow label="Email" value={user.email} />
+            <InfoRow label="Name" value={user.full_name || "-"} />
+            <InfoRow label="Role" value={user.role} />
             <InfoRow
               label="Subscription"
-              value={(user.subscription_status as string) || "none"}
+              value={user.subscription_status || "none"}
             />
+            {user.cancel_at_period_end ? (
+              <InfoRow
+                label="Cancels at"
+                value={fullDate(user.subscription_period_end) ?? "End of period"}
+              />
+            ) : null}
+            {user.subscription_period_end && !user.cancel_at_period_end ? (
+              <InfoRow
+                label="Renews on"
+                value={fullDate(user.subscription_period_end) ?? "-"}
+              />
+            ) : null}
+            {user.trial_ends_at && user.subscription_status === "trialing" ? (
+              <InfoRow
+                label="Trial ends"
+                value={fullDate(user.trial_ends_at) ?? "-"}
+              />
+            ) : null}
             <InfoRow
               label="Protein Goal"
-              value={
-                user.protein_goal_g ? `${user.protein_goal_g}g` : "-"
-              }
+              value={user.protein_goal_g ? `${user.protein_goal_g}g` : "-"}
             />
             <InfoRow
               label="GLP-1 Medication"
-              value={(user.glp1_medication as string) || "-"}
+              value={user.glp1_medication || "-"}
             />
             <InfoRow
               label="Workout Streak"
@@ -137,16 +218,9 @@ export default function UserDetailClient({
             />
             <InfoRow
               label="Onboarding"
-              value={user.onboarding_completed ? "Complete" : "Incomplete"}
+              value={user.onboarding_done ? "Complete" : "Incomplete"}
             />
-            <InfoRow
-              label="Joined"
-              value={
-                user.created_at
-                  ? new Date(user.created_at as string).toLocaleDateString()
-                  : "-"
-              }
-            />
+            <InfoRow label="Joined" value={fullDate(user.auth_created_at) ?? "-"} />
           </div>
         </div>
 
@@ -274,11 +348,9 @@ export default function UserDetailClient({
           title={`Recent Food Logs (${foodLogs.length})`}
           columns={["Date", "Meal", "Food", "Protein", "Cal"]}
           rows={foodLogs.map((l) => [
-            l.log_date
-              ? new Date((l.log_date as string) + "T12:00:00Z").toLocaleDateString("en-US", { month: "short", day: "numeric" })
-              : "-",
-            (l.meal_type as string) ?? "-",
-            (l.food_name as string) || "-",
+            dayDate(l.log_date) ?? "-",
+            l.meal_type ?? "-",
+            l.food_name || "-",
             l.protein_g ? `${l.protein_g}g` : "-",
             l.calories ? `${l.calories}` : "-",
           ])}
@@ -289,11 +361,9 @@ export default function UserDetailClient({
           title={`Recent Workouts (${workoutLogs.length})`}
           columns={["Date", "Session", "Week"]}
           rows={workoutLogs.map((l) => [
-            l.completed_at
-              ? new Date(l.completed_at as string).toLocaleDateString("en-US", { month: "short", day: "numeric" })
-              : "-",
-            (l.workout_day as string) || "-",
-            (l.week_key as string) || "-",
+            shortDate(l.completed_at) ?? "-",
+            l.workout_day || "-",
+            l.week_key || "-",
           ])}
         />
 
@@ -302,19 +372,173 @@ export default function UserDetailClient({
           title={`Recent Medications (${medicationLogs.length})`}
           columns={["Date", "Type", "Dose", "Appetite"]}
           rows={medicationLogs.map((l) => [
-            l.change_date
-              ? new Date((l.change_date as string) + "T12:00:00Z").toLocaleDateString("en-US", { month: "short", day: "numeric" })
-              : l.created_at
-              ? new Date(l.created_at as string).toLocaleDateString("en-US", { month: "short", day: "numeric" })
-              : "-",
-            ((l.change_type as string) ?? "-").replace("_", " "),
+            dayDate(l.change_date) ?? shortDate(l.created_at) ?? "-",
+            (l.change_type ?? "-").replace("_", " "),
             l.dose_mg ? `${l.dose_mg}mg` : "-",
-            ((l.appetite_level as string) ?? "-").replace("_", " "),
+            (l.appetite_level ?? "-").replace("_", " "),
           ])}
         />
       </div>
+
+      {/* Activity & Payments */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
+        {/* Activity history */}
+        <div className="bg-white rounded-[10px] border border-black/5 p-5">
+          <h3 className="text-sm font-medium text-obsidian mb-3">
+            Activity History ({activityLogs.length})
+          </h3>
+          {activityLogs.length === 0 ? (
+            <p className="text-sm text-mgray">No activity recorded yet</p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="border-b border-black/5">
+                    <th className="text-left px-2 py-2 font-medium text-mgray">Date</th>
+                    <th className="text-left px-2 py-2 font-medium text-mgray">Action</th>
+                    <th className="text-left px-2 py-2 font-medium text-mgray">Changes</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {activityLogs.map((log) => {
+                    const fields = log.changed_fields;
+                    const fieldNames = fields ? Object.keys(fields) : [];
+                    return (
+                      <tr key={log.id} className="border-b border-black/5 last:border-0 align-top">
+                        <td className="px-2 py-2 text-obsidian whitespace-nowrap">
+                          {log.created_at
+                            ? new Date(log.created_at).toLocaleDateString("en-US", {
+                                month: "short",
+                                day: "numeric",
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              })
+                            : "-"}
+                        </td>
+                        <td className="px-2 py-2">
+                          <span
+                            className={`inline-block px-1.5 py-0.5 rounded text-[10px] font-medium ${
+                              log.action === "sign_in"
+                                ? "bg-blue-100 text-blue-800"
+                                : log.action === "app_opened"
+                                ? "bg-lime/20 text-green-800"
+                                : "bg-gray-100 text-gray-700"
+                            }`}
+                          >
+                            {log.action === "sign_in"
+                              ? "Login"
+                              : log.action === "app_opened"
+                              ? "Opened app"
+                              : (log.action ?? "").replace("_", " ")}
+                          </span>
+                        </td>
+                        <td className="px-2 py-2 text-obsidian">
+                          {fieldNames.length > 0 ? (
+                            <div className="space-y-0.5">
+                              {fieldNames.map((f) => (
+                                <div key={f}>
+                                  <span className="text-mgray">{f.replace(/_/g, " ")}:</span>{" "}
+                                  <span className="line-through text-mgray/60">{fields![f].old || "empty"}</span>{" "}
+                                  &rarr; {fields![f].new || "empty"}
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            "-"
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+
+        {/* Payment history */}
+        <div className="bg-white rounded-[10px] border border-black/5 p-5">
+          <h3 className="text-sm font-medium text-obsidian mb-3">
+            Payment History ({payments.length})
+          </h3>
+          {payments.length === 0 ? (
+            <p className="text-sm text-mgray">
+              {user.stripe_customer_id ? "No payments found" : "No Stripe customer linked"}
+            </p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="border-b border-black/5">
+                    <th className="text-left px-2 py-2 font-medium text-mgray">Date</th>
+                    <th className="text-left px-2 py-2 font-medium text-mgray">Amount</th>
+                    <th className="text-left px-2 py-2 font-medium text-mgray">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {payments.map((p, i) => (
+                    <tr key={i} className="border-b border-black/5 last:border-0">
+                      <td className="px-2 py-2 text-obsidian whitespace-nowrap">
+                        {new Date(p.date).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        })}
+                      </td>
+                      <td className="px-2 py-2 text-obsidian font-medium">
+                        ${p.amount.toFixed(2)} {p.currency.toUpperCase()}
+                      </td>
+                      <td className="px-2 py-2">
+                        <span
+                          className={`inline-block px-1.5 py-0.5 rounded text-[10px] font-medium ${
+                            p.status === "paid"
+                              ? "bg-lime/20 text-green-800"
+                              : p.status === "open"
+                              ? "bg-yellow-100 text-yellow-800"
+                              : "bg-red-100 text-red-700"
+                          }`}
+                        >
+                          {p.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
+}
+
+/** "Aug 10, 2026" — null in, null out, so callers can pick their own fallback. */
+function fullDate(value: string | null): string | null {
+  if (!value) return null;
+  return new Date(value).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
+/** "Aug 10" from a timestamp. */
+function shortDate(value: string | null): string | null {
+  if (!value) return null;
+  return new Date(value).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+  });
+}
+
+/** "Aug 10" from a date-only column, read at midday UTC to avoid a timezone shift. */
+function dayDate(value: string | null): string | null {
+  if (!value) return null;
+  return new Date(value + "T12:00:00Z").toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+  });
 }
 
 function InfoRow({ label, value }: { label: string; value: string }) {

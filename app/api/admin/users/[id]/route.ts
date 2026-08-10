@@ -90,7 +90,7 @@ export async function PATCH(
   const allowedFields = [
     "role",
     "subscription_status",
-    "onboarding_completed",
+    "onboarding_done",
   ];
   const updateData: Record<string, unknown> = {};
   for (const field of allowedFields) {

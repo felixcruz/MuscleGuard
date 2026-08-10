@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
@@ -40,6 +41,14 @@ export async function GET(request: NextRequest) {
       console.error("User fetch error:", userError?.message);
       return NextResponse.redirect(new URL("/login?error=Failed to verify user", request.url));
     }
+
+    // Log the sign-in
+    const admin = createAdminClient();
+    await admin.from("user_activity_log").insert({
+      user_id: user.id,
+      action: "sign_in",
+      changed_fields: null,
+    });
 
     // Redirect to original page or dashboard
     const redirect = searchParams.get("redirect");

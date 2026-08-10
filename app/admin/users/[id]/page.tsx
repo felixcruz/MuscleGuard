@@ -3,6 +3,7 @@ export const dynamic = "force-dynamic";
 import { redirect } from "next/navigation";
 import { getAdminSession } from "@/lib/admin-session";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { getStripe } from "@/lib/stripe";
 import AdminNav from "@/components/admin/AdminNav";
 import UserDetailClient from "./UserDetailClient";
 
@@ -53,9 +54,37 @@ export default async function AdminUserDetailPage({
     .order("created_at", { ascending: false })
     .limit(20);
 
+  // Get activity log (profile updates)
+  const { data: activityLogs } = await supabase
+    .from("user_activity_log")
+    .select("id, action, changed_fields, created_at")
+    .eq("user_id", id)
+    .order("created_at", { ascending: false })
+    .limit(30);
+
+  // Get Stripe payment history
+  let payments: { amount: number; currency: string; date: string; status: string }[] = [];
+  if (profile.stripe_customer_id) {
+    try {
+      const invoices = await getStripe().invoices.list({
+        customer: profile.stripe_customer_id,
+        limit: 30,
+      });
+      payments = invoices.data.map((inv) => ({
+        amount: (inv.amount_paid ?? 0) / 100,
+        currency: inv.currency ?? "usd",
+        date: new Date((inv.created ?? 0) * 1000).toISOString(),
+        status: inv.status ?? "unknown",
+      }));
+    } catch (err) {
+      console.error("Stripe payment fetch error:", err);
+    }
+  }
+
   const user = {
     ...profile,
     email: userData.user?.email ?? "",
+    auth_created_at: userData.user?.created_at ?? null,
   };
 
   return (
@@ -68,6 +97,8 @@ export default async function AdminUserDetailPage({
           foodLogs={foodLogs ?? []}
           workoutLogs={workoutLogs ?? []}
           medicationLogs={medicationLogs ?? []}
+          activityLogs={activityLogs ?? []}
+          payments={payments}
           isSuperAdmin={session.role === "super_admin"}
         />
       </div>
