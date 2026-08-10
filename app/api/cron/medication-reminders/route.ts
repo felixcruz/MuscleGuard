@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getNextDueDate } from "@/lib/personalization";
 import { brandedEmail } from "@/lib/email-template";
+import { signEmailAction } from "@/lib/email-token";
+
+/** Days after the due date when we send the single "did you pause?" check-in. */
+const PAUSE_CHECK_IN_DAY = 7;
 
 async function sendEmail(
   to: string,
@@ -66,7 +70,8 @@ export async function GET(req: NextRequest) {
     )
     .eq("onboarding_done", true)
     .not("glp1_frequency", "is", null)
-    .not("glp1_last_dose_date", "is", null);
+    .not("glp1_last_dose_date", "is", null)
+    .not("glp1_paused", "is", true);
 
   const profiles = (profilesRaw ?? []) as ProfileRow[];
 
@@ -117,6 +122,10 @@ export async function GET(req: NextRequest) {
         ? "Tirzepatide"
         : profile.glp1_medication ?? "GLP-1";
 
+    // Exactly two emails per missed cycle: a soft nudge on the due date, and a
+    // single check-in a week later. After day 7 we stay silent until the user
+    // logs a dose again — repeating daily burns the sender reputation and the
+    // user's patience.
     if (daysOverdue === 0) {
       // Due today — soft reminder
       await sendEmail(
@@ -131,33 +140,24 @@ export async function GET(req: NextRequest) {
         })
       );
       processed++;
-    } else if (daysOverdue === 1 || daysOverdue === 2) {
-      // 1-2 days overdue — active reminder
+    } else if (daysOverdue === PAUSE_CHECK_IN_DAY) {
+      // One week without a logged dose — ask instead of nagging
+      const pauseUrl = `${appUrl}/api/medication/pause?uid=${profile.id}&t=${signEmailAction(
+        profile.id,
+        "pause"
+      )}`;
       await sendEmail(
         email,
-        `Haven't logged your ${medLabel} dose yet?`,
+        `Did you pause your ${medLabel}?`,
         brandedEmail({
-          title: `Your dose is ${daysOverdue} day${daysOverdue !== 1 ? "s" : ""} overdue`,
-          body: `<p style="margin:0 0 8px">It looks like you haven't logged your <strong style="color:#ffffff">${doseMg}mg ${medLabel}</strong> dose yet.</p>
-<p style="margin:0">Your protein and training plan is personalized to your medication schedule. Logging your dose keeps your recommendations accurate.</p>`,
-          ctaText: "Log your dose now",
-          ctaUrl: `${appUrl}/medication`,
-        })
-      );
-      processed++;
-    } else if (daysOverdue >= 3) {
-      // 3+ days overdue — critical reminder
-      await sendEmail(
-        email,
-        `Your dose is ${daysOverdue} days overdue`,
-        brandedEmail({
-          title: `${daysOverdue} days since your last dose`,
-          body: `<p style="margin:0 0 8px">Your <strong style="color:#ffffff">${doseMg}mg ${medLabel}</strong> dose is now <strong style="color:#FFB4AB">${daysOverdue} days overdue</strong>.</p>
-<p style="margin:0 0 8px">When your medication schedule changes, your protein targets and training intensity may also need to adjust.</p>
-<p style="margin:0">If you've paused or changed your medication, you can log that too and your plan will automatically adjust.</p>`,
-          ctaText: "Update medication status",
-          ctaUrl: `${appUrl}/medication`,
-          footer: "Consistent medication tracking helps MuscleGuard keep your plan accurate.",
+          title: "Did you pause your medication?",
+          body: `<p style="margin:0 0 8px">We haven't seen a logged <strong style="color:#ffffff">${doseMg}mg ${medLabel}</strong> dose in a week.</p>
+<p style="margin:0">Let us know so your protein and training plan stays accurate. This is the last reminder we'll send until you log a dose.</p>`,
+          ctaText: "Yes, I paused it",
+          ctaUrl: pauseUrl,
+          secondaryCtaText: "I'm still taking it",
+          secondaryCtaUrl: `${appUrl}/medication`,
+          footer: "Either way, we won't email you about doses again until you log one.",
         })
       );
       processed++;

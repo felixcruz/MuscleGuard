@@ -7,17 +7,28 @@ export function brandedEmail({
   body,
   ctaText,
   ctaUrl,
+  secondaryCtaText,
+  secondaryCtaUrl,
   footer,
 }: {
   title: string;
   body: string;
   ctaText?: string;
   ctaUrl?: string;
+  secondaryCtaText?: string;
+  secondaryCtaUrl?: string;
   footer?: string;
 }): string {
+  const secondaryButton = secondaryCtaText && secondaryCtaUrl
+    ? `<div style="margin-top:12px;">
+        <a href="${secondaryCtaUrl}" style="display:inline-block;padding:13px 40px;border:1px solid rgba(255,255,255,0.25);color:#ffffff;font-size:14px;font-weight:600;text-decoration:none;border-radius:8px;">${secondaryCtaText}</a>
+      </div>`
+    : "";
+
   const ctaBlock = ctaText && ctaUrl
     ? `<tr><td style="padding:0 32px 32px;text-align:center;">
         <a href="${ctaUrl}" style="display:inline-block;padding:14px 40px;background-color:#CDFF00;color:#131413;font-size:14px;font-weight:600;text-decoration:none;border-radius:8px;">${ctaText}</a>
+        ${secondaryButton}
       </td></tr>`
     : "";
 

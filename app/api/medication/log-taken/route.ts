@@ -24,10 +24,15 @@ export async function POST() {
     return NextResponse.json({ error: "Profile not found" }, { status: 404 });
   }
 
-  // Update last dose date
+  // Update last dose date. Logging a dose also clears a paused state, so
+  // reminders resume for anyone who told us they'd stopped.
   await supabase
     .from("profiles")
-    .update({ glp1_last_dose_date: today, updated_at: new Date().toISOString() })
+    .update({
+      glp1_last_dose_date: today,
+      glp1_paused: false,
+      updated_at: new Date().toISOString(),
+    })
     .eq("id", user.id);
 
   // Insert medication log
