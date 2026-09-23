@@ -121,7 +121,7 @@ export function MealsClient({
       setResults([]);
     } catch (err) {
       setSearchError(
-        err instanceof Error ? err.message : "Failed to log food"
+        err instanceof Error ? err.message : t("failedToLog")
       );
     } finally {
       setLogging(false);

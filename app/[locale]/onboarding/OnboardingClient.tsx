@@ -309,7 +309,7 @@ export default function OnboardingPage() {
                 <div className="relative max-w-[160px]">
                   <input
                     type="number"
-                    placeholder={weightUnit === "kg" ? "e.g. 82" : "e.g. 180"}
+                    placeholder={`${tc("egPrefix")} ${weightUnit === "kg" ? "82" : "180"}`}
                     value={form.weight_kg}
                     onChange={(e) => set("weight_kg", e.target.value)}
                     className="w-full px-3 py-2.5 pr-12 border border-black/10 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-obsidian/20 bg-white"
@@ -410,7 +410,7 @@ export default function OnboardingPage() {
                     <div className="relative max-w-[160px]">
                       <input
                         type="number"
-                        placeholder="e.g. 1.0"
+                        placeholder={tc("doseExample")}
                         value={form.dose_other}
                         onChange={(e) => set("dose_other", e.target.value)}
                         className="w-full px-3 py-2.5 pr-10 border border-black/10 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-obsidian/20 bg-white"

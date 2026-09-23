@@ -156,14 +156,14 @@ export function ReportsClient({
         body: JSON.stringify({ weekStart: lastWeekStart, weekEnd: lastWeekEnd }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to generate");
+      if (!res.ok) throw new Error(data.error || t("failedToGenerate"));
       setLiveReports((prev) => {
         const exists = prev.some((r) => r.week_start === data.report.week_start);
         if (exists) return prev;
         return [data.report, ...prev];
       });
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to generate report");
+      setError(err instanceof Error ? err.message : t("failedToGenerate"));
     } finally {
       setGenerating(false);
     }

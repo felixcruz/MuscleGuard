@@ -383,7 +383,7 @@ export function ProgressClient({
                   <button
                     onClick={() => handleDelete(m.id)}
                     className="text-muted hover:text-[#FFB4AB] transition-colors p-1"
-                    aria-label="Delete measurement"
+                    aria-label={t("deleteMeasurement")}
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>

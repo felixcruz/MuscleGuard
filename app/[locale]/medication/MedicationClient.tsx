@@ -302,7 +302,7 @@ export function MedicationClient({
                 ) : (
                   <input
                     type="number"
-                    placeholder="e.g. 1.0"
+                    placeholder={tc("doseExample")}
                     value={newDose}
                     onChange={(e) => setNewDose(e.target.value)}
                     required

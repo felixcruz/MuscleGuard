@@ -23,7 +23,9 @@
     "thisWeek": "Esta semana",
     "optional": "opcional",
     "entries": "registros",
-    "notAvailable": "No disponible"
+    "notAvailable": "No disponible",
+    "egPrefix": "ej.",
+    "doseExample": "ej. 1.0"
   },
   "nav": {
     "today": "Hoy",
@@ -310,6 +312,7 @@
     "totalProtein": "Proteína total"
   },
   "meals": {
+    "failedToLog": "No se pudo registrar la comida",
     "title": "Comidas",
     "proteinRemaining": "{amount}g de proteína restante hoy",
     "goalReached": "¡Objetivo diario de proteína alcanzado!",
@@ -383,6 +386,7 @@
     "complementaryStrengthDesc": "Completa 2x/semana para prevenir pérdida muscular con GLP-1."
   },
   "progress": {
+    "deleteMeasurement": "Eliminar medición",
     "title": "Progreso",
     "subtitle": "Rastrea tu peso y masa muscular semanalmente.",
     "muscleLossDetected": "Pérdida muscular detectada",
@@ -425,6 +429,7 @@
     "ofDays": "de 7 días",
     "ofTarget": "de 3 objetivo",
     "proteinDaysCount": "días de proteína",
+    "failedToGenerate": "No se pudo generar el reporte",
     "doctorReportTitle": "Resumen de protección muscular",
     "doctorReportDesc": "Un resumen de 30 días para compartir con tu médico (PDF)"
   },
