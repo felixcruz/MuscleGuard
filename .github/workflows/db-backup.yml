@@ -29,14 +29,19 @@ jobs:
     steps:
       - name: Dump database
         env:
-          # Set in GitHub → Settings → Secrets and variables → Actions.
-          # This is ONLY the database password, nothing else.
-          PGPASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+          # Repo secret SUPABASE_DB_URL must hold ONLY the database password
+          # (not a full connection string — host/user are set above).
+          PGPASSWORD: ${{ secrets.SUPABASE_DB_URL }}
         run: |
           if [ -z "$PGPASSWORD" ]; then
-            echo "::error::SUPABASE_DB_PASSWORD secret is not set."
+            echo "::error::SUPABASE_DB_URL secret is not set."
             exit 1
           fi
+          case "$PGPASSWORD" in
+            postgres://*|postgresql://*)
+              echo "::error::The secret holds a full connection URL. Put ONLY the password."
+              exit 1 ;;
+          esac
           STAMP="$(date -u +%Y-%m-%d_%H%M%SZ)"
           echo "FILE=muscleguard-backup-${STAMP}.sql.gz" >> "$GITHUB_ENV"
           # pg_dump 17 (matches the Supabase server) via the official image.
