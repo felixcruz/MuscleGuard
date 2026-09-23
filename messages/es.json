@@ -515,6 +515,19 @@
     "redirectDesc": "Serás redirigido a nuestro socio de pagos seguro para iniciar tu prueba gratis de 7 días. No se te cobrará hoy.",
     "redirecting": "Redirigiendo al checkout…",
     "somethingWentWrong": "Algo salió mal. Por favor intenta de nuevo.",
-    "priceInfo": "$14.99/mes después de la prueba de 7 días · Cancela cuando quieras"
+    "priceInfo": "$14.99/mes después de la prueba de 7 días · Cancela cuando quieras",
+    "choosePlanTitle": "Elige tu plan",
+    "choosePlanDesc": "Prueba gratis de 7 días. No se te cobra hoy.",
+    "planAnnualName": "Anual",
+    "planMonthlyName": "Mensual",
+    "annualPrice": "$89.99",
+    "annualPer": "por año",
+    "annualEquiv": "$7.50/mes, facturado anual",
+    "monthlyPrice": "$14.99",
+    "monthlyPer": "por mes",
+    "monthlySub": "Facturado mensual",
+    "save": "Ahorra 50%",
+    "startTrialCta": "Empezar prueba de 7 días",
+    "noChargeToday": "No se te cobra hoy · Cancela cuando quieras"
   }
 }

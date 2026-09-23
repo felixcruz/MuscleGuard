@@ -25,5 +25,8 @@ export default async function CheckoutPage() {
     return redirect("/onboarding");
   }
 
-  return <CheckoutRedirect />;
+  // The annual plan only shows once its Stripe price is configured.
+  const annualAvailable = !!process.env.STRIPE_PRICE_ID_ANNUAL;
+
+  return <CheckoutRedirect annualAvailable={annualAvailable} />;
 }

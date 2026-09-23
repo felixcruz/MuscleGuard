@@ -3,11 +3,33 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getStripe } from "@/lib/stripe";
 
-export async function POST() {
+export async function POST(request: Request) {
   try {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    // Plan selection: "annual" uses the discounted yearly price, anything else
+    // falls back to the monthly price (keeps older callers working).
+    let plan: "monthly" | "annual" = "monthly";
+    try {
+      const body = await request.json();
+      if (body?.plan === "annual") plan = "annual";
+    } catch {
+      // no body → monthly
+    }
+
+    const priceId =
+      plan === "annual"
+        ? process.env.STRIPE_PRICE_ID_ANNUAL
+        : process.env.STRIPE_PRICE_ID;
+
+    if (!priceId) {
+      return NextResponse.json(
+        { error: "Selected plan is not available yet. Please try another plan." },
+        { status: 400 }
+      );
+    }
 
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
@@ -56,16 +78,16 @@ export async function POST() {
       payment_method_types: ["card"],
       line_items: [
         {
-          price: process.env.STRIPE_PRICE_ID!,
+          price: priceId,
           quantity: 1,
         },
       ],
       success_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?trial_started=1`,
       cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/checkout`,
-      metadata: { supabase_uid: user.id },
+      metadata: { supabase_uid: user.id, plan },
       subscription_data: {
         trial_period_days: 7,
-        metadata: { supabase_uid: user.id },
+        metadata: { supabase_uid: user.id, plan },
       },
     });
 

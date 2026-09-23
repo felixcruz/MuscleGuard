@@ -515,6 +515,19 @@
     "redirectDesc": "You will be redirected to our secure payment partner to start your 7-day free trial. You will not be charged today.",
     "redirecting": "Redirecting to checkout…",
     "somethingWentWrong": "Something went wrong. Please try again.",
-    "priceInfo": "$14.99/month after 7-day trial · Cancel anytime"
+    "priceInfo": "$14.99/month after 7-day trial · Cancel anytime",
+    "choosePlanTitle": "Choose your plan",
+    "choosePlanDesc": "7-day free trial. You won't be charged today.",
+    "planAnnualName": "Annual",
+    "planMonthlyName": "Monthly",
+    "annualPrice": "$89.99",
+    "annualPer": "per year",
+    "annualEquiv": "$7.50/mo, billed annually",
+    "monthlyPrice": "$14.99",
+    "monthlyPer": "per month",
+    "monthlySub": "Billed monthly",
+    "save": "Save 50%",
+    "startTrialCta": "Start 7-day free trial",
+    "noChargeToday": "You won't be charged today · Cancel anytime"
   }
 }
