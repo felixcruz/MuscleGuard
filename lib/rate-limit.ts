@@ -1,72 +1,54 @@
 /**
- * Simple in-memory rate limiter for MVP
- * Tracks requests per user ID
+ * Durable rate limiter backed by Postgres.
+ *
+ * The previous implementation kept counters in a module-level Map. On Vercel
+ * each serverless invocation may run in a different, short-lived instance, so
+ * an in-memory counter is effectively per-request and does not limit anything.
+ * This version calls an atomic Postgres function (check_rate_limit) via the
+ * service role, so the limit is shared across every instance.
  */
+import { createAdminClient } from "@/lib/supabase/admin";
 
-interface RateLimitEntry {
-  count: number;
-  resetAt: number;
-}
+const REQUESTS_PER_MINUTE = 5;
+const WINDOW_SECONDS = 60;
 
-const rateLimitStore = new Map<string, RateLimitEntry>();
-
-const REQUESTS_PER_MINUTE = 5; // 5 requests per minute per user
-const MINUTE_MS = 60 * 1000;
-
-export function checkRateLimit(userId: string): {
+export interface RateLimitResult {
   allowed: boolean;
   remaining: number;
-  resetAt: number;
-} {
-  const now = Date.now();
-  const entry = rateLimitStore.get(userId);
-
-  // Create new entry if doesn't exist or expired
-  if (!entry || entry.resetAt < now) {
-    const newEntry: RateLimitEntry = {
-      count: 1,
-      resetAt: now + MINUTE_MS,
-    };
-    rateLimitStore.set(userId, newEntry);
-    return {
-      allowed: true,
-      remaining: REQUESTS_PER_MINUTE - 1,
-      resetAt: newEntry.resetAt,
-    };
-  }
-
-  // Check if limit exceeded
-  if (entry.count >= REQUESTS_PER_MINUTE) {
-    return {
-      allowed: false,
-      remaining: 0,
-      resetAt: entry.resetAt,
-    };
-  }
-
-  // Increment counter
-  entry.count += 1;
-  return {
-    allowed: true,
-    remaining: REQUESTS_PER_MINUTE - entry.count,
-    resetAt: entry.resetAt,
-  };
+  resetAt: number; // epoch ms
 }
 
-// Cleanup old entries every 5 minutes (only in runtime, not build time)
-if (typeof globalThis !== "undefined" && typeof globalThis.setInterval === "function") {
-  setInterval(() => {
-    const now = Date.now();
-    const entriesToDelete: string[] = [];
-
-    rateLimitStore.forEach((entry, userId) => {
-      if (entry.resetAt < now) {
-        entriesToDelete.push(userId);
-      }
+/**
+ * @param key   Identity to rate-limit on (e.g. a user id). Namespaced per route.
+ * @param max   Max requests allowed in the window. Defaults to 5.
+ * @param windowSeconds Window length in seconds. Defaults to 60.
+ */
+export async function checkRateLimit(
+  key: string,
+  max: number = REQUESTS_PER_MINUTE,
+  windowSeconds: number = WINDOW_SECONDS
+): Promise<RateLimitResult> {
+  try {
+    const supabase = createAdminClient();
+    const { data, error } = await supabase.rpc("check_rate_limit", {
+      p_key: key,
+      p_max: max,
+      p_window_seconds: windowSeconds,
     });
 
-    entriesToDelete.forEach((userId) => {
-      rateLimitStore.delete(userId);
-    });
-  }, 5 * 60 * 1000);
+    if (error || !data) {
+      // Fail closed: if the limiter backend is unavailable, deny the request
+      // rather than leaving an expensive endpoint (e.g. AI generation) wide open.
+      return { allowed: false, remaining: 0, resetAt: Date.now() + windowSeconds * 1000 };
+    }
+
+    const result = data as { allowed: boolean; remaining: number; reset_at: number };
+    return {
+      allowed: result.allowed,
+      remaining: result.remaining,
+      resetAt: result.reset_at,
+    };
+  } catch {
+    return { allowed: false, remaining: 0, resetAt: Date.now() + windowSeconds * 1000 };
+  }
 }

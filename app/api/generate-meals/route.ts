@@ -11,8 +11,8 @@ export async function POST(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  // Rate limiting
-  const rateLimit = checkRateLimit(user.id);
+  // Rate limiting (durable, shared across serverless instances)
+  const rateLimit = await checkRateLimit(`generate-meals:${user.id}`);
   if (!rateLimit.allowed) {
     const resetAt = new Date(rateLimit.resetAt).toISOString();
     return NextResponse.json(

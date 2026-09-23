@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { getStripe } from "@/lib/stripe";
 
 export async function POST() {
@@ -31,7 +32,10 @@ export async function POST() {
         });
         customerId = customer.id;
 
-        const { error: updateError } = await supabase
+        // stripe_customer_id is a privileged column locked by the DB trigger
+        // (016_security_hardening), so it must be written with the service role,
+        // not the user's own session.
+        const { error: updateError } = await createAdminClient()
           .from("profiles")
           .update({ stripe_customer_id: customerId })
           .eq("id", user.id);
