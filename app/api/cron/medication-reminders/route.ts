@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getNextDueDate } from "@/lib/personalization";
 import { brandedEmail } from "@/lib/email-template";
-import { signEmailAction } from "@/lib/email-token";
+import { signEmailAction, EMAIL_ACTION_TTL_MS } from "@/lib/email-token";
 
 /** Days after the due date when we send the single "did you pause?" check-in. */
 const PAUSE_CHECK_IN_DAY = 7;
@@ -142,9 +142,11 @@ export async function GET(req: NextRequest) {
       processed++;
     } else if (daysOverdue === PAUSE_CHECK_IN_DAY) {
       // One week without a logged dose — ask instead of nagging
-      const pauseUrl = `${appUrl}/api/medication/pause?uid=${profile.id}&t=${signEmailAction(
+      const exp = Date.now() + EMAIL_ACTION_TTL_MS;
+      const pauseUrl = `${appUrl}/api/medication/pause?uid=${profile.id}&exp=${exp}&t=${signEmailAction(
         profile.id,
-        "pause"
+        "pause",
+        exp
       )}`;
       await sendEmail(
         email,

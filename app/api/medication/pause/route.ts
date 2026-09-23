@@ -43,8 +43,9 @@ export async function GET(req: NextRequest) {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://muscleguard.app";
   const uid = req.nextUrl.searchParams.get("uid") ?? "";
   const token = req.nextUrl.searchParams.get("t") ?? "";
+  const exp = Number(req.nextUrl.searchParams.get("exp") ?? "");
 
-  if (!uid || !verifyEmailAction(uid, "pause", token)) {
+  if (!uid || !verifyEmailAction(uid, "pause", exp, token)) {
     return page(
       "This link isn't valid",
       "It may have expired or been copied incorrectly. You can update your medication status directly in the app.",

@@ -8,9 +8,25 @@ import {
   SESSION_DURATION_MS,
 } from "@/lib/admin-auth";
 import { auditLog } from "@/lib/admin-audit";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 export async function POST(request: NextRequest) {
   const supabase = createAdminClient();
+
+  // Per-IP throttle. Sits in front of the expensive listUsers scan below and
+  // caps distributed / cross-account guessing that the per-account lockout
+  // (which an attacker can also weaponise to lock out the real admin) misses.
+  const clientIp =
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    request.headers.get("x-real-ip") ||
+    "unknown";
+  const ipLimit = await checkRateLimit(`admin-login:${clientIp}`, 10, 15 * 60);
+  if (!ipLimit.allowed) {
+    return NextResponse.json(
+      { error: "Too many attempts. Please try again later." },
+      { status: 429 }
+    );
+  }
 
   let body: { email?: string; password?: string; totp_code?: string };
   try {
