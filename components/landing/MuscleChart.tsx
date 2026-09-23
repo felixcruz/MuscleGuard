@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 
 export function MuscleChart() {
+  const t = useTranslations("landing");
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
 
@@ -31,7 +33,7 @@ export function MuscleChart() {
   const chartH = h - py * 2;
 
   // Months
-  const months = ["Month 0", "Month 1", "Month 2", "Month 3", "Month 4", "Month 5", "Month 6"];
+  const months = Array.from({ length: 7 }, (_, i) => `${t("chartMonth")} ${i}`);
   const steps = months.length;
 
   // Data points (normalized 0-1, where 1 = top of chart)
@@ -163,8 +165,8 @@ export function MuscleChart() {
         })}
 
         {/* Y axis labels */}
-        <text x={px - 8} y={py + 4} textAnchor="end" fontSize={9} fill="rgba(255,255,255,0.2)">High</text>
-        <text x={px - 8} y={py + chartH + 4} textAnchor="end" fontSize={9} fill="rgba(255,255,255,0.2)">Low</text>
+        <text x={px - 8} y={py + 4} textAnchor="end" fontSize={9} fill="rgba(255,255,255,0.2)">{t("chartHigh")}</text>
+        <text x={px - 8} y={py + chartH + 4} textAnchor="end" fontSize={9} fill="rgba(255,255,255,0.2)">{t("chartLow")}</text>
 
         {/* Weight line (white, both scenarios) */}
         <path
@@ -206,13 +208,13 @@ export function MuscleChart() {
 
         {/* Labels */}
         <text x={labelX} y={weightEndY + 4} fontSize={11} fill="rgba(255,255,255,0.35)" className="mg-label mg-label-delay">
-          Weight
+          {t("chartWeight")}
         </text>
         <text x={labelX} y={unprotectedEndY + 4} fontSize={11} fill="#FFB4AB" fontWeight={600} className="mg-label mg-label-delay">
-          Muscle (no protection)
+          {t("chartMuscleNoProtection")}
         </text>
         <text x={labelX} y={protectedEndY + 4} fontSize={11} fill="#CDFF00" fontWeight={600} className="mg-label mg-label-delay">
-          Muscle (MuscleGuard)
+          {t("chartMuscleProtected")}
         </text>
       </svg>
     </div>

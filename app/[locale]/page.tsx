@@ -26,6 +26,7 @@ export default async function LandingPage() {
   const t = await getTranslations("landing");
   const tc = await getTranslations("common");
   const annualAvailable = !!process.env.STRIPE_PRICE_ID_ANNUAL;
+  const moUnit = t("compPerMonthUnit");
 
   const features = [
     {
@@ -73,7 +74,7 @@ export default async function LandingPage() {
       mealPlanner: true,
       training: true,
       medReminders: true,
-      price: "$14.99/mo",
+      price: `$14.99${moUnit}`,
       highlight: true,
     },
     {
@@ -83,7 +84,7 @@ export default async function LandingPage() {
       mealPlanner: false,
       training: false,
       medReminders: false,
-      price: "$10–15/mo",
+      price: `$10–15${moUnit}`,
       highlight: false,
     },
     {
@@ -93,7 +94,7 @@ export default async function LandingPage() {
       mealPlanner: false,
       training: false,
       medReminders: false,
-      price: "$149+/mo",
+      price: `$149+${moUnit}`,
       highlight: false,
     },
     {
@@ -103,7 +104,7 @@ export default async function LandingPage() {
       mealPlanner: false,
       training: true,
       medReminders: false,
-      price: "$99–199/mo",
+      price: `$99–199${moUnit}`,
       highlight: false,
     },
     {
@@ -113,7 +114,7 @@ export default async function LandingPage() {
       mealPlanner: false,
       training: false,
       medReminders: false,
-      price: "$10–15/mo",
+      price: `$10–15${moUnit}`,
       highlight: false,
     },
   ];
