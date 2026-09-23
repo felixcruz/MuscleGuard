@@ -35,7 +35,7 @@
     "settings": "Settings"
   },
   "landing": {
-    "heroSubtitle": "The only app built for GLP-1 muscle protection",
+    "heroSubtitle": "The app focused on protecting your muscle on GLP-1",
     "heroTitle1": "Up to 40% of your weight loss",
     "heroTitle2": "could be",
     "heroHighlight": "muscle, not fat.",
@@ -50,8 +50,8 @@
     "whyMattersLabel": "Why this matters",
     "whyMattersTitle": "The problem nobody is talking about",
     "whyMattersDesc": "GLP-1 medications are transformative for weight loss, but the muscle loss side of the equation is often overlooked.",
-    "problem1Title": "Your doctor may not mention it",
-    "problem1Desc": "Many prescribing physicians focus primarily on weight and metabolic markers. Detailed protein guidance adjusted to your specific GLP-1 dose may not always be part of the conversation.",
+    "problem1Title": "Take this to your doctor",
+    "problem1Desc": "Your doctor manages your medication and overall health, and there's a lot to cover in a short visit. MuscleGuard gives you a clear, dose-adjusted protein plan you can bring to your appointments, so protecting your muscle becomes part of the conversation with your care team.",
     "problem2Title": "Other apps are not built for this",
     "problem2Desc": "Generic calorie trackers do not account for GLP-1 appetite suppression, dose-specific protein multipliers, or the unique training considerations that come with these medications.",
     "problem3Title": "Your muscles need a signal to stay",
