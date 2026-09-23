@@ -413,7 +413,31 @@
     "workoutCompletion": "Workout completion",
     "ofDays": "of 7 days",
     "ofTarget": "of 3 target",
-    "proteinDaysCount": "protein days"
+    "proteinDaysCount": "protein days",
+    "doctorReportTitle": "Muscle protection summary",
+    "doctorReportDesc": "A 30-day summary to share with your doctor (PDF)"
+  },
+  "doctorReport": {
+    "title": "Muscle protection summary",
+    "subtitle": "A 30-day summary to share with your doctor.",
+    "forPatient": "Patient",
+    "period": "Period",
+    "medication": "Medication",
+    "metricsTitle": "Your last 30 days",
+    "proteinTarget": "Daily protein target",
+    "daysLogged": "Days with food logged",
+    "daysHit": "Days at 80%+ of target",
+    "avgProtein": "Avg protein, logged days",
+    "workouts": "Strength sessions",
+    "weightChange": "Weight change",
+    "summaryTitle": "Summary",
+    "shareTitle": "Sharing this with your doctor",
+    "shareBody": "MuscleGuard turns your daily tracking into a clear snapshot your care team can read in seconds. Bring it to your next appointment so you and your doctor can decide together how to protect your muscle as your treatment continues.",
+    "disclaimer": "This document summarizes data you tracked yourself in MuscleGuard. It is for educational purposes and is not medical advice, a diagnosis, or a substitute for professional care. Treatment decisions rest with your healthcare provider.",
+    "download": "Download PDF",
+    "back": "Back to reports",
+    "loading": "Preparing your summary…",
+    "errorMsg": "We couldn't generate the summary. Please try again."
   },
   "settings": {
     "title": "Settings",

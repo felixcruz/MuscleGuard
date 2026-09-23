@@ -413,7 +413,31 @@
     "workoutCompletion": "Cumplimiento de entrenamientos",
     "ofDays": "de 7 días",
     "ofTarget": "de 3 objetivo",
-    "proteinDaysCount": "días de proteína"
+    "proteinDaysCount": "días de proteína",
+    "doctorReportTitle": "Resumen de protección muscular",
+    "doctorReportDesc": "Un resumen de 30 días para compartir con tu médico (PDF)"
+  },
+  "doctorReport": {
+    "title": "Resumen de protección muscular",
+    "subtitle": "Un resumen de 30 días para compartir con tu médico.",
+    "forPatient": "Paciente",
+    "period": "Período",
+    "medication": "Medicamento",
+    "metricsTitle": "Tus últimos 30 días",
+    "proteinTarget": "Objetivo diario de proteína",
+    "daysLogged": "Días con comida registrada",
+    "daysHit": "Días con 80%+ del objetivo",
+    "avgProtein": "Prom. proteína, días registrados",
+    "workouts": "Sesiones de fuerza",
+    "weightChange": "Cambio de peso",
+    "summaryTitle": "Resumen",
+    "shareTitle": "Compartir esto con tu médico",
+    "shareBody": "MuscleGuard convierte tu registro diario en un resumen claro que tu equipo de salud puede leer en segundos. Llévalo a tu próxima cita para que tú y tu médico decidan juntos cómo proteger tu músculo mientras avanza tu tratamiento.",
+    "disclaimer": "Este documento resume datos que registraste por tu cuenta en MuscleGuard. Tiene fines educativos y no es consejo médico, diagnóstico ni sustituto de la atención profesional. Las decisiones de tratamiento corresponden a tu proveedor de salud.",
+    "download": "Descargar PDF",
+    "back": "Volver a reportes",
+    "loading": "Preparando tu resumen…",
+    "errorMsg": "No pudimos generar el resumen. Inténtalo de nuevo."
   },
   "settings": {
     "title": "Ajustes",

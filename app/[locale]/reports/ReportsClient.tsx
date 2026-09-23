@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { useTranslations } from "next-intl";
-import { Sparkles, ChevronDown, ChevronRight, BarChart2 } from "lucide-react";
+import { useTranslations, useLocale } from "next-intl";
+import { Sparkles, ChevronDown, ChevronRight, BarChart2, Stethoscope } from "lucide-react";
 import type { WeeklyReportData } from "@/lib/weekly-report";
 
 interface CurrentWeek {
@@ -141,6 +141,7 @@ export function ReportsClient({
   isSunday,
 }: Props) {
   const t = useTranslations("reports");
+  const locale = useLocale();
   const [generating, setGenerating] = useState(false);
   const [liveReports, setLiveReports] = useState<WeeklyReportData[]>(reports);
   const [error, setError] = useState<string | null>(null);
@@ -239,6 +240,21 @@ export function ReportsClient({
           </div>
         </div>
       </div>
+
+      {/* Doctor report (last 30 days) */}
+      <a
+        href={`/${locale}/reports/doctor`}
+        className="flex items-center gap-4 bg-white border border-black/5 rounded-[10px] p-5 hover:border-black/15 transition-colors"
+      >
+        <div className="w-11 h-11 rounded-full bg-surface flex items-center justify-center shrink-0">
+          <Stethoscope className="h-5 w-5 text-obsidian" />
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-semibold text-obsidian">{t("doctorReportTitle")}</p>
+          <p className="text-xs text-mgray mt-0.5">{t("doctorReportDesc")}</p>
+        </div>
+        <ChevronRight className="h-5 w-5 text-mgray shrink-0" />
+      </a>
 
       {/* Generate last week's report if missing */}
       {showGenerateButton && (
