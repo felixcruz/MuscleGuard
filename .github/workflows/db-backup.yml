@@ -1,0 +1,49 @@
+name: Database backup
+
+# Daily logical backup of the Supabase Postgres database.
+# Supabase's free plan has no automatic backups, so this runs pg_dump on a
+# schedule and stores each dump as a private, compressed GitHub artifact
+# (kept out of the git history so user health data is never committed).
+
+on:
+  schedule:
+    # 07:00 UTC daily (~2-3am US Eastern). Adjust if you like.
+    - cron: "0 7 * * *"
+  workflow_dispatch: {} # lets you run a backup on demand from the Actions tab
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Dump database
+        env:
+          # Set in GitHub → Settings → Secrets and variables → Actions.
+          # Use the Supabase "Session pooler" connection string (port 5432).
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          if [ -z "$SUPABASE_DB_URL" ]; then
+            echo "::error::SUPABASE_DB_URL secret is not set."
+            exit 1
+          fi
+          STAMP="$(date -u +%Y-%m-%d_%H%M%SZ)"
+          echo "FILE=muscleguard-backup-${STAMP}.sql.gz" >> "$GITHUB_ENV"
+          # pg_dump 17 (matches the Supabase server) via the official image.
+          docker run --rm -i postgres:17-alpine \
+            pg_dump "$SUPABASE_DB_URL" \
+              --no-owner --no-privileges --clean --if-exists \
+            | gzip -9 > "muscleguard-backup-${STAMP}.sql.gz"
+          echo "Backup size:"; ls -lh "muscleguard-backup-${STAMP}.sql.gz"
+          # Sanity check: a real dump is more than a few bytes.
+          if [ "$(stat -c%s "muscleguard-backup-${STAMP}.sql.gz")" -lt 200 ]; then
+            echo "::error::Backup looks empty — check the connection string."
+            exit 1
+          fi
+
+      - name: Upload backup artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.FILE }}
+          path: ${{ env.FILE }}
+          retention-days: 90 # free-plan max; ~90 daily backups on hand
+          if-no-files-found: error
