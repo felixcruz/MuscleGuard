@@ -18,12 +18,14 @@ import {
   Check,
 } from "lucide-react";
 import { MuscleChart } from "@/components/landing/MuscleChart";
+import { PricingToggle } from "@/components/landing/PricingToggle";
 import { getTranslations } from "next-intl/server";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 export default async function LandingPage() {
   const t = await getTranslations("landing");
   const tc = await getTranslations("common");
+  const annualAvailable = !!process.env.STRIPE_PRICE_ID_ANNUAL;
 
   const features = [
     {
@@ -418,36 +420,7 @@ export default async function LandingPage() {
           <h2 className="text-3xl sm:text-4xl font-medium text-[#131413] text-center mb-14 tracking-tight">
             {t("pricingTitle")}
           </h2>
-          <div className="rounded-[10px] bg-white border border-black/5 overflow-hidden">
-            <div className="bg-[#CDFF00] text-[#131413] text-center py-2.5 text-sm font-medium tracking-wide">
-              {t("trialBanner")}
-            </div>
-            <div className="p-8">
-              <h3 className="text-lg font-medium text-[#131413]">{t("proPlan")}</h3>
-              <div className="mt-4 flex items-baseline gap-1">
-                <span className="text-5xl font-medium text-[#131413]">{t("proPrice")}</span>
-                <span className="text-[#585A59]">{t("perMonth")}</span>
-              </div>
-              <p className="text-sm text-[#BFC1C0] mt-1">{t("afterTrial")}</p>
-              <ul className="mt-8 space-y-4">
-                {pricingFeatures.map((item) => (
-                  <li key={item} className="flex items-start gap-3 text-sm text-[#585A59]">
-                    <Check className="h-5 w-5 text-[#131413] shrink-0 opacity-50" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-              <Link
-                href="/login"
-                className="flex items-center justify-center gap-2 mt-8 w-full py-3.5 bg-[#131413] text-white font-medium rounded-lg hover:bg-[#202222] transition-colors"
-              >
-                {tc("startFreeTrial")} <ArrowRight className="h-4 w-4" />
-              </Link>
-              <p className="text-xs text-[#BFC1C0] text-center mt-3">
-                {t("cancelFromSettings")}
-              </p>
-            </div>
-          </div>
+          <PricingToggle features={pricingFeatures} annualAvailable={annualAvailable} />
         </div>
       </section>
 
