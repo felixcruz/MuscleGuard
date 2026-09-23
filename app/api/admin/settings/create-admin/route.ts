@@ -3,6 +3,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { getAdminSession } from "@/lib/admin-session";
 import { hashPassword } from "@/lib/admin-auth";
 import { auditLog } from "@/lib/admin-audit";
+import { isPasswordPwned } from "@/lib/pwned-password";
 
 export async function POST(request: NextRequest) {
   const session = await getAdminSession();
@@ -33,6 +34,18 @@ export async function POST(request: NextRequest) {
   if (password.length < 12) {
     return NextResponse.json(
       { error: "Password must be at least 12 characters" },
+      { status: 400 }
+    );
+  }
+
+  // Reject passwords found in known breaches (free equivalent of Supabase's
+  // Pro-plan leaked-password protection).
+  if (await isPasswordPwned(password)) {
+    return NextResponse.json(
+      {
+        error:
+          "This password has appeared in a known data breach. Please choose a different one.",
+      },
       { status: 400 }
     );
   }
