@@ -6,7 +6,6 @@ import {
   ArrowLeft,
   Download,
   Loader2,
-  ShieldCheck,
   TrendingUp,
   TrendingDown,
   Minus,
@@ -175,7 +174,6 @@ export function DoctorReportClient() {
               <h1 className="text-xl font-semibold mt-2">{t("title")}</h1>
               <p className="text-sm text-mgray mt-1">{t("subtitle")}</p>
             </div>
-            <ShieldCheck className="h-8 w-8 text-[#8a8f98] shrink-0" />
           </div>
 
           {/* Meta */}
