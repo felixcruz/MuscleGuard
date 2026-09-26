@@ -76,7 +76,7 @@ export default async function DashboardPage() {
   const bestAppetiteTime = profile?.best_appetite_time ?? "midday";
 
   const proteinGoalG = profile?.protein_goal_g ?? calculateProteinGoal(weightKg, goal, doseMg);
-  const explanation = proteinGoalExplanation(weightKg, goal, doseMg, medication);
+  const explanation = proteinGoalExplanation(weightKg, goal, doseMg);
   const breakdown = proteinMealBreakdown(proteinGoalG, bestAppetiteTime);
   const trainingIntensityPct = calculateTrainingIntensityPct(doseMg, appetiteLevel);
 

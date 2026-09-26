@@ -1,6 +1,6 @@
 "use client";
 
-import { calcProteinGoal } from "@/lib/protein";
+import { PROTEIN_MIN_PER_KG, PROTEIN_MAX_PER_KG } from "@/lib/personalization";
 import { Dumbbell, Zap, Apple } from "lucide-react";
 
 interface Props {
@@ -9,7 +9,8 @@ interface Props {
 }
 
 export function StepGoal({ weightKg, targetWeightKg }: Props) {
-  const proteinGoal = calcProteinGoal(weightKg);
+  const proteinLow = Math.round(weightKg * PROTEIN_MIN_PER_KG);
+  const proteinHigh = Math.round(weightKg * PROTEIN_MAX_PER_KG);
   const tolose = Math.max(0, weightKg - targetWeightKg);
 
   return (
@@ -26,10 +27,11 @@ export function StepGoal({ weightKg, targetWeightKg }: Props) {
           <Dumbbell className="h-6 w-6 text-brand-600 mt-0.5 shrink-0" />
           <div>
             <p className="font-semibold text-brand-800">
-              {proteinGoal}g protein / day
+              {proteinLow}–{proteinHigh}g protein / day
             </p>
             <p className="text-sm text-brand-700">
-              Minimum to prevent muscle loss (1.6g × {weightKg}kg)
+              A common range of 1.2 to 1.6 g per kg. We&apos;ll set your exact
+              target from your goal and dose. Talk to your care team.
             </p>
           </div>
         </div>
@@ -53,7 +55,7 @@ export function StepGoal({ weightKg, targetWeightKg }: Props) {
               20-min strength training, 3×/week
             </p>
             <p className="text-sm text-purple-700">
-              Resistance exercises that signal your body to keep muscle
+              Resistance training that supports muscle during weight loss
             </p>
           </div>
         </div>

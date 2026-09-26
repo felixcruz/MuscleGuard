@@ -4,10 +4,17 @@ export type AppetiteLevel = "none" | "mild" | "moderate" | "severe" | "very_seve
 export const SEMAGLUTIDE_DOSES = [0.25, 0.5, 1.0, 1.7, 2.4];
 export const TIRZEPATIDE_DOSES = [2.5, 5, 7.5, 10, 12.5, 15];
 
+// Protein target range, in grams per kg of body weight. A commonly cited range
+// for protein during weight loss. This is general guidance, not medical advice.
+export const PROTEIN_MIN_PER_KG = 1.2;
+export const PROTEIN_MAX_PER_KG = 1.6;
+
 /**
- * Calculate protein goal in grams based on weight, goal, and dose.
- * base_per_kg: preserve_muscle=1.3, build_strength=1.5, general_health=1.1
- * dose_multiplier: <=0.5→1.0, <=1.7→1.15, <2.4→1.25, >=2.4→1.35
+ * Single source of truth for the daily protein target, in grams.
+ *
+ * A base amount per kg is chosen from the user's goal, then nudged up a little
+ * for higher GLP-1 doses (appetite suppression makes hitting protein harder).
+ * The result is always kept within 1.2 to 1.6 g/kg. Talk to your care team.
  */
 export function calculateProteinGoal(
   weightKg: number,
@@ -16,16 +23,16 @@ export function calculateProteinGoal(
 ): number {
   const basePerKg =
     goal === "build_strength" ? 1.5 :
-    goal === "general_health" ? 1.1 :
-    1.3; // preserve_muscle
+    goal === "general_health" ? 1.2 :
+    1.4; // preserve_muscle
 
-  const doseMultiplier =
-    doseMg <= 0.5 ? 1.0 :
-    doseMg <= 1.7 ? 1.15 :
-    doseMg < 2.4  ? 1.25 :
-    1.35;
+  const doseAdj =
+    doseMg <= 0.5 ? 0 :
+    doseMg <= 1.7 ? 0.05 :
+    0.1;
 
-  return Math.round(weightKg * basePerKg * doseMultiplier);
+  const perKg = Math.min(PROTEIN_MAX_PER_KG, basePerKg + doseAdj);
+  return Math.round(weightKg * perKg);
 }
 
 /**
@@ -92,35 +99,11 @@ export function proteinMealBreakdown(
 export function proteinGoalExplanation(
   weightKg: number,
   goal: Goal,
-  doseMg: number,
-  medication: string
+  doseMg: number
 ): string {
-  const basePerKg =
-    goal === "build_strength" ? 1.5 :
-    goal === "general_health" ? 1.1 :
-    1.3;
-
-  const doseMultiplier =
-    doseMg <= 0.5 ? 1.0 :
-    doseMg <= 1.7 ? 1.15 :
-    doseMg < 2.4  ? 1.25 :
-    1.35;
-
-  const basePct = Math.round((doseMultiplier - 1) * 100);
-  const baseG   = Math.round(weightKg * basePerKg);
-  const totalG  = Math.round(weightKg * basePerKg * doseMultiplier);
-  const extraG  = totalG - baseG;
-
-  const medLabel =
-    medication === "semaglutide" ? "semaglutide" :
-    medication === "tirzepatide" ? "tirzepatide" :
-    medication;
-
-  if (basePct === 0) {
-    return `At ${doseMg}mg ${medLabel}, your protein goal is ${totalG}g/day to preserve muscle.`;
-  }
-
-  return `Your ${doseMg}mg ${medLabel} dose requires ${basePct}% more protein (+${extraG}g) to preserve muscle during weight loss.`;
+  const totalG = calculateProteinGoal(weightKg, goal, doseMg);
+  const perKg = weightKg > 0 ? (totalG / weightKg).toFixed(1) : "0";
+  return `Your daily protein target is about ${totalG} g (${perKg} g per kg), based on your weight, goal, and dose. A common target range is 1.2 to 1.6 g per kg. Talk to your care team about what is right for you.`;
 }
 
 /**
