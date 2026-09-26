@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { SITE_URL, SITE_NAME } from "./site";
+import { SITE_URL } from "./site";
 
 /**
  * Canonical + hreflang + per-locale Open Graph for a public, indexable page.
@@ -15,6 +15,9 @@ export function pageMetadata(
 ): Metadata {
   const suffix = path === "/" ? "" : path;
   const canonical = `${SITE_URL}/${locale}${suffix}`;
+  // Note: openGraph is intentionally not set here. Defining it per page would
+  // suppress the file-based opengraph-image. The root layout supplies the OG
+  // block and the image; here we only add canonical + hreflang (and title).
   return {
     ...(opts?.title ? { title: opts.title } : {}),
     ...(opts?.description ? { description: opts.description } : {}),
@@ -25,13 +28,6 @@ export function pageMetadata(
         es: `${SITE_URL}/es${suffix}`,
         "x-default": `${SITE_URL}/en${suffix}`,
       },
-    },
-    openGraph: {
-      url: canonical,
-      locale: locale === "es" ? "es_ES" : "en_US",
-      siteName: SITE_NAME,
-      ...(opts?.title ? { title: opts.title } : {}),
-      ...(opts?.description ? { description: opts.description } : {}),
     },
   };
 }
