@@ -37,3 +37,7 @@ yarn-error.log*
 .DS_Store
 Thumbs.db
 .vercel
+
+# Research and private docs (never publish - public repo)
+research/
+/*.pdf
