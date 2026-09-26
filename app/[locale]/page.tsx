@@ -549,6 +549,9 @@ export default async function LandingPage({
               {t("medicalDisclaimer")}
             </p>
             <p className="text-xs text-[#BFC1C0] mt-4">
+              {t("footerTrademarks")}
+            </p>
+            <p className="text-xs text-[#BFC1C0] mt-4">
               &copy; {new Date().getFullYear()} {t("legalEntity")}. {t("allRightsReserved")}
             </p>
           </div>

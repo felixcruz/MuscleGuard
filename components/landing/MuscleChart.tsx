@@ -43,7 +43,7 @@ export function MuscleChart() {
   // Muscle WITHOUT protection: drops significantly
   const muscleUnprotected = [0.85, 0.80, 0.72, 0.63, 0.55, 0.48, 0.40];
 
-  // Muscle WITH MuscleGuard: stays mostly stable
+  // Muscle with protein + strength training: stays mostly stable
   const muscleProtected = [0.85, 0.84, 0.83, 0.83, 0.82, 0.82, 0.81];
 
   function toPath(data: number[]): string {
@@ -190,7 +190,7 @@ export function MuscleChart() {
           className="mg-line-unprotected"
         />
 
-        {/* Muscle WITH MuscleGuard (lime) */}
+        {/* Muscle with protein + strength training (lime) */}
         <path
           d={protectedPath}
           fill="none"
