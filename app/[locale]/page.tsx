@@ -22,9 +22,10 @@ import { PricingToggle } from "@/components/landing/PricingToggle";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
-import { SITE_NAME, SITE_URL, SITE_DESCRIPTION } from "@/lib/site";
+import { SITE_NAME, SITE_URL, SITE_DESCRIPTION, FORMER_NAME, SOCIAL_LINKS } from "@/lib/site";
 import { pageMetadata } from "@/lib/seo";
 import { MarketingAnalytics } from "@/components/MarketingAnalytics";
+import { JsonLd } from "@/components/JsonLd";
 
 export async function generateMetadata({
   params,
@@ -35,7 +36,12 @@ export async function generateMetadata({
   return pageMetadata(locale, "");
 }
 
-export default async function LandingPage() {
+export default async function LandingPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
   const t = await getTranslations("landing");
   const tc = await getTranslations("common");
   const annualAvailable = !!process.env.STRIPE_PRICE_ID_ANNUAL;
@@ -156,29 +162,56 @@ export default async function LandingPage() {
     t("pricingFeature7"),
   ];
 
+  const sameAs = Object.values(SOCIAL_LINKS).filter(Boolean);
+  const offers: object[] = [
+    { "@type": "Offer", price: "14.99", priceCurrency: "USD" },
+  ];
+  if (annualAvailable) {
+    offers.push({ "@type": "Offer", price: "89.99", priceCurrency: "USD" });
+  }
+
+  const jsonLd = [
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      name: SITE_NAME,
+      alternateName: [FORMER_NAME],
+      url: SITE_URL,
+      logo: `${SITE_URL}/apple-touch-icon.png`,
+      ...(sameAs.length ? { sameAs } : {}),
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      name: SITE_NAME,
+      url: SITE_URL,
+      inLanguage: locale === "es" ? "es" : "en",
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      name: SITE_NAME,
+      applicationCategory: "HealthApplication",
+      operatingSystem: "Web",
+      description: SITE_DESCRIPTION,
+      url: SITE_URL,
+      offers: offers.length === 1 ? offers[0] : offers,
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      mainEntity: faqs.map((f) => ({
+        "@type": "Question",
+        name: f.q,
+        acceptedAnswer: { "@type": "Answer", text: f.a },
+      })),
+    },
+  ];
+
   return (
     <div className="min-h-screen bg-[#f7f7f7]">
       <MarketingAnalytics />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "SoftwareApplication",
-            name: SITE_NAME,
-            applicationCategory: "LifestyleApplication",
-            operatingSystem: "Web",
-            description: SITE_DESCRIPTION,
-            url: SITE_URL,
-            offers: {
-              "@type": "Offer",
-              price: "14.99",
-              priceCurrency: "USD",
-              priceValidUntil: "2027-12-31",
-            },
-          }),
-        }}
-      />
+      <JsonLd data={jsonLd} />
       {/* Nav */}
       <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-black/5">
         <div className="flex items-center justify-between px-6 py-4 max-w-6xl mx-auto">
