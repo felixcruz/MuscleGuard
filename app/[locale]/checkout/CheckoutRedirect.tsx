@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Shield, Check } from "lucide-react";
+import { Link } from "@/i18n/navigation";
 
 type Plan = "annual" | "monthly";
 
@@ -11,6 +12,7 @@ export function CheckoutRedirect({ annualAvailable = false }: { annualAvailable?
   const [plan, setPlan] = useState<Plan>(annualAvailable ? "annual" : "monthly");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [agreed, setAgreed] = useState(false);
 
   async function startCheckout() {
     setLoading(true);
@@ -113,10 +115,36 @@ export function CheckoutRedirect({ annualAvailable = false }: { annualAvailable?
           })}
         </div>
 
+        <label className="flex items-start gap-3 mt-5 text-xs text-[#585A59] cursor-pointer">
+          <input
+            type="checkbox"
+            checked={agreed}
+            onChange={(e) => setAgreed(e.target.checked)}
+            className="mt-0.5 h-4 w-4 shrink-0 accent-obsidian"
+          />
+          <span>
+            {t.rich("consent", {
+              price:
+                plan === "annual"
+                  ? t("consentPriceAnnual")
+                  : t("consentPriceMonthly"),
+              terms: (chunks) => (
+                <Link
+                  href="/legal/terms"
+                  target="_blank"
+                  className="underline text-obsidian"
+                >
+                  {chunks}
+                </Link>
+              ),
+            })}
+          </span>
+        </label>
+
         <button
           onClick={startCheckout}
-          disabled={loading}
-          className="w-full mt-5 py-3 bg-obsidian text-white text-sm font-semibold rounded-lg hover:bg-obsidian-light transition-colors disabled:opacity-50 inline-flex items-center justify-center gap-2"
+          disabled={loading || !agreed}
+          className="w-full mt-4 py-3 bg-obsidian text-white text-sm font-semibold rounded-lg hover:bg-obsidian-light transition-colors disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
         >
           {loading ? (
             <>

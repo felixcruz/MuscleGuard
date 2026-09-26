@@ -540,6 +540,9 @@
     "monthlySub": "Facturado mensual",
     "save": "Ahorra 50%",
     "startTrialCta": "Empezar prueba de 7 días",
-    "noChargeToday": "No se te cobra hoy · Cancela cuando quieras"
+    "noChargeToday": "No se te cobra hoy · Cancela cuando quieras",
+    "consent": "Acepto los <terms>Términos</terms>. Después de la prueba de 7 días, se me cobrará {price} hasta que cancele. Cancela cuando quieras en Ajustes.",
+    "consentPriceMonthly": "$14.99/mes",
+    "consentPriceAnnual": "$89.99/año"
   }
 }

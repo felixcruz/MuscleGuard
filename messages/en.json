@@ -540,6 +540,9 @@
     "monthlySub": "Billed monthly",
     "save": "Save 50%",
     "startTrialCta": "Start 7-day free trial",
-    "noChargeToday": "You won't be charged today · Cancel anytime"
+    "noChargeToday": "You won't be charged today · Cancel anytime",
+    "consent": "I agree to the <terms>Terms</terms>. After the 7-day free trial, I will be charged {price} until I cancel. Cancel anytime in Settings.",
+    "consentPriceMonthly": "$14.99/month",
+    "consentPriceAnnual": "$89.99/year"
   }
 }
