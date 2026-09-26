@@ -3,6 +3,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { getNextDueDate } from "@/lib/personalization";
 import { brandedEmail } from "@/lib/email-template";
 import { signEmailAction, EMAIL_ACTION_TTL_MS } from "@/lib/email-token";
+import { SITE_URL } from "@/lib/site";
 
 /** Days after the due date when we send the single "did you pause?" check-in. */
 const PAUSE_CHECK_IN_DAY = 7;
@@ -52,7 +53,7 @@ export async function GET(req: NextRequest) {
   const admin = createAdminClient();
   const today = new Date();
   const todayStr = today.toISOString().split("T")[0];
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://muscleguard.app";
+  const appUrl = SITE_URL;
 
   interface ProfileRow {
     id: string;

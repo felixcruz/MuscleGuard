@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { verifyEmailAction } from "@/lib/email-token";
+import { SITE_URL } from "@/lib/site";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -40,7 +41,7 @@ function page(title: string, message: string, appUrl: string): Response {
 }
 
 export async function GET(req: NextRequest) {
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://muscleguard.app";
+  const appUrl = SITE_URL;
   const uid = req.nextUrl.searchParams.get("uid") ?? "";
   const token = req.nextUrl.searchParams.get("t") ?? "";
   const exp = Number(req.nextUrl.searchParams.get("exp") ?? "");

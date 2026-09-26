@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getStripe } from "@/lib/stripe";
+import { SITE_URL } from "@/lib/site";
 
 export async function POST() {
   try {
@@ -30,7 +31,7 @@ export async function POST() {
 
     const portalSession = await getStripe().billingPortal.sessions.create({
       customer: profile.stripe_customer_id,
-      return_url: `${process.env.NEXT_PUBLIC_APP_URL}/settings`,
+      return_url: `${SITE_URL}/settings`,
     });
 
     if (!portalSession.url) {

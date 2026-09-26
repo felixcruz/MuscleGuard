@@ -3,6 +3,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { getAdminSession } from "@/lib/admin-session";
 import { auditLog } from "@/lib/admin-audit";
 import { brandedEmail } from "@/lib/email-template";
+import { SITE_URL } from "@/lib/site";
 
 async function sendInviteEmail(to: string, loginUrl: string): Promise<void> {
   const apiKey = process.env.RESEND_API_KEY;
@@ -70,7 +71,7 @@ export async function POST(req: NextRequest) {
   });
 
   // Send branded invite email with auto-login link
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://muscleguard.app";
+  const appUrl = SITE_URL;
   const loginUrl = `${appUrl}/login?email=${encodeURIComponent(email)}&auto=1`;
   await sendInviteEmail(email, loginUrl);
 

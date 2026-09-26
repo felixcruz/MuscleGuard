@@ -31,7 +31,7 @@ export default async function AdminSettingsPage() {
     "STRIPE_SECRET_KEY",
     "STRIPE_WEBHOOK_SECRET",
     "ANTHROPIC_API_KEY",
-    "NEXT_PUBLIC_APP_URL",
+    "NEXT_PUBLIC_SITE_URL",
   ];
 
   const envStatus = envVars.map((name) => ({
