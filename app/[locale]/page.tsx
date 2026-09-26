@@ -215,7 +215,8 @@ export default async function LandingPage({
       <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-black/5">
         <div className="flex items-center justify-between px-6 py-4 max-w-6xl mx-auto">
           <div className="flex items-center gap-2">
-            <span className="font-semibold text-lg text-[#131413] tracking-tight">{tc("appName")}</span>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/stoova-logo.svg" alt={tc("appName")} className="h-6 w-auto" />
           </div>
           <div className="flex items-center gap-2">
             <LanguageSwitcher />

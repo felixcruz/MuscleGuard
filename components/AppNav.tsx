@@ -39,7 +39,8 @@ export function AppNav() {
       {/* Top bar (desktop) */}
       <header className="hidden sm:flex items-center justify-between px-6 py-3 border-b border-black/5 bg-white/90 backdrop-blur-md sticky top-0 z-10">
         <Link href="/dashboard" className="flex items-center gap-2">
-          <span className="font-semibold tracking-tight text-obsidian">Stoova</span>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/stoova-logo.svg" alt="Stoova" className="h-6 w-auto" />
         </Link>
         <nav className="flex gap-1 items-center">
           {DESKTOP_NAV.map((item) => {
@@ -66,7 +67,8 @@ export function AppNav() {
       {/* Top bar (mobile) */}
       <header className="sm:hidden flex items-center justify-between px-4 py-3 border-b border-black/5 bg-white/90 backdrop-blur-md sticky top-0 z-10">
         <Link href="/dashboard" className="flex items-center gap-2">
-          <span className="font-semibold tracking-tight text-obsidian">Stoova</span>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/stoova-logo.svg" alt="Stoova" className="h-6 w-auto" />
         </Link>
         <Link
           href="/settings"
