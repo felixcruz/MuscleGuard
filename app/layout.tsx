@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { getLocale } from "next-intl/server";
 import { SITE_NAME, SITE_URL, SITE_TAGLINE, SITE_DESCRIPTION } from "@/lib/site";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -70,13 +71,16 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  // Server-rendered lang. For localized pages this is en or es; admin and auth
+  // routes fall back to the default locale (en).
+  const locale = await getLocale();
   return (
-    <html>
+    <html lang={locale}>
       <body className={inter.className}>{children}</body>
     </html>
   );
