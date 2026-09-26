@@ -1,4 +1,4 @@
-import { SITE_URL, SITE_NAME } from "./site";
+import { SITE_NAME } from "./site";
 
 /**
  * Branded email wrapper for all Stoova emails.
@@ -46,14 +46,7 @@ export function brandedEmail({
 <tr><td style="background-color:#131413;border-radius:14px;overflow:hidden;">
 <table width="100%" cellpadding="0" cellspacing="0">
 <tr><td style="padding:32px 32px 24px;text-align:center;">
-  <table cellpadding="0" cellspacing="0" style="margin:0 auto;"><tr>
-    <td style="padding-right:8px;vertical-align:middle;">
-      <img src="${SITE_URL}/icon-shield.png" width="20" height="20" alt="" style="display:block;" onerror="this.style.display='none'">
-    </td>
-    <td style="vertical-align:middle;">
-      <span style="font-size:18px;font-weight:700;color:#ffffff;letter-spacing:-0.3px;">${SITE_NAME}</span>
-    </td>
-  </tr></table>
+  <span style="font-size:18px;font-weight:700;color:#ffffff;letter-spacing:-0.3px;">${SITE_NAME}</span>
 </td></tr>
 <tr><td style="padding:0 32px 32px;text-align:center;">
   <h1 style="margin:0 0 12px;font-size:22px;font-weight:600;color:#ffffff;">${title}</h1>
