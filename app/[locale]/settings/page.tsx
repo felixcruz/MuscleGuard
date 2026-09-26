@@ -1,3 +1,4 @@
+export const metadata = { robots: { index: false, follow: true } };
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { SettingsClient } from "./SettingsClient";

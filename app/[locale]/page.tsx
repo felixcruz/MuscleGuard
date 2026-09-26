@@ -19,9 +19,20 @@ import {
 } from "lucide-react";
 import { MuscleChart } from "@/components/landing/MuscleChart";
 import { PricingToggle } from "@/components/landing/PricingToggle";
+import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { SITE_NAME, SITE_URL, SITE_DESCRIPTION } from "@/lib/site";
+import { pageMetadata } from "@/lib/seo";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  return pageMetadata(locale, "");
+}
 
 export default async function LandingPage() {
   const t = await getTranslations("landing");
