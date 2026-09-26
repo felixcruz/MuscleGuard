@@ -24,6 +24,7 @@ import { getTranslations } from "next-intl/server";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { SITE_NAME, SITE_URL, SITE_DESCRIPTION } from "@/lib/site";
 import { pageMetadata } from "@/lib/seo";
+import { MarketingAnalytics } from "@/components/MarketingAnalytics";
 
 export async function generateMetadata({
   params,
@@ -157,6 +158,7 @@ export default async function LandingPage() {
 
   return (
     <div className="min-h-screen bg-[#f7f7f7]">
+      <MarketingAnalytics />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{

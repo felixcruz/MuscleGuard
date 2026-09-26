@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { pageMetadata } from "@/lib/seo";
+import { MarketingAnalytics } from "@/components/MarketingAnalytics";
 
 export async function generateMetadata({
   params,
@@ -14,6 +15,7 @@ export async function generateMetadata({
 export default function PrivacyPolicy() {
   return (
     <div className="max-w-3xl mx-auto px-6 py-12">
+      <MarketingAnalytics />
       <Link href="/" className="text-sm text-brand-600 hover:underline">
         &larr; Back to home
       </Link>
