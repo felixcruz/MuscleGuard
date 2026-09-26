@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Shield, Users, DollarSign, Settings, LogOut, LayoutDashboard, Menu, X } from "lucide-react";
+import { Users, DollarSign, Settings, LogOut, LayoutDashboard, Menu, X } from "lucide-react";
 import { useState } from "react";
 
 const navItems = [
@@ -39,7 +39,6 @@ export default function AdminNav({
       <nav className="hidden md:flex items-center justify-between bg-obsidian text-white px-6 py-3">
         <div className="flex items-center gap-6">
           <Link href="/admin" className="flex items-center gap-2">
-            <Shield className="h-5 w-5 text-lime" />
             <span className="font-medium text-sm">Stoova Admin</span>
           </Link>
           <div className="flex items-center gap-1">
@@ -80,7 +79,6 @@ export default function AdminNav({
       <nav className="md:hidden bg-obsidian text-white px-4 py-3">
         <div className="flex items-center justify-between">
           <Link href="/admin" className="flex items-center gap-2">
-            <Shield className="h-5 w-5 text-lime" />
             <span className="font-medium text-sm">Admin</span>
           </Link>
           <button

@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { Shield, ArrowLeft } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 export default function LoginPage() {
@@ -154,7 +154,6 @@ export default function LoginPage() {
       <div className="w-full max-w-md bg-white rounded-[10px] border border-black/5 overflow-hidden">
         <div className="text-center pt-8 pb-4 px-6">
           <div className="flex justify-center mb-2">
-            <Shield className="h-10 w-10 text-obsidian" />
           </div>
           <h1 className="text-2xl font-medium tracking-tight text-obsidian">{tc("appName")}</h1>
           <p className="text-mgray text-sm mt-1">{tc("tagline")}</p>

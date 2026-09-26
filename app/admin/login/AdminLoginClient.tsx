@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Shield, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 
 export default function AdminLoginClient() {
   const router = useRouter();
@@ -64,7 +64,6 @@ export default function AdminLoginClient() {
         <div className="bg-white rounded-[10px] border border-black/5 shadow-sm p-8">
           <div className="text-center mb-6">
             <div className="flex justify-center mb-3">
-              <Shield className="h-10 w-10 text-obsidian" />
             </div>
             <h1 className="text-2xl font-medium tracking-tight text-obsidian">
               Admin Login

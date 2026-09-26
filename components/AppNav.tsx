@@ -3,7 +3,7 @@
 import { Link } from "@/i18n/navigation";
 import { usePathname } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
-import { Shield, LayoutDashboard, Sparkles, Dumbbell, TrendingUp, BarChart2, Settings, Pill } from "lucide-react";
+import { LayoutDashboard, Sparkles, Dumbbell, TrendingUp, BarChart2, Settings, Pill } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { LucideIcon } from "lucide-react";
 
@@ -39,7 +39,6 @@ export function AppNav() {
       {/* Top bar (desktop) */}
       <header className="hidden sm:flex items-center justify-between px-6 py-3 border-b border-black/5 bg-white/90 backdrop-blur-md sticky top-0 z-10">
         <Link href="/dashboard" className="flex items-center gap-2">
-          <Shield className="h-5 w-5 text-obsidian" />
           <span className="font-semibold tracking-tight text-obsidian">Stoova</span>
         </Link>
         <nav className="flex gap-1 items-center">
@@ -67,7 +66,6 @@ export function AppNav() {
       {/* Top bar (mobile) */}
       <header className="sm:hidden flex items-center justify-between px-4 py-3 border-b border-black/5 bg-white/90 backdrop-blur-md sticky top-0 z-10">
         <Link href="/dashboard" className="flex items-center gap-2">
-          <Shield className="h-5 w-5 text-obsidian" />
           <span className="font-semibold tracking-tight text-obsidian">Stoova</span>
         </Link>
         <Link

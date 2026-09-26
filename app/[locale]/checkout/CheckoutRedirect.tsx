@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { Shield, Check } from "lucide-react";
+import { Check } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 
 type Plan = "annual" | "monthly";
@@ -69,7 +69,6 @@ export function CheckoutRedirect({ annualAvailable = false }: { annualAvailable?
     <div className="min-h-screen flex flex-col items-center justify-center bg-surface px-4 py-10">
       <div className="w-full max-w-md bg-white rounded-[14px] border border-black/5 p-8">
         <div className="text-center">
-          <Shield className="h-10 w-10 text-obsidian mx-auto mb-4" />
           <h1 className="text-xl font-bold text-obsidian">{t("choosePlanTitle")}</h1>
           <p className="text-sm text-mgray mt-1">{t("choosePlanDesc")}</p>
         </div>

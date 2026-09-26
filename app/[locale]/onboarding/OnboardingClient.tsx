@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
-import { Shield, Check, Square, CheckSquare } from "lucide-react";
+import { Check, Square, CheckSquare } from "lucide-react";
 import { calculateProteinGoal, type Goal } from "@/lib/personalization";
 import { Link } from "@/i18n/navigation";
 
@@ -243,7 +243,6 @@ export default function OnboardingPage() {
     <div className="min-h-screen bg-surface flex flex-col items-center px-4 py-8 pb-12">
       {/* Logo */}
       <div className="flex items-center gap-2 mb-6">
-        <Shield className="h-5 w-5 text-obsidian" />
         <span className="font-semibold text-obsidian tracking-tight">{tc("appName")}</span>
       </div>
 

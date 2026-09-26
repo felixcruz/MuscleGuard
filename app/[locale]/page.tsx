@@ -1,6 +1,5 @@
 import { Link } from "@/i18n/navigation";
 import {
-  Shield,
   Dumbbell,
   Sparkles,
   TrendingUp,
@@ -216,7 +215,6 @@ export default async function LandingPage({
       <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-black/5">
         <div className="flex items-center justify-between px-6 py-4 max-w-6xl mx-auto">
           <div className="flex items-center gap-2">
-            <Shield className="h-6 w-6 text-[#131413]" />
             <span className="font-semibold text-lg text-[#131413] tracking-tight">{tc("appName")}</span>
           </div>
           <div className="flex items-center gap-2">
@@ -404,9 +402,6 @@ export default async function LandingPage({
                         row.highlight ? "text-[#131413]" : "text-[#585A59]"
                       }`}
                     >
-                      {row.highlight && (
-                        <Shield className="h-3.5 w-3.5 inline mr-1.5 text-[#131413]" />
-                      )}
                       {row.name}
                     </td>
                     {[row.glp1, row.doseProtein, row.mealPlanner, row.training, row.medReminders].map(
@@ -521,7 +516,6 @@ export default async function LandingPage({
           <div className="flex flex-col md:flex-row items-start justify-between gap-8">
             <div>
               <div className="flex items-center gap-2 mb-3">
-                <Shield className="h-5 w-5 text-[#131413]" />
                 <span className="font-semibold text-[#131413]">{tc("appName")}</span>
               </div>
               <p className="text-sm text-[#585A59] max-w-xs">

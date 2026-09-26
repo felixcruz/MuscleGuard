@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import {
-  Shield,
   ExternalLink,
   Loader2,
   Check,
@@ -175,7 +174,6 @@ export default function AdminSettingsClient({
       {/* TOTP Setup */}
       <div className="bg-white rounded-[10px] border border-black/5 p-5">
         <div className="flex items-center gap-2 mb-4">
-          <Shield className="h-4 w-4 text-obsidian" />
           <h3 className="text-sm font-medium text-obsidian">
             Two-Factor Authentication
           </h3>

@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl";
 import { useLocale } from "next-intl";
 import { useRouter as useIntlRouter, usePathname as useIntlPathname } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { CreditCard, LogOut, Shield, User, Receipt, Settings, Check } from "lucide-react";
+import { CreditCard, LogOut, User, Receipt, Settings, Check } from "lucide-react";
 
 interface Props {
   userId: string;
@@ -404,7 +404,6 @@ export function SettingsClient({ userId, email, profile }: Props) {
           {isCancelled && !stillHasAccess && (
             <div className="bg-surface border border-black/5 rounded-[10px] p-5">
               <div className="flex items-center gap-2 mb-2">
-                <Shield className="h-5 w-5 text-mgray" />
                 <p className="text-sm font-medium text-obsidian">{t("subscriptionEnded")}</p>
               </div>
               <p className="text-xs text-mgray">{t("subscriptionEndedDesc")}</p>
