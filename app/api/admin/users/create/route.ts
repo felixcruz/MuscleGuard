@@ -10,10 +10,10 @@ async function sendInviteEmail(to: string, loginUrl: string): Promise<void> {
   if (!apiKey) return;
 
   const html = brandedEmail({
-    title: "You've been invited to MuscleGuard",
-    body: `<p style="margin:0 0 8px">Someone has created an account for you on MuscleGuard, the GLP-1 muscle protection companion.</p>
+    title: "You've been invited to Stoova",
+    body: `<p style="margin:0 0 8px">Someone has created an account for you on Stoova, the GLP-1 muscle protection companion.</p>
 <p style="margin:0">Click the button below to sign in and start protecting your muscle during weight loss.</p>`,
-    ctaText: "Sign in to MuscleGuard",
+    ctaText: "Sign in to Stoova",
     ctaUrl: loginUrl,
     footer: "This link expires in 24 hours. If you didn't expect this invitation, you can safely ignore this email.",
   });
@@ -25,9 +25,9 @@ async function sendInviteEmail(to: string, loginUrl: string): Promise<void> {
       Authorization: `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
-      from: "MuscleGuard <noreply@muscleguard.app>",
+      from: "Stoova <noreply@muscleguard.app>",
       to,
-      subject: "You've been invited to MuscleGuard",
+      subject: "You've been invited to Stoova",
       html,
     }),
   });

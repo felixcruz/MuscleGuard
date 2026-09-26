@@ -23,7 +23,7 @@ async function sendEmail(
       Authorization: `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
-      from: "MuscleGuard <noreply@muscleguard.app>",
+      from: "Stoova <noreply@muscleguard.app>",
       to,
       subject,
       html,
@@ -135,7 +135,7 @@ export async function GET(req: NextRequest) {
         brandedEmail({
           title: "Your dose is due today",
           body: `<p style="margin:0 0 8px">Your <strong style="color:#ffffff">${doseMg}mg ${medLabel}</strong> dose is scheduled for today.</p>
-<p style="margin:0">Log it in MuscleGuard to keep your protein and training plan accurate.</p>`,
+<p style="margin:0">Log it in Stoova to keep your protein and training plan accurate.</p>`,
           ctaText: "Log dose taken",
           ctaUrl: `${appUrl}/medication`,
         })

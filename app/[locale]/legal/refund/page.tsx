@@ -11,14 +11,14 @@ export default function RefundPolicy() {
         <p className="text-xs text-gray-400">Last updated: April 2026</p>
 
         <p>
-          We want you to be satisfied with MuscleGuard. This Refund Policy explains how refunds
+          We want you to be satisfied with Stoova. This Refund Policy explains how refunds
           work for our subscription service.
         </p>
 
         <section>
           <h2 className="text-lg font-semibold text-gray-900 mt-8 mb-3">1. 7-Day Free Trial</h2>
           <p>
-            All new MuscleGuard accounts include a 7-day free trial. During the trial period, you
+            All new Stoova accounts include a 7-day free trial. During the trial period, you
             have full access to all features of the Service. A valid payment method is required to
             start the trial.
           </p>
@@ -54,8 +54,8 @@ export default function RefundPolicy() {
             </li>
             <li>
               Contact us at{" "}
-              <a href="mailto:support@muscleguard.app" className="text-brand-600 hover:underline">
-                support@muscleguard.app
+              <a href="mailto:support@stoovaapp.com" className="text-brand-600 hover:underline">
+                support@stoovaapp.com
               </a>{" "}
               with your account email address and the reason for your refund request.
             </li>
@@ -83,10 +83,10 @@ export default function RefundPolicy() {
         <section>
           <h2 className="text-lg font-semibold text-gray-900 mt-8 mb-3">4. How to Cancel Your Subscription</h2>
           <p>
-            You can cancel your MuscleGuard subscription at any time by following these steps:
+            You can cancel your Stoova subscription at any time by following these steps:
           </p>
           <ol className="list-decimal pl-6 mt-2 space-y-1">
-            <li>Log in to your MuscleGuard account.</li>
+            <li>Log in to your Stoova account.</li>
             <li>Go to <strong>Settings</strong>.</li>
             <li>Click on <strong>Billing</strong>.</li>
             <li>Click <strong>Manage subscription</strong> to open the Stripe customer portal.</li>
@@ -102,8 +102,8 @@ export default function RefundPolicy() {
           <h2 className="text-lg font-semibold text-gray-900 mt-8 mb-3">5. Disputes and Chargebacks</h2>
           <p>
             If you have a billing dispute or believe you were charged in error, please contact us at{" "}
-            <a href="mailto:support@muscleguard.app" className="text-brand-600 hover:underline">
-              support@muscleguard.app
+            <a href="mailto:support@stoovaapp.com" className="text-brand-600 hover:underline">
+              support@stoovaapp.com
             </a>{" "}
             before initiating a chargeback with your bank or credit card company. We are committed
             to resolving billing issues promptly and fairly.
@@ -120,8 +120,8 @@ export default function RefundPolicy() {
             In exceptional circumstances (such as extended service outages, billing errors on our
             end, or other extenuating situations), we may issue refunds outside of the standard
             14-day window at our discretion. Please contact us at{" "}
-            <a href="mailto:support@muscleguard.app" className="text-brand-600 hover:underline">
-              support@muscleguard.app
+            <a href="mailto:support@stoovaapp.com" className="text-brand-600 hover:underline">
+              support@stoovaapp.com
             </a>{" "}
             to discuss your situation.
           </p>
@@ -135,8 +135,8 @@ export default function RefundPolicy() {
           <ul className="list-none pl-0 mt-2 space-y-1">
             <li>
               Email:{" "}
-              <a href="mailto:support@muscleguard.app" className="text-brand-600 hover:underline">
-                support@muscleguard.app
+              <a href="mailto:support@stoovaapp.com" className="text-brand-600 hover:underline">
+                support@stoovaapp.com
               </a>
             </li>
           </ul>

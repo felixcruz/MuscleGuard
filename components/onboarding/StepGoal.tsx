@@ -15,7 +15,7 @@ export function StepGoal({ weightKg, targetWeightKg }: Props) {
   return (
     <div className="space-y-5">
       <div>
-        <h2 className="text-xl font-semibold">Your MuscleGuard plan</h2>
+        <h2 className="text-xl font-semibold">Your Stoova plan</h2>
         <p className="text-sm text-gray-500 mt-1">
           Based on your stats, here&apos;s what we&apos;ll track for you every day.
         </p>

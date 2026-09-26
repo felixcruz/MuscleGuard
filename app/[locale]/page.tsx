@@ -21,6 +21,7 @@ import { MuscleChart } from "@/components/landing/MuscleChart";
 import { PricingToggle } from "@/components/landing/PricingToggle";
 import { getTranslations } from "next-intl/server";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { SITE_NAME, SITE_URL, SITE_DESCRIPTION } from "@/lib/site";
 
 export default async function LandingPage() {
   const t = await getTranslations("landing");
@@ -151,12 +152,11 @@ export default async function LandingPage() {
           __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "SoftwareApplication",
-            name: "MuscleGuard",
+            name: SITE_NAME,
             applicationCategory: "LifestyleApplication",
             operatingSystem: "Web",
-            description:
-              "Preserve lean muscle during GLP-1 weight loss with dose-adjusted protein targets, smart meal planning, and training protocols.",
-            url: "https://muscleguard.app",
+            description: SITE_DESCRIPTION,
+            url: SITE_URL,
             offers: {
               "@type": "Offer",
               price: "14.99",

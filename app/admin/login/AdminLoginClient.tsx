@@ -69,7 +69,7 @@ export default function AdminLoginClient() {
             <h1 className="text-2xl font-medium tracking-tight text-obsidian">
               Admin Login
             </h1>
-            <p className="text-sm text-mgray mt-1">MuscleGuard Dashboard</p>
+            <p className="text-sm text-mgray mt-1">Stoova Dashboard</p>
           </div>
 
           {error && (
@@ -97,7 +97,7 @@ export default function AdminLoginClient() {
                   <input
                     id="email"
                     type="email"
-                    placeholder="admin@muscleguard.app"
+                    placeholder="admin@stoovaapp.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required

@@ -229,7 +229,7 @@ export async function POST(request: NextRequest) {
 
   const dataBlock =
     locale === "es"
-      ? `Datos que el paciente registró en la app en los últimos 30 días (${startYmd} a ${endYmd}). El objetivo de proteína lo calcula MuscleGuard a partir del onboarding (peso, dosis y meta del paciente), no lo fija un médico.
+      ? `Datos que el paciente registró en la app en los últimos 30 días (${startYmd} a ${endYmd}). El objetivo de proteína lo calcula Stoova a partir del onboarding (peso, dosis y meta del paciente), no lo fija un médico.
 - Medicamento: ${medication}${doseMg ? `, dosis ${doseMg} mg` : ""}
 - Objetivo diario de proteína (calculado por la app): ${proteinGoalG} g
 - Registró alimentos ${daysLogged}/30 días (${loggingPct}% de constancia)
@@ -240,7 +240,7 @@ export async function POST(request: NextRequest) {
 - Tendencia de proteína (primera vs segunda mitad): ${trendWord} (${Math.round(firstHalfAvg)} g → ${Math.round(secondHalfAvg)} g)
 Desglose semanal:
 ${weeklyLines}`
-      : `Data the patient tracked in the app over the last 30 days (${startYmd} to ${endYmd}). The protein target is calculated by MuscleGuard from onboarding (the patient's weight, dose and goal); it is not set by a clinician.
+      : `Data the patient tracked in the app over the last 30 days (${startYmd} to ${endYmd}). The protein target is calculated by Stoova from onboarding (the patient's weight, dose and goal); it is not set by a clinician.
 - Medication: ${medication}${doseMg ? `, dose ${doseMg} mg` : ""}
 - Daily protein target (app-calculated): ${proteinGoalG} g
 - Logged food ${daysLogged}/30 days (${loggingPct}% consistency)

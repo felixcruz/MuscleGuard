@@ -40,7 +40,7 @@ export function AppNav() {
       <header className="hidden sm:flex items-center justify-between px-6 py-3 border-b border-black/5 bg-white/90 backdrop-blur-md sticky top-0 z-10">
         <Link href="/dashboard" className="flex items-center gap-2">
           <Shield className="h-5 w-5 text-obsidian" />
-          <span className="font-semibold tracking-tight text-obsidian">MuscleGuard</span>
+          <span className="font-semibold tracking-tight text-obsidian">Stoova</span>
         </Link>
         <nav className="flex gap-1 items-center">
           {DESKTOP_NAV.map((item) => {
@@ -68,7 +68,7 @@ export function AppNav() {
       <header className="sm:hidden flex items-center justify-between px-4 py-3 border-b border-black/5 bg-white/90 backdrop-blur-md sticky top-0 z-10">
         <Link href="/dashboard" className="flex items-center gap-2">
           <Shield className="h-5 w-5 text-obsidian" />
-          <span className="font-semibold tracking-tight text-obsidian">MuscleGuard</span>
+          <span className="font-semibold tracking-tight text-obsidian">Stoova</span>
         </Link>
         <Link
           href="/settings"

@@ -1,4 +1,4 @@
-import { SITE_URL } from "./site";
+import { SITE_URL, SITE_NAME } from "./site";
 
 /**
  * Branded email wrapper for all Stoova emails.
@@ -51,7 +51,7 @@ export function brandedEmail({
       <img src="${SITE_URL}/icon-shield.png" width="20" height="20" alt="" style="display:block;" onerror="this.style.display='none'">
     </td>
     <td style="vertical-align:middle;">
-      <span style="font-size:18px;font-weight:700;color:#ffffff;letter-spacing:-0.3px;">MuscleGuard</span>
+      <span style="font-size:18px;font-weight:700;color:#ffffff;letter-spacing:-0.3px;">${SITE_NAME}</span>
     </td>
   </tr></table>
 </td></tr>
@@ -67,7 +67,7 @@ ${ctaBlock}
 </table>
 </td></tr>
 <tr><td style="padding:24px 0 0;text-align:center;">
-  <p style="margin:0;font-size:11px;color:#BFC1C0;">MuscleGuard is a wellness tool designed to support GLP-1 users.<br>Not a medical device. Always consult your healthcare provider.</p>
+  <p style="margin:0;font-size:11px;color:#BFC1C0;">${SITE_NAME} is a wellness tool designed to support GLP-1 users.<br>Not a medical device. Always consult your healthcare provider.</p>
 </td></tr>
 </table>
 </td></tr>

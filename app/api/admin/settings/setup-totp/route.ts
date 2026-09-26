@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
     .eq("user_id", session.userId);
 
   // Generate otpauth:// URL
-  const otpauthUrl = `otpauth://totp/MuscleGuard:${encodeURIComponent(session.email)}?secret=${secret}&issuer=MuscleGuard&algorithm=SHA1&digits=6&period=30`;
+  const otpauthUrl = `otpauth://totp/Stoova:${encodeURIComponent(session.email)}?secret=${secret}&issuer=Stoova&algorithm=SHA1&digits=6&period=30`;
 
   await auditLog({
     adminUserId: session.userId,

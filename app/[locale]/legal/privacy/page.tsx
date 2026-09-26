@@ -11,7 +11,7 @@ export default function PrivacyPolicy() {
         <p className="text-xs text-gray-400">Last updated: April 2026</p>
 
         <p>
-          MuscleGuard (&ldquo;we,&rdquo; &ldquo;us,&rdquo; or &ldquo;our&rdquo;) is committed to
+          Stoova (&ldquo;we,&rdquo; &ldquo;us,&rdquo; or &ldquo;our&rdquo;) is committed to
           protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and
           safeguard your information when you use our wellness tracking application (the
           &ldquo;Service&rdquo;). Please read this Privacy Policy carefully. By using the Service,
@@ -97,7 +97,7 @@ export default function PrivacyPolicy() {
         <section>
           <h2 className="text-lg font-semibold text-gray-900 mt-8 mb-3">3. Third-Party Services</h2>
           <p>
-            We use the following third-party services to operate MuscleGuard. Each service has
+            We use the following third-party services to operate Stoova. Each service has
             access only to the data necessary to perform its function:
           </p>
           <ul className="list-disc pl-6 mt-3 space-y-3">
@@ -139,7 +139,7 @@ export default function PrivacyPolicy() {
               </a>.
             </li>
             <li>
-              <strong>Vercel</strong> (hosting and deployment): Hosts the MuscleGuard application.
+              <strong>Vercel</strong> (hosting and deployment): Hosts the Stoova application.
               Vercel may process IP addresses and request metadata for performance and security
               purposes. See{" "}
               <a
@@ -168,7 +168,7 @@ export default function PrivacyPolicy() {
             </li>
             <li>
               <strong>Safety:</strong> If we believe disclosure is necessary to protect the rights,
-              property, or safety of MuscleGuard, our users, or the public.
+              property, or safety of Stoova, our users, or the public.
             </li>
             <li>
               <strong>Business Transfers:</strong> In connection with a merger, acquisition, or sale
@@ -254,8 +254,8 @@ export default function PrivacyPolicy() {
           </ul>
           <p className="mt-3">
             To exercise these rights, contact us at{" "}
-            <a href="mailto:support@muscleguard.app" className="text-brand-600 hover:underline">
-              support@muscleguard.app
+            <a href="mailto:support@stoovaapp.com" className="text-brand-600 hover:underline">
+              support@stoovaapp.com
             </a>. We will respond to verifiable consumer requests within 45 days.
           </p>
         </section>
@@ -263,12 +263,12 @@ export default function PrivacyPolicy() {
         <section>
           <h2 className="text-lg font-semibold text-gray-900 mt-8 mb-3">8. Children&apos;s Privacy</h2>
           <p>
-            MuscleGuard is not intended for use by individuals under the age of 18. We do not
+            Stoova is not intended for use by individuals under the age of 18. We do not
             knowingly collect personal information from children under 18. If you are a parent or
             guardian and believe your child has provided us with personal information, please contact
             us at{" "}
-            <a href="mailto:support@muscleguard.app" className="text-brand-600 hover:underline">
-              support@muscleguard.app
+            <a href="mailto:support@stoovaapp.com" className="text-brand-600 hover:underline">
+              support@stoovaapp.com
             </a>{" "}
             and we will promptly delete such information.
           </p>
@@ -294,8 +294,8 @@ export default function PrivacyPolicy() {
           <ul className="list-none pl-0 mt-2 space-y-1">
             <li>
               Email:{" "}
-              <a href="mailto:support@muscleguard.app" className="text-brand-600 hover:underline">
-                support@muscleguard.app
+              <a href="mailto:support@stoovaapp.com" className="text-brand-600 hover:underline">
+                support@stoovaapp.com
               </a>
             </li>
           </ul>

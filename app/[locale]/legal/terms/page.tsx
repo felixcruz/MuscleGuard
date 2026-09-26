@@ -10,10 +10,12 @@ export default function TermsOfUse() {
       <div className="prose prose-gray max-w-none space-y-6 text-sm text-gray-600">
         <p className="text-xs text-gray-400">Last updated: April 2026</p>
 
+        <p>Stoova was formerly known as MuscleGuard.</p>
+
         <section>
           <h2 className="text-lg font-semibold text-gray-900 mt-8 mb-3">1. Acceptance of Terms</h2>
           <p>
-            By accessing or using MuscleGuard (&ldquo;the Service&rdquo;), you agree to be bound by
+            By accessing or using Stoova (&ldquo;the Service&rdquo;), you agree to be bound by
             these Terms of Use (&ldquo;Terms&rdquo;). If you do not agree to these Terms, you may not
             access or use the Service. We reserve the right to update these Terms at any time. Your
             continued use of the Service after any changes constitutes acceptance of the revised Terms.
@@ -24,14 +26,14 @@ export default function TermsOfUse() {
         <section>
           <h2 className="text-lg font-semibold text-gray-900 mt-8 mb-3">2. Service Description</h2>
           <p>
-            MuscleGuard is an educational wellness tracking tool designed to support individuals
+            Stoova is an educational wellness tracking tool designed to support individuals
             taking GLP-1 receptor agonist medications (such as semaglutide and tirzepatide) in
             monitoring their protein intake, physical activity, medication schedule, and body
             composition during weight loss.
           </p>
           <p className="mt-3">
-            <strong>MuscleGuard is not a medical service.</strong> The Service does not provide
-            medical advice, diagnoses, or treatment recommendations. MuscleGuard is not a medical
+            <strong>Stoova is not a medical service.</strong> The Service does not provide
+            medical advice, diagnoses, or treatment recommendations. Stoova is not a medical
             device and is not intended to diagnose, treat, cure, or prevent any disease. All
             information provided through the Service is for educational and informational purposes
             only. You should always consult your healthcare provider before making any decisions
@@ -41,7 +43,7 @@ export default function TermsOfUse() {
 
         <section>
           <h2 className="text-lg font-semibold text-gray-900 mt-8 mb-3">3. Account Requirements</h2>
-          <p>To use MuscleGuard, you must:</p>
+          <p>To use Stoova, you must:</p>
           <ul className="list-disc pl-6 mt-2 space-y-1">
             <li>Be at least 18 years of age.</li>
             <li>Be a resident of the United States (the Service is currently available in the US only).</li>
@@ -57,7 +59,7 @@ export default function TermsOfUse() {
         <section>
           <h2 className="text-lg font-semibold text-gray-900 mt-8 mb-3">4. Subscription Terms</h2>
           <p>
-            MuscleGuard offers a subscription plan at $14.99 per month. New users receive a 7-day
+            Stoova offers a subscription plan at $14.99 per month. New users receive a 7-day
             free trial upon creating an account. A valid payment method is required to start the
             free trial.
           </p>
@@ -88,7 +90,7 @@ export default function TermsOfUse() {
 
         <section>
           <h2 className="text-lg font-semibold text-gray-900 mt-8 mb-3">5. User Responsibilities</h2>
-          <p>When using MuscleGuard, you agree to:</p>
+          <p>When using Stoova, you agree to:</p>
           <ul className="list-disc pl-6 mt-2 space-y-1">
             <li>Provide accurate health information (weight, medication, dose) for the Service to function correctly.</li>
             <li>Not use the Service as a replacement for professional medical advice, diagnosis, or treatment.</li>
@@ -105,7 +107,7 @@ export default function TermsOfUse() {
           <p>
             All content, features, and functionality of the Service — including but not limited to
             text, graphics, logos, algorithms, software, and the overall design — are the exclusive
-            property of MuscleGuard and are protected by United States and international copyright,
+            property of Stoova and are protected by United States and international copyright,
             trademark, and other intellectual property laws.
           </p>
           <p className="mt-3">
@@ -124,7 +126,7 @@ export default function TermsOfUse() {
         <section>
           <h2 className="text-lg font-semibold text-gray-900 mt-8 mb-3">7. Limitation of Liability</h2>
           <p>
-            TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, MUSCLEGUARD AND ITS OFFICERS,
+            TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, STOOVA AND ITS OFFICERS,
             DIRECTORS, EMPLOYEES, AGENTS, AND AFFILIATES SHALL NOT BE LIABLE FOR ANY INDIRECT,
             INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, INCLUDING BUT NOT LIMITED TO
             LOSS OF PROFITS, DATA, USE, OR GOODWILL, ARISING OUT OF OR IN CONNECTION WITH YOUR USE
@@ -148,7 +150,7 @@ export default function TermsOfUse() {
           <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
             <p className="font-semibold text-amber-900">Important Medical Notice</p>
             <p className="mt-2 text-amber-800">
-              MuscleGuard is not a medical device and is not intended to diagnose, treat, cure, or
+              Stoova is not a medical device and is not intended to diagnose, treat, cure, or
               prevent any disease. The protein targets, meal suggestions, training protocols, and
               other information provided by the Service are for educational and informational purposes
               only. They are not a substitute for professional medical advice, diagnosis, or treatment.
@@ -157,7 +159,7 @@ export default function TermsOfUse() {
               Always seek the advice of your physician or other qualified healthcare provider with
               any questions you may have regarding a medical condition, your GLP-1 medication, dietary
               changes, or exercise program. Never disregard professional medical advice or delay in
-              seeking it because of information provided by MuscleGuard.
+              seeking it because of information provided by Stoova.
             </p>
             <p className="mt-2 text-amber-800">
               If you experience adverse effects from your medication, diet, or exercise, contact your
@@ -201,8 +203,8 @@ export default function TermsOfUse() {
           <h2 className="text-lg font-semibold text-gray-900 mt-8 mb-3">11. Contact Information</h2>
           <p>
             If you have any questions about these Terms, please contact us at{" "}
-            <a href="mailto:support@muscleguard.app" className="text-brand-600 hover:underline">
-              support@muscleguard.app
+            <a href="mailto:support@stoovaapp.com" className="text-brand-600 hover:underline">
+              support@stoovaapp.com
             </a>.
           </p>
         </section>

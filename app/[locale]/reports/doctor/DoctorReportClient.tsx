@@ -171,7 +171,7 @@ export function DoctorReportClient() {
           {/* Header */}
           <div className="flex items-start justify-between border-b border-black/10 pb-5">
             <div>
-              <p className="text-lg font-bold tracking-tight">MuscleGuard</p>
+              <p className="text-lg font-bold tracking-tight">Stoova</p>
               <h1 className="text-xl font-semibold mt-2">{t("title")}</h1>
               <p className="text-sm text-mgray mt-1">{t("subtitle")}</p>
             </div>

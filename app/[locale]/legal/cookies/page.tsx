@@ -11,7 +11,7 @@ export default function CookiePolicy() {
         <p className="text-xs text-gray-400">Last updated: April 2026</p>
 
         <p>
-          This Cookie Policy explains how MuscleGuard (&ldquo;we,&rdquo; &ldquo;us,&rdquo; or
+          This Cookie Policy explains how Stoova (&ldquo;we,&rdquo; &ldquo;us,&rdquo; or
           &ldquo;our&rdquo;) uses cookies and similar technologies when you use our wellness tracking
           application (the &ldquo;Service&rdquo;). This policy is part of our{" "}
           <Link href="/legal/privacy" className="text-brand-600 hover:underline">
@@ -32,7 +32,7 @@ export default function CookiePolicy() {
         <section>
           <h2 className="text-lg font-semibold text-gray-900 mt-8 mb-3">2. Cookies We Use</h2>
           <p>
-            MuscleGuard uses a minimal set of cookies, limited to what is necessary for the Service
+            Stoova uses a minimal set of cookies, limited to what is necessary for the Service
             to function properly. We categorize our cookies as follows:
           </p>
 
@@ -70,7 +70,7 @@ export default function CookiePolicy() {
           </div>
 
           <h3 className="text-base font-medium text-gray-800 mt-6 mb-2">Cookies We Do Not Use</h3>
-          <p>MuscleGuard does not use:</p>
+          <p>Stoova does not use:</p>
           <ul className="list-disc pl-6 mt-2 space-y-1">
             <li>
               <strong>Advertising or tracking cookies:</strong> We do not serve ads, and we do not
@@ -94,7 +94,7 @@ export default function CookiePolicy() {
         <section>
           <h2 className="text-lg font-semibold text-gray-900 mt-8 mb-3">3. How to Manage Cookies</h2>
           <p>
-            Because MuscleGuard only uses strictly necessary cookies for authentication, disabling
+            Because Stoova only uses strictly necessary cookies for authentication, disabling
             these cookies will prevent you from logging in to and using the Service.
           </p>
           <p className="mt-3">
@@ -124,7 +124,7 @@ export default function CookiePolicy() {
             </li>
           </ul>
           <p className="mt-3">
-            Please note that if you block or delete the authentication cookies used by MuscleGuard,
+            Please note that if you block or delete the authentication cookies used by Stoova,
             you will be logged out and will need to sign in again.
           </p>
         </section>
@@ -143,8 +143,8 @@ export default function CookiePolicy() {
           <h2 className="text-lg font-semibold text-gray-900 mt-8 mb-3">5. Contact Us</h2>
           <p>
             If you have questions about our use of cookies, please contact us at{" "}
-            <a href="mailto:support@muscleguard.app" className="text-brand-600 hover:underline">
-              support@muscleguard.app
+            <a href="mailto:support@stoovaapp.com" className="text-brand-600 hover:underline">
+              support@stoovaapp.com
             </a>.
           </p>
         </section>

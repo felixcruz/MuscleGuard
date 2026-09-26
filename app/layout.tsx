@@ -1,33 +1,29 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { SITE_NAME, SITE_URL, SITE_TAGLINE, SITE_DESCRIPTION } from "@/lib/site";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: {
-    default: "MuscleGuard — GLP-1 Muscle Protection Coach",
-    template: "%s | MuscleGuard",
+    default: `${SITE_NAME} — ${SITE_TAGLINE}`,
+    template: `%s | ${SITE_NAME}`,
   },
-  description:
-    "Preserve lean muscle during GLP-1 weight loss. Dose-adjusted protein targets, personalized meal planning, smart training protocols, and medication tracking for Ozempic, Wegovy, and Mounjaro users.",
+  description: SITE_DESCRIPTION,
   keywords: [
     "GLP-1",
-    "muscle preservation",
-    "Ozempic",
-    "Wegovy",
-    "Mounjaro",
     "protein tracking",
-    "muscle loss prevention",
+    "strength training",
     "semaglutide",
     "tirzepatide",
+    "GLP-1 nutrition",
     "GLP-1 companion app",
-    "muscle protection",
   ],
-  authors: [{ name: "MuscleGuard" }],
-  creator: "MuscleGuard",
-  publisher: "MuscleGuard",
-  metadataBase: new URL("https://muscleguard.app"),
+  authors: [{ name: SITE_NAME }],
+  creator: SITE_NAME,
+  publisher: SITE_NAME,
+  metadataBase: new URL(SITE_URL),
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "any" },
@@ -42,25 +38,23 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://muscleguard.app",
-    siteName: "MuscleGuard",
-    title: "MuscleGuard — Preserve Muscle on GLP-1 Medications",
-    description:
-      "Up to 40% of GLP-1 weight loss can be muscle. MuscleGuard helps you hit dose-adjusted protein targets, follow smart training protocols, and track your medication — all in one app.",
+    url: SITE_URL,
+    siteName: SITE_NAME,
+    title: `${SITE_NAME} — ${SITE_TAGLINE}`,
+    description: SITE_DESCRIPTION,
     images: [
       {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "MuscleGuard — GLP-1 Muscle Protection Coach",
+        alt: `${SITE_NAME} — ${SITE_TAGLINE}`,
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "MuscleGuard — Preserve Muscle on GLP-1 Medications",
-    description:
-      "Dose-adjusted protein targets, smart meal planning, and training protocols for Ozempic, Wegovy, and Mounjaro users.",
+    title: `${SITE_NAME} — ${SITE_TAGLINE}`,
+    description: SITE_DESCRIPTION,
     images: ["/og-image.png"],
   },
   robots: {

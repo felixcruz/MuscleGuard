@@ -465,7 +465,7 @@ export function SettingsClient({ userId, email, profile }: Props) {
               <div className="space-y-4">
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-mgray">{t("plan")}</span>
-                  <span className="font-medium text-obsidian">MuscleGuard Pro</span>
+                  <span className="font-medium text-obsidian">Stoova Pro</span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-mgray">{t("price")}</span>
