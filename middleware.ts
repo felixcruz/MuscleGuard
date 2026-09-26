@@ -17,13 +17,18 @@ const intlMiddleware = createMiddleware({
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Skip middleware for API routes, auth callback, and static files
+  // Skip the i18n redirect for API routes, auth, admin, and any public file or
+  // SEO route that must be served as-is (robots.txt, sitemap.xml, llms*.txt,
+  // manifest, favicons, OG/Twitter images). Redirecting these to /en/... breaks
+  // them, so they never go through locale detection.
   if (
     pathname.startsWith("/api/") ||
     pathname.startsWith("/auth/") ||
     pathname.startsWith("/admin") ||
     pathname.startsWith("/_next/") ||
-    pathname.match(/\.(svg|png|jpg|jpeg|gif|webp|ico)$/)
+    pathname.startsWith("/opengraph-image") ||
+    pathname.startsWith("/twitter-image") ||
+    pathname.match(/\.(txt|xml|json|webmanifest|svg|png|jpg|jpeg|gif|webp|ico)$/)
   ) {
     return await updateSession(request);
   }
@@ -94,6 +99,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    "/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|llms.txt|llms-full.txt|manifest|opengraph-image|twitter-image|.*\\.(?:txt|xml|json|webmanifest|svg|png|jpg|jpeg|gif|webp|ico)$).*)",
   ],
 };
