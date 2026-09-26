@@ -82,6 +82,16 @@ export default function CookiePolicy() {
             </table>
           </div>
 
+          <h3 className="text-base font-medium text-gray-800 mt-6 mb-2">Analytics Cookies (Marketing Pages Only)</h3>
+          <p>
+            On our public marketing pages (our home page and legal pages), we use Google Analytics
+            to understand how visitors find and use the site. These cookies collect anonymous usage
+            data such as pages viewed, referral source, and general location. We do not load Google
+            Analytics anywhere inside the app (your dashboard, meals, medication, progress, reports,
+            settings, or any signed in page), so your health data, medication, dose, weight, and food
+            logs are never sent to Google. This analytics runs only when it is enabled for the site.
+          </p>
+
           <h3 className="text-base font-medium text-gray-800 mt-6 mb-2">Cookies We Do Not Use</h3>
           <p>Stoova does not use:</p>
           <ul className="list-disc pl-6 mt-2 space-y-1">
@@ -90,8 +100,9 @@ export default function CookiePolicy() {
               use cookies to track your activity across other websites.
             </li>
             <li>
-              <strong>Analytics cookies:</strong> We do not currently use third-party analytics
-              cookies (such as Google Analytics).
+              <strong>Analytics inside the app:</strong> We never load analytics or tracking on
+              signed in pages that contain your health data. Analytics runs only on our public
+              marketing pages.
             </li>
             <li>
               <strong>Social media cookies:</strong> We do not embed social media widgets that set

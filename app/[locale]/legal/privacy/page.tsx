@@ -164,6 +164,22 @@ export default function PrivacyPolicy() {
                 Vercel&apos;s Privacy Policy
               </a>.
             </li>
+            <li>
+              <strong>Google Analytics</strong> (website analytics, public pages only): On our
+              public marketing pages only (home and legal pages), we use Google Analytics to measure
+              how visitors find and use the site. Google receives anonymous usage data such as pages
+              viewed, referral source, and general location. Google Analytics is never loaded on
+              signed in pages, so your health data, medication, dose, weight, and food logs are never
+              shared with Google. See{" "}
+              <a
+                href="https://policies.google.com/privacy"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-brand-600 hover:underline"
+              >
+                Google&apos;s Privacy Policy
+              </a>.
+            </li>
           </ul>
         </section>
 
