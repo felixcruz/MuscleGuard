@@ -64,4 +64,8 @@ test("report escapes emails and never divides by zero", () => {
   assert.ok(!body.includes("<script>"));
   assert.ok(body.includes("&lt;script&gt;@x.com"));
   assert.ok(!body.includes("NaN"));
+  // Dark email background: every text element needs its own color.
+  for (const tag of body.match(/<(td|li|p|ul|table)\b[^>]*>/g) ?? []) {
+    assert.match(tag, /color:/, `missing color on ${tag}`);
+  }
 });

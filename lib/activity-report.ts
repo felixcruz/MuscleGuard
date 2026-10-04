@@ -144,22 +144,25 @@ function pct(part: number, whole: number): string {
   return whole ? `${Math.round((part / whole) * 100)}%` : "—";
 }
 
-const ROW = 'style="padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.08)"';
+// Email clients (Zoho, Outlook) don't pass the template's text color down into
+// tables and lists, so every text element sets a solid color explicitly.
+const TEXT = "#C9CBCA";
+const ROW = `style="padding:6px 0;border-bottom:1px solid #2A2B2A;color:${TEXT}"`;
 
 function section(title: string, rows: [string, string | number][]): string {
   const trs = rows
     .map(([k, v]) => `<tr><td ${ROW}>${k}</td><td ${ROW} align="right"><strong style="color:#ffffff">${v}</strong></td></tr>`)
     .join("");
   return `<p style="margin:24px 0 8px;color:#CDFF00;font-weight:600;font-size:13px;text-transform:uppercase;letter-spacing:0.05em">${title}</p>
-<table width="100%" cellpadding="0" cellspacing="0" style="font-size:14px">${trs}</table>`;
+<table width="100%" cellpadding="0" cellspacing="0" style="font-size:14px;color:${TEXT}">${trs}</table>`;
 }
 
 function people(title: string, list: CustomerEvent[]): string {
   if (!list.length) return "";
   const items = list
-    .map((e) => `<li>${escapeHtml(e.email ?? e.customerId ?? "desconocido")} · ${fmtDate(new Date(e.at * 1000))}</li>`)
+    .map((e) => `<li style="color:${TEXT}">${escapeHtml(e.email ?? e.customerId ?? "desconocido")} · ${fmtDate(new Date(e.at * 1000))}</li>`)
     .join("");
-  return `<p style="margin:16px 0 4px;color:#ffffff;font-weight:600">${title}</p><ul style="margin:0;padding-left:18px">${items}</ul>`;
+  return `<p style="margin:16px 0 4px;color:#ffffff;font-weight:600">${title}</p><ul style="margin:0;padding-left:18px;color:${TEXT}">${items}</ul>`;
 }
 
 export function renderActivityReport(r: ActivityReport): { subject: string; body: string } {
@@ -169,7 +172,7 @@ export function renderActivityReport(r: ActivityReport): { subject: string; body
   const subject = `Stoova · ${r.signups.total} registros, ${newCustomers} altas, ${losses} bajas (últimas ${REPORT_WINDOW_HOURS}h)`;
 
   const st = r.statusCounts;
-  const body = `<p style="margin:0 0 4px">Del ${fmtDate(r.since)} al ${fmtDate(r.until)} (hora RD).</p>
+  const body = `<p style="margin:0 0 4px;color:${TEXT}">Del ${fmtDate(r.since)} al ${fmtDate(r.until)} (hora RD).</p>
 ${section("Altas y bajas", [
     ["Nuevos registros", r.signups.total],
     ["Pruebas gratis iniciadas", s.trialsStarted.length],
