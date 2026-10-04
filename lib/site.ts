@@ -25,8 +25,8 @@ export const FORMER_NAME = "MuscleGuard";
 
 // Filled in later by the team; empty links are omitted where used.
 export const SOCIAL_LINKS = {
-  instagram: "",
-  tiktok: "",
+  instagram: "https://www.instagram.com/stoovaapp",
+  tiktok: "https://www.tiktok.com/@stoovaapp",
 };
 
 export const LOCALES = ["en", "es"] as const;
