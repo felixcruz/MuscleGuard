@@ -507,6 +507,8 @@
     "price": "Precio",
     "manageBilling": "Administrar facturación",
     "opening": "Abriendo…",
+    "billingError": "No pudimos abrir la facturación. Inténtalo de nuevo o escribe a support@stoovaapp.com.",
+    "noBillingAccount": "Aún no tienes una cuenta de facturación. Elige un plan para gestionarla.",
     "cancelMembership": "Cancelar membresía",
     "cancelScheduled": "Tu cancelación está programada",
     "cancelScheduledBadge": "Cancelando",

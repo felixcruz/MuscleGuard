@@ -57,6 +57,7 @@ export function SettingsClient({ userId, email, profile }: Props) {
   const [saved, setSaved] = useState(false);
   const [upgrading, setUpgrading] = useState(false);
   const [portal, setPortal] = useState(false);
+  const [billingError, setBillingError] = useState<string | null>(null);
 
   const [fullName, setFullName] = useState(profile.full_name ?? "");
   const [gender, setGender] = useState(profile.gender ?? "");
@@ -109,18 +110,29 @@ export function SettingsClient({ userId, email, profile }: Props) {
 
   async function handleUpgrade() {
     setUpgrading(true);
-    const res = await fetch("/api/stripe/checkout", { method: "POST" });
-    const data = await res.json();
+    setBillingError(null);
+    const data = await fetch("/api/stripe/checkout", { method: "POST" })
+      .then((r) => r.json())
+      .catch(() => ({}));
     if (data.url) window.location.href = data.url;
-    else setUpgrading(false);
+    else {
+      setUpgrading(false);
+      setBillingError(t("billingError"));
+    }
   }
 
   async function handlePortal() {
     setPortal(true);
-    const res = await fetch("/api/stripe/portal", { method: "POST" });
-    const data = await res.json();
+    setBillingError(null);
+    const res = await fetch("/api/stripe/portal", { method: "POST" }).catch(() => null);
+    const data = res ? await res.json().catch(() => ({})) : {};
     if (data.url) window.location.href = data.url;
-    else setPortal(false);
+    else {
+      setPortal(false);
+      setBillingError(res?.status === 400 ? t("noBillingAccount") : t("billingError"));
+      // 400 = no usable billing account; refresh so stale buttons disappear.
+      if (res?.status === 400) router.refresh();
+    }
   }
 
   async function handleSignOut() {
@@ -385,6 +397,12 @@ export function SettingsClient({ userId, email, profile }: Props) {
       {/* ── BILLING TAB ── */}
       {tab === "billing" && (
         <div className="space-y-5">
+          {billingError && (
+            <div role="alert" className="bg-[#FFB4AB]/10 border border-[#FFB4AB]/30 rounded-[10px] p-4 text-sm text-obsidian">
+              {billingError}
+            </div>
+          )}
+
           {/* Cancelling at period end banner */}
           {isActive && isCancellingAtPeriodEnd && stillHasAccess && (
             <div className="bg-[#FFF3E0] border border-[#FFB74D]/30 rounded-[10px] p-5">

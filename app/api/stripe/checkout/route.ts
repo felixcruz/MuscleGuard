@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { getStripe } from "@/lib/stripe";
+import { getStripe, isMissingCustomerError } from "@/lib/stripe";
 import { SITE_URL } from "@/lib/site";
 
 export async function POST(request: Request) {
@@ -46,6 +46,18 @@ export async function POST(request: Request) {
     }
 
     let customerId = profile?.stripe_customer_id;
+
+    // Drop a saved ID Stripe doesn't recognize (e.g. created with test keys)
+    // so a fresh customer is made below.
+    if (customerId) {
+      try {
+        const existing = await getStripe().customers.retrieve(customerId);
+        if (existing.deleted) customerId = null;
+      } catch (err) {
+        if (!isMissingCustomerError(err)) throw err;
+        customerId = null;
+      }
+    }
 
     if (!customerId) {
       try {

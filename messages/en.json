@@ -507,6 +507,8 @@
     "price": "Price",
     "manageBilling": "Manage billing",
     "opening": "Opening…",
+    "billingError": "Couldn't open billing right now. Please try again, or write to support@stoovaapp.com.",
+    "noBillingAccount": "No billing account found yet. Start a plan to manage billing.",
     "cancelMembership": "Cancel membership",
     "cancelScheduled": "Your cancellation is scheduled",
     "cancelScheduledBadge": "Cancelling",

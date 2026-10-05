@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { getStripe } from "@/lib/stripe";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { getStripe, isMissingCustomerError } from "@/lib/stripe";
 import { SITE_URL } from "@/lib/site";
 
 export async function POST() {
@@ -29,10 +30,25 @@ export async function POST() {
       );
     }
 
-    const portalSession = await getStripe().billingPortal.sessions.create({
-      customer: profile.stripe_customer_id,
-      return_url: `${SITE_URL}/settings`,
-    });
+    let portalSession;
+    try {
+      portalSession = await getStripe().billingPortal.sessions.create({
+        customer: profile.stripe_customer_id,
+        return_url: `${SITE_URL}/settings`,
+      });
+    } catch (err) {
+      if (!isMissingCustomerError(err)) throw err;
+      // Stale ID (e.g. created with test keys). Clear it so checkout makes a
+      // fresh customer; privileged column, so write with the service role.
+      await createAdminClient()
+        .from("profiles")
+        .update({ stripe_customer_id: null, stripe_subscription_id: null })
+        .eq("id", user.id);
+      return NextResponse.json(
+        { error: "No active billing account. Please subscribe first." },
+        { status: 400 }
+      );
+    }
 
     if (!portalSession.url) {
       throw new Error("Failed to create billing portal session");
