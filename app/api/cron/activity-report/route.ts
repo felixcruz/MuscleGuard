@@ -11,6 +11,7 @@ import {
   summarizeStripeEvents,
   monthlyCents,
   renderActivityReport,
+  hasActivity,
   type CustomerEvent,
 } from "@/lib/activity-report";
 
@@ -136,10 +137,16 @@ export async function GET(req: NextRequest) {
     e.email = emailByCustomer.get(id) ?? null;
   }
 
+  const signups = { total: newUserIds.length, onboarded: newOnboarded };
+  // Scheduled runs skip the email when nothing happened; an admin opening the URL still gets it.
+  if (isCron && !hasActivity({ signups, stripe: summary })) {
+    return NextResponse.json({ sent: false, reason: "no activity" });
+  }
+
   const { subject, body } = renderActivityReport({
     since,
     until,
-    signups: { total: newUserIds.length, onboarded: newOnboarded },
+    signups,
     allTime: { users: totalUsers, onboarded: onboardedAll, everSubscribed },
     statusCounts,
     stripe: summary,

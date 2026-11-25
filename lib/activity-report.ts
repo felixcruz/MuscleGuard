@@ -165,6 +165,22 @@ function people(title: string, list: CustomerEvent[]): string {
   return `<p style="margin:16px 0 4px;color:#ffffff;font-weight:600">${title}</p><ul style="margin:0;padding-left:18px;color:${TEXT}">${items}</ul>`;
 }
 
+/** True when signups or subscription/payment events happened; an all-zero report isn't worth an email. */
+export function hasActivity(r: Pick<ActivityReport, "signups" | "stripe">): boolean {
+  const s = r.stripe;
+  return (
+    r.signups.total +
+      s.trialsStarted.length +
+      s.paidSignups.length +
+      s.trialsConverted.length +
+      s.cancellationsScheduled.length +
+      s.subscriptionsEnded.length +
+      s.reactivations.length +
+      s.paymentsFailed.length >
+    0
+  );
+}
+
 export function renderActivityReport(r: ActivityReport): { subject: string; body: string } {
   const s = r.stripe;
   const newCustomers = s.trialsStarted.length + s.paidSignups.length;

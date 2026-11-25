@@ -4,6 +4,7 @@ import {
   summarizeStripeEvents,
   monthlyCents,
   renderActivityReport,
+  hasActivity,
   type StripeEventLike,
   type ActivityReport,
 } from "./activity-report.ts";
@@ -68,4 +69,12 @@ test("report escapes emails and never divides by zero", () => {
   for (const tag of body.match(/<(td|li|p|ul|table)\b[^>]*>/g) ?? []) {
     assert.match(tag, /color:/, `missing color on ${tag}`);
   }
+});
+
+test("hasActivity is false only when nothing happened", () => {
+  const empty = summarizeStripeEvents([]);
+  assert.equal(hasActivity({ signups: { total: 0, onboarded: 0 }, stripe: empty }), false);
+  assert.equal(hasActivity({ signups: { total: 1, onboarded: 0 }, stripe: empty }), true);
+  const failed = summarizeStripeEvents([ev("invoice.payment_failed", { customer: "cus_f" })]);
+  assert.equal(hasActivity({ signups: { total: 0, onboarded: 0 }, stripe: failed }), true);
 });
